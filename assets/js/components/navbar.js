@@ -23,7 +23,7 @@ class Navbar extends Component {
     }
 
     displayAnonymousView = () => {
-        let Anonymous = () => <li><Link to="/login">Se connnnnecter</Link></li>
+        let Anonymous = () => <li><Link to="/login">Se connecter</Link></li>
         return <Anonymous />
     }
 
