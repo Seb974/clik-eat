@@ -58,7 +58,7 @@ class ProductList extends React.Component
                     <div className="card-img">
                         <Link to={ "/show/" + props.details.id }>
                             { 
-                                (props.details.picture !== null && props.details.picture !== "") ? <img src={ 'uploads/pictures/' + props.details.picture.b64 } className="card-img-top" alt={ props.details.picture.b64 }/> : ""
+                                typeof props.details.picture === 'undefined' ? '' : (props.details.picture !== null && props.details.picture !== "") ? <img src={ 'uploads/pictures/' + props.details.picture.b64 } className="card-img-top" alt={ props.details.picture.b64 }/> : ""
                             }
                         </Link>
                     </div>
