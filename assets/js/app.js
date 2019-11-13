@@ -32,7 +32,7 @@ class App extends React.Component
     };
 
     componentDidMount = () => {
-        const url = new URL('http://localhost:3000/hub');
+        const url = new URL('https:clikeat.re:3000/.well-known/mercure');
         url.searchParams.append('topic', 'pong/ping');
 
         const eventSource = new EventSource(url);

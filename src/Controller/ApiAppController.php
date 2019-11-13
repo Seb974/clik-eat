@@ -40,7 +40,7 @@ class ApiAppController extends AbstractController
         $response = $serializer->serializeEntity($article, 'variant');
         $update = new Update("pong/ping", $response);
         $bus->dispatch($update);
-        return  JsonResponse::fromJsonString($response);
+	return JsonResponse::fromJsonString($response);
     }
 
 
