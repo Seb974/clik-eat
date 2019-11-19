@@ -269,9 +269,10 @@ class Checkout extends Component {
                                 <span>Total (TTC)</span>
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
-                            {/* <a href="{ payment_url }"> */}
+
+                           {/* <a href="{ payment_url }"> */}
                                 <button className="btn btn-primary btn-lg btn-block" type="submit" onClick={ this.onPay }>PAYER</button>
-                            {/* </a> */}
+                           {/* </a> */}
                         </ul>
                     </div>
 
