@@ -145,6 +145,161 @@ class PaiementController extends AbstractController
 		]);
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * checkout
+     * @Route("/pay/{id}", name="checkout", , methods={"POST"})
+	 * @param  integer $id corresponding to the id of the current user
+     * @param  App\Service\Cart\CartService $cartService
+     * @param  Doctrine\ORM\EntityManagerInterface $em
+	 *
+	 * @return void
+     */
+    public function paymentProcess(Request $request, $id, CartService $cartService, EntityManagerInterface $em )
+    {
+		if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+            $data = json_decode($request->getContent(), true);
+            $request->request->replace(is_array($data) ? $data : array());
+		}
+		
+		Payplug\Payplug::setSecretKey( $_ENV['PAYPLUG_KEY'] );
+		$user    = $em->getRepository( User::class )->find($request->request->get("id"));
+		$cart    = $user->getCart();
+		$uniq_id = uniqid( $user->getEmail() );
+
+		$payment = \Payplug\Payment::create(array(
+			'amount'   => $cart->getTotalToPay() * 100,
+			'currency' => 'EUR',
+			'billing'        => array(
+				'title'      => 'mr'               ,
+				'first_name' => 'John'             ,
+				'last_name'  => 'Watson'           ,
+				'email'      => $user->getEmail()  ,
+				'address1'   => '221B Baker Street',
+				'postcode'   => 'NW16XE'           ,
+				'city'       => 'London'           ,
+				'country'    => 'FR'               ,
+				'language'   => 'fr'
+			),
+
+			'shipping'          => array(
+				'title'         => 'mr'               ,
+				'first_name'    => 'John'             ,
+				'last_name'     => 'Watson'           ,
+				'email'         => $user->getEmail()  ,
+				'address1'      => '221B Baker Street',
+				'postcode'      => 'NW16XE'           ,
+				'city'          => 'London'           ,
+				'country'       => 'FR'               ,
+				'language'      => 'fr'               ,
+				'delivery_type' => 'BILLING'
+			),
+
+			'hosted_payment' => array(
+				'return_url' => "{$_ENV['SERVER_URL']}/payment/success/{$id}?id={$uniq_id}",
+				'cancel_url' => "{$_ENV['SERVER_URL']}/payment/fail?id={$uniq_id}"
+		),
+
+			// 'notification_url' => "{$_ENV['SERVER_URL']}/payment/notif?id={$uniq_id}"
+		));
+
+		$cartItems = $user->getCart()->getCartItems();
+		foreach ( $cartItems as $key => $value ) {
+			if ( $value->getIsPaid() === false ) {
+				$OneCartItem = $value;
+			}
+		}
+
+		$payment_url     = $payment->hosted_payment->payment_url;
+		$payment_id      = $payment->id;
+		$itemOrder_exist = $em->getRepository( Orders::class )->findOneBy( [ 'cartItem' => $OneCartItem ] );
+		$count           = 0;
+
+		if ( ! $itemOrder_exist ) {
+			$cartService->convertCartToOrders( $user->getCart(), $uniq_id, $payment_id, 'payplug' );
+		} else {
+			//! Must resolve this to not have 2 existing payment at same time during 15mn
+			// Abort old payment
+			$old_payplug_id = $itemOrder_exist->getPaymentId();
+			if ( 1 === 3 ) {
+				$payment = \Payplug\Payment::abort( $old_payplug_id );
+			}
+
+			// Update Internal & External ID of new Payment
+			foreach ( $user->getCart()->getCartItems() as $key => $value ) {
+				if ( ! $value->getIsPaid() ) {
+					$item = $em->getRepository( Orders::class )->findOneBy( [ 'cartItem' => $value ] );
+					$item->setPaymentId( $payment_id );
+					$item->setInternalId( $uniq_id );
+					$em->flush();
+					$count++;
+				}
+			}
+		};
+
+		$metas['billing1'    ]["field"  ] = "";
+		$metas['billing2'    ]["field"  ] = "";
+		$metas['billing_city']["zipCode"] = "";
+		$metas['billing_city']["name"   ] = "";
+
+		$billing_city = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_city'  ] );
+		if ( $billing_city ) {
+			$metas['billing1'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_1' ] );
+			$metas['billing2'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_2' ] );
+			$metas['billing_city'  ] = $em->getRepository( City    ::class )->find( $billing_city );
+		}
+
+		$metas['phone'] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'phone_number' ] );
+		if ( ! $metas['phone'] ) {
+			$metas['phone']["field"] = "";
+		}
+
+		$api['ALGOLIA_APPID']  = $_ENV['ALGOLIA_APPID' ];
+		$api['ALGOLIA_APIKEY'] = $_ENV['ALGOLIA_APIKEY'];
+
+        return $this->render('paiement/checkout.html.twig', [
+			'payment_url' => $payment_url,
+			'payment'     => $payment,
+			'cart'		  => $user->getCart(),
+			'user' 		  => $user,
+			'count'		  => $count,
+			'metas'       => $metas,
+			'api'         => $api
+		]);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * payement_success
      * @Route("/payment/success/{id}", name="payment_success")
