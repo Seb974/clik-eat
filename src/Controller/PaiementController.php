@@ -145,7 +145,6 @@ class PaiementController extends AbstractController
 		]);
 	}
 
-
     /**
      * checkout
      * @Route("/pay", name="pay", methods={"POST"})
@@ -164,9 +163,6 @@ class PaiementController extends AbstractController
 
 		dd($request->request);
     }
-
-
-
 
 	/**
 	 * payement_success
