@@ -145,6 +145,29 @@ class PaiementController extends AbstractController
 		]);
 	}
 
+
+    /**
+     * checkout
+     * @Route("/pay", name="pay", methods={"POST"})
+     * @param  integer $id corresponding to the id of the current user
+     * @param  App\Service\Cart\CartService $cartService
+     * @param  Doctrine\ORM\EntityManagerInterface $em
+     *
+     * @return void
+     */
+    public function paymentProcess(Request $request, CartService $cartService, EntityManagerInterface $em )
+    {
+		if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+                    $data = json_decode($request->getContent(), true);
+                    $request->request->replace(is_array($data) ? $data : array());
+		}
+
+		dd($request->request);
+    }
+
+
+
+
 	/**
 	 * payement_success
      * @Route("/payment/success/{id}", name="payment_success")

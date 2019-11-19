@@ -191,7 +191,7 @@ class Checkout extends Component {
           });
     };
 
-    onSubmit = e => {
+    onMetadataSubmit = e => {
         e.preventDefault();
         let userDetails = { 
             ...this.state,
@@ -202,6 +202,17 @@ class Checkout extends Component {
             cities: [],
         };
         // this.props.updateUser(userDetails);
+    }
+
+    onPay = e => {
+        e.preventDefault();
+        console.log("Paiement");
+        const config = { headers: { 'Content-Type': 'application/json' } };
+        const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
+        axios.post('/pay', body, tokenConfig())
+             .then((res) => {
+                alert('Paid');
+             });
     }
 
     displayItems = () => {
@@ -257,15 +268,15 @@ class Checkout extends Component {
                                 <span>Total (TTC)</span>
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
-                            <a href="{ payment_url }">
-                                <button className="btn btn-primary btn-lg btn-block" type="submit">PAYER</button>
-                            </a>
+                           {/* <a href="{ payment_url }"> */}
+                                <button className="btn btn-primary btn-lg btn-block" type="submit" onClick={ this.onPay }>PAYER</button>
+                           {/* </a> */}
                         </ul>
                     </div>
 
                     {/* Addresses panel */}
                     <div className="col-md-8 order-md-1" id="adresses-panel">
-                        <form className="needs-validation" onSubmit={ this.onSubmit }>
+                        <form className="needs-validation" onSubmit={ this.onMetadataSubmit }>
                             <div className="row">
                                 <div className="row">
                                     {/* <div className="col-md-4 mb-3"></div> */}
