@@ -24,6 +24,7 @@ use Payplug;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PaiementController extends AbstractController
@@ -160,8 +161,7 @@ class PaiementController extends AbstractController
                     $data = json_decode($request->getContent(), true);
                     $request->request->replace(is_array($data) ? $data : array());
 		}
-
-		dd($request->request);
+		return JsonResponse::fromJsonString(json_encode($request->request));
     }
 
 	/**
