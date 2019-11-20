@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
 import PropTypes from 'prop-types';
 import { tokenConfig } from '../helpers/security';
-import { threadId } from 'worker_threads';
+// import { threadId } from 'worker_threads';
 
 class Checkout extends Component {
 
