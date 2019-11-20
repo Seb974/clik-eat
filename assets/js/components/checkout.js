@@ -207,9 +207,9 @@ class Checkout extends Component {
 
     onPay = e => {
         e.preventDefault();
-        console.log("Paiement");
         const config = { headers: { 'Content-Type': 'application/json' } };
         const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
+        console.log(body);
         axios.post('/pay', body, tokenConfig())
              .then((res) => {
                 alert('Paid');

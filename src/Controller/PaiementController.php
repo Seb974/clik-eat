@@ -156,44 +156,43 @@ class PaiementController extends AbstractController
      *
      * @return void
      */
-    public function paymentProcess(Request $request, CartService $cartService, EntityManagerInterface $em )
+    public function paymentProcess( Request $request )
     {
 		if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
-                    $data = json_decode($request->getContent(), true);
-                    $request->request->replace(is_array($data) ? $data : array());
+            $data = json_decode($request->getContent(), true);
+            $request->request->replace(is_array($data) ? $data : array());
 		}
 
 		Payplug\Payplug::setSecretKey( $_ENV['PAYPLUG_KEY'] );
 		$uniq_id = uniqid($request->request->get('email'));
 
 		$payment = \Payplug\Payment::create(array(
-			'amount'   => $request->request->get('totalToPayTTC'),		//$cart->getTotalToPay() * 100, 
+			'amount'   => $request->request->get('totalToPayTTC'),
 			'currency' => 'EUR',
 			'billing'        => array(
 				'title'      => 'mr'               ,
-				'first_name' => $request->request->get('username'),				//'John'             ,
+				'first_name' => $request->request->get('username'),
 				'last_name'  => 'Watson'           ,
-				'email'      => $request->request->get('email'),				//$user->getEmail()  ,
-				'address1'   => $request->request->get('b_address'),			//'221B Baker Street',
-				'postcode'   => $request->request->get('b_zipCode'),			//'NW16XE'           ,
-				'city'       => $request->request->get('b_city'),				//'London'           ,
+				'email'      => $request->request->get('email'),
+				'address1'   => $request->request->get('b_address'),
+				'postcode'   => $request->request->get('b_zipCode'),
+				'city'       => $request->request->get('b_city'),
 				'country'    => 'FR'               ,
 				'language'   => 'fr'
 			),
 			'shipping'          => array(
 				'title'         => 'mr'               ,
-				'first_name'    => $request->request->get('username'),			//'John'             ,
+				'first_name'    => $request->request->get('username'),
 				'last_name'     => 'Watson'           ,
-				'email'         => $request->request->get('email'),				//$user->getEmail()  ,
-				'address1'      => $request->request->get('d_address'),			//'221B Baker Street',
-				'postcode'      => $request->request->get('d_zipCode'),			//'NW16XE'           ,
-				'city'          => $request->request->get('d_city'),			//'London'           ,
+				'email'         => $request->request->get('email'),
+				'address1'      => $request->request->get('d_address'),
+				'postcode'      => $request->request->get('d_zipCode'),
+				'city'          => $request->request->get('d_city'),
 				'country'       => 'FR'               ,
 				'language'      => 'fr'               ,
 				'delivery_type' => 'BILLING'
 			),
 			'hosted_payment' => array(
-				// 'return_url' => "{$_ENV['SERVER_URL']}/payment/success/{$id}?id={$uniq_id}",
 				'return_url' => "{$_ENV['SERVER_URL']}/payment/success?id={$uniq_id}",
 				'cancel_url' => "{$_ENV['SERVER_URL']}/payment/fail?id={$uniq_id}"
 			),
@@ -204,38 +203,6 @@ class PaiementController extends AbstractController
 			$count           = 0;
 
 			return new RedirectResponse($payment_url);
-
-			// $metas['billing1'    ]["field"  ] = "";
-			// $metas['billing2'    ]["field"  ] = "";
-			// $metas['billing_city']["zipCode"] = "";
-			// $metas['billing_city']["name"   ] = "";
-
-			// $billing_city = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_city'  ] );
-			// if ( $billing_city ) {
-			// 	$metas['billing1'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_1' ] );
-			// 	$metas['billing2'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_2' ] );
-			// 	$metas['billing_city'  ] = $em->getRepository( City    ::class )->find( $billing_city );
-			// }
-
-			// $metas['phone'] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'phone_number' ] );
-			// if ( ! $metas['phone'] ) {
-			// 	$metas['phone']["field"] = "";
-			// }
-
-			// $api['ALGOLIA_APPID']  = $_ENV['ALGOLIA_APPID' ];
-			// $api['ALGOLIA_APIKEY'] = $_ENV['ALGOLIA_APIKEY'];
-
-			// return $this->render('paiement/checkout.html.twig', [
-			// 	'payment_url' => $payment_url,
-			// 	'payment'     => $payment,
-			// 	'cart'		  => $user->getCart(),
-			// 	'user' 		  => $user,
-			// 	'count'		  => $count,
-			// 	'metas'       => $metas,
-			// 	'api'         => $api
-			// ]);
-
-			// ));
     }
 
 	/**
@@ -246,7 +213,6 @@ class PaiementController extends AbstractController
 	 * @param  App\Service\Cart\CartService $cartService
 	 * @param  App\Service\Anonymize\AnonymizeService $anonymizeService
 	 * @param  Doctrine\ORM\EntityManagerInterface $em
-	 *
 	 * @return Symfony\Component\HttpFoundation\Response
      */
 
@@ -276,7 +242,6 @@ class PaiementController extends AbstractController
      * @Route("/payment/fail", name="payment_fail")
 	 * @param  Symfony\Component\HttpFoundation\Request $request
 	 * @param  Doctrine\ORM\EntityManagerInterface $em
-	 *
 	 * @return Symfony\Component\HttpFoundation\Response
      */
 	public function payement_fail( Request $request, EntityManagerInterface $em ): Response {
@@ -295,7 +260,6 @@ class PaiementController extends AbstractController
 	 * payement_notif
      * @Route("/payment/notif", name="payment_notif")
 	 * @param  Symfony\Component\HttpFoundation\Request $request
-	 *
 	 * @return Symfony\Component\HttpFoundation\Response
      */
 	public function payement_notif( Request $request ): Response {
