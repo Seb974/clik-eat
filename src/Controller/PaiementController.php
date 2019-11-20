@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PaiementController extends AbstractController
@@ -161,7 +162,80 @@ class PaiementController extends AbstractController
                     $data = json_decode($request->getContent(), true);
                     $request->request->replace(is_array($data) ? $data : array());
 		}
-		return JsonResponse::fromJsonString(json_encode($request->request));
+
+		Payplug\Payplug::setSecretKey( $_ENV['PAYPLUG_KEY'] );
+		$uniq_id = uniqid($request->request->get('email'));
+
+		$payment = \Payplug\Payment::create(array(
+			'amount'   => $request->request->get('totalToPayTTC'),		//$cart->getTotalToPay() * 100, 
+			'currency' => 'EUR',
+			'billing'        => array(
+				'title'      => 'mr'               ,
+				'first_name' => $request->request->get('username'),				//'John'             ,
+				'last_name'  => 'Watson'           ,
+				'email'      => $request->request->get('email'),				//$user->getEmail()  ,
+				'address1'   => $request->request->get('b_address'),			//'221B Baker Street',
+				'postcode'   => $request->request->get('b_zipCode'),			//'NW16XE'           ,
+				'city'       => $request->request->get('b_city'),				//'London'           ,
+				'country'    => 'FR'               ,
+				'language'   => 'fr'
+			),
+			'shipping'          => array(
+				'title'         => 'mr'               ,
+				'first_name'    => $request->request->get('username'),			//'John'             ,
+				'last_name'     => 'Watson'           ,
+				'email'         => $request->request->get('email'),				//$user->getEmail()  ,
+				'address1'      => $request->request->get('d_address'),			//'221B Baker Street',
+				'postcode'      => $request->request->get('d_zipCode'),			//'NW16XE'           ,
+				'city'          => $request->request->get('d_city'),			//'London'           ,
+				'country'       => 'FR'               ,
+				'language'      => 'fr'               ,
+				'delivery_type' => 'BILLING'
+			),
+			'hosted_payment' => array(
+				// 'return_url' => "{$_ENV['SERVER_URL']}/payment/success/{$id}?id={$uniq_id}",
+				'return_url' => "{$_ENV['SERVER_URL']}/payment/success?id={$uniq_id}",
+				'cancel_url' => "{$_ENV['SERVER_URL']}/payment/fail?id={$uniq_id}"
+			),
+			// 'notification_url' => "{$_ENV['SERVER_URL']}/payment/notif?id={$uniq_id}"
+		));
+			$payment_url     = $payment->hosted_payment->payment_url;
+			$payment_id      = $payment->id;
+			$count           = 0;
+
+			return new RedirectResponse($payment_url);
+
+			// $metas['billing1'    ]["field"  ] = "";
+			// $metas['billing2'    ]["field"  ] = "";
+			// $metas['billing_city']["zipCode"] = "";
+			// $metas['billing_city']["name"   ] = "";
+
+			// $billing_city = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_city'  ] );
+			// if ( $billing_city ) {
+			// 	$metas['billing1'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_1' ] );
+			// 	$metas['billing2'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_2' ] );
+			// 	$metas['billing_city'  ] = $em->getRepository( City    ::class )->find( $billing_city );
+			// }
+
+			// $metas['phone'] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'phone_number' ] );
+			// if ( ! $metas['phone'] ) {
+			// 	$metas['phone']["field"] = "";
+			// }
+
+			// $api['ALGOLIA_APPID']  = $_ENV['ALGOLIA_APPID' ];
+			// $api['ALGOLIA_APIKEY'] = $_ENV['ALGOLIA_APIKEY'];
+
+			// return $this->render('paiement/checkout.html.twig', [
+			// 	'payment_url' => $payment_url,
+			// 	'payment'     => $payment,
+			// 	'cart'		  => $user->getCart(),
+			// 	'user' 		  => $user,
+			// 	'count'		  => $count,
+			// 	'metas'       => $metas,
+			// 	'api'         => $api
+			// ]);
+
+			// ));
     }
 
 	/**
@@ -176,23 +250,24 @@ class PaiementController extends AbstractController
 	 * @return Symfony\Component\HttpFoundation\Response
      */
 
-	public function payement_success($id, Request $request, CartService $cartService, AnonymizeService $anonymizeService, EntityManagerInterface $em ): Response {
+	// public function payement_success($id, Request $request, CartService $cartService, AnonymizeService $anonymizeService, EntityManagerInterface $em ): Response {
+		public function payement_success(Request $request, CartService $cartService, AnonymizeService $anonymizeService, EntityManagerInterface $em ): Response {
 
-		$uniq_id = $request->query->get('id');
-		$orders  = $em->getRepository( Orders::class )->findBy( [ 'internalId' => $uniq_id ] );
-		$user    = $em->getRepository( User::class   )->find( $id );
-		$cart    = $user->getCart();
+		// $uniq_id = $request->query->get('id');
+		// $orders  = $em->getRepository( Orders::class )->findBy( [ 'internalId' => $uniq_id ] );
+		// $user    = $em->getRepository( User::class   )->find( $id );
+		// $cart    = $user->getCart();
 
-		foreach ( $orders as $key => $order ) {
-			$order->setOrderStatus('ON_PREPARE');
-			$order->setPayDateTime( new \DateTime() );
-			$em->flush();
-		}
-		$cartService->decreaseStock( $cart );
-		$cartService->initCart( $cart );
-		if (in_array('ROLE_GUEST', $user->getRoles())) {
-			$anonymizeService->anonymize($user);
-		}
+		// foreach ( $orders as $key => $order ) {
+		// 	$order->setOrderStatus('ON_PREPARE');
+		// 	$order->setPayDateTime( new \DateTime() );
+		// 	$em->flush();
+		// }
+		// $cartService->decreaseStock( $cart );
+		// $cartService->initCart( $cart );
+		// if (in_array('ROLE_GUEST', $user->getRoles())) {
+		// 	$anonymizeService->anonymize($user);
+		// }
 		return $this->redirectToRoute('index');
 	}
 
