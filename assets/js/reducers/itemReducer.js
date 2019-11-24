@@ -5,6 +5,7 @@ import {
     ADD_ITEM,
     DELETE_ITEM,
     UPDATE_ITEM,
+    DELETE_CART,
     ITEMS_LOADING
   } from '../actions/types';
   
@@ -63,7 +64,15 @@ import {
             totalTax: getTotalTax(state.items),
             totalToPayHT: getTotalHT(state.items)
           };
-
+      case DELETE_CART:
+          localStorage.removeItem('cart');
+          return {
+            items: [],
+            totalToPayTTC: 0,
+            totalToPayHT: 0,
+            totalTax: 0,
+            loading: false
+          };
       case ITEMS_LOADING:
         return {
           ...state,

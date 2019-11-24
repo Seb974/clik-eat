@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, ITEMS_LOADING, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK } from './types';
+import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, DELETE_CART, ITEMS_LOADING, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK } from './types';
 import { tokenConfig } from './authActions';
 import { returnErrors } from './errorActions';
 import userExtractor from '../helpers/userExtractor';
@@ -30,7 +30,7 @@ export const addItem = item => (dispatch, getState) => {
   axios.post('/app/ping', body, config)
        .catch(err => {
         dispatch(
-          returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')       
+          returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
         )
         });
   // FIN SUPPLEMENT MERCURE
@@ -61,7 +61,7 @@ export const deleteItem = item => (dispatch, getState) => {
   axios.post('/app/ping', body, config)
          .catch(err => {
           dispatch(
-            returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')       
+            returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
           )
           });
   // FIN SUPPLEMENT MERCURE
@@ -79,8 +79,6 @@ export const deleteItem = item => (dispatch, getState) => {
     }
   })
 };
-
-
 
 export const updateItem = (item, qty) => (dispatch, getState) => {
   const action = (qty > 0) ? DECREASE_PRODUCT_STOCK : INCREASE_PRODUCT_STOCK;
@@ -100,14 +98,18 @@ export const updateItem = (item, qty) => (dispatch, getState) => {
   });
 }
 
-
-
-
 export const setItemsLoading = () => {
   return {
     type: ITEMS_LOADING
   };
 };
+
+export const deleteCart = () => (dispatch, getState) => {
+  dispatch({
+    type: DELETE_CART,
+    payload: ''
+  });
+}
 
 // axios
   //   .delete(`/api/items/${id}`, tokenConfig(getState))

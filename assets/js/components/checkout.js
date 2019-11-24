@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
 import PropTypes from 'prop-types';
 import { tokenConfig } from '../helpers/security';
-// import { threadId } from 'worker_threads';
 
 class Checkout extends Component {
 
@@ -33,7 +32,9 @@ class Checkout extends Component {
         identicalBillingAddress: true,
         d_city: '',
         b_city: '',
-        cities: []
+        cities: [],
+        totalCost: this.props.item === null ? '' : this.props.item.totalToPayTTC,
+        paymentLink: '#',
     }
 
     static propTypes = {
@@ -48,6 +49,9 @@ class Checkout extends Component {
         else 
             this.setState( { identicalBillingAddress: false } );
 
+        if (this.state.email !== '') {
+            this.onInformationsReady();
+        }
         axios.get('/api/cities', tokenConfig())
              .then((res) => {
                 this.setState({ cities : res.data['hydra:member'] });
@@ -168,9 +172,25 @@ class Checkout extends Component {
         }
     }
 
+    componentDidUpdate = () => {
+        if (this.props.item.totalToPayTTC !== this.state.totalCost) {
+            this.setState({ totalCost: this.props.item.totalToPayTTC });
+            this.onInformationsReady();
+        }
+    }
+
     onChange = e => {
         this.setState({ [e.target.name]: e.target.value });
     };
+
+    handleUpdateEmail = e => {
+        e.preventDefault();
+        if (e.target.name === 'email' && e.target.value !== '') {
+            let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (re.test(String(e.target.value).toLowerCase()))
+                this.onInformationsReady();
+        }
+    }
 
     onZipCodeChange = e => {
         this.setState({ [e.target.name]: e.target.value });
@@ -186,7 +206,7 @@ class Checkout extends Component {
         cityInput.textContent = (typeof selectedCity === 'undefined') ? errorMsg : ((cityId === 'd_city' && selectedCity.isDeliverable === false) ? notDeliverableMsg : selectedCity.name);
     };
 
-    handleBillingAddress = (e) => {
+    handleBillingAddress = e => {
         this.setState({
             identicalBillingAddress: !this.state.identicalBillingAddress,
           });
@@ -205,15 +225,13 @@ class Checkout extends Component {
         // this.props.updateUser(userDetails);
     }
 
-    onPay = e => {
-        e.preventDefault();
-        const config = { headers: { 'Content-Type': 'application/json' } };
+    onInformationsReady = () => {
         const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
-        console.log(body);
         axios.post('/pay', body, tokenConfig())
              .then((res) => {
-                alert('Paid');
-                console.log(res);
+                const url = JSON.parse(res.data);
+                this.setState({paymentLink: url});
+                
              });
     }
 
@@ -271,9 +289,9 @@ class Checkout extends Component {
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
 
-                           {/* <a href="{ payment_url }"> */}
-                                <button className="btn btn-primary btn-lg btn-block" type="submit" onClick={ this.onPay }>PAYER</button>
-                           {/* </a> */}
+                           <a href={ this.state.paymentLink }>
+                                <button className="btn btn-primary btn-lg btn-block">PAYER</button>
+                           </a>
                         </ul>
                     </div>
 
@@ -294,7 +312,7 @@ class Checkout extends Component {
                                         </div>
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="email">Email</label>
-                                            <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange } required/>
+                                            <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange } onBlur={ this.handleUpdateEmail } required/>
                                             <div className="invalid-feedback">
                                                 Merci de renseigner un email afin d'être informé de étapes de votre commande.
                                             </div>

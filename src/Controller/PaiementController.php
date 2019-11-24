@@ -162,39 +162,50 @@ class PaiementController extends AbstractController
             $data = json_decode($request->getContent(), true);
             $request->request->replace(is_array($data) ? $data : array());
 		}
+		$dataUser = $request->request->get('dataUser');
+		$dataItems = $request->request->get('dataItems');
+		$d_city = array_values(array_filter($dataUser['cities'], function($value, $key) use ($dataUser) {
+			return $value['zipCode'] == $dataUser['d_zipCode'];
+		}, ARRAY_FILTER_USE_BOTH));
+		if ($dataUser['identicalBillingAddress']) {
+			$b_city = array_values(array_filter($dataUser['cities'], function($value, $key) use ($dataUser) {
+				return $value['zipCode'] == $dataUser['d_zipCode'];
+			}, ARRAY_FILTER_USE_BOTH));
+		}
 
 		Payplug\Payplug::setSecretKey( $_ENV['PAYPLUG_KEY'] );
 		$uniq_id = uniqid($request->request->get('email'));
 
 		$payment = \Payplug\Payment::create(array(
-			'amount'   => $request->request->get('totalToPayTTC'),
+			'amount'   => $dataItems['totalToPayTTC'] * 100,
 			'currency' => 'EUR',
 			'billing'        => array(
 				'title'      => 'mr'               ,
-				'first_name' => $request->request->get('username'),
+				'first_name' => 'John'             ,
 				'last_name'  => 'Watson'           ,
-				'email'      => $request->request->get('email'),
-				'address1'   => $request->request->get('b_address'),
-				'postcode'   => $request->request->get('b_zipCode'),
-				'city'       => $request->request->get('b_city'),
+				'email'      => $dataUser['email'] ,
+				'address1'   => '221B Baker Street',
+				'postcode'   => 'NW16XE'           ,
+				'city'       => 'London'           ,
 				'country'    => 'FR'               ,
 				'language'   => 'fr'
 			),
+
 			'shipping'          => array(
 				'title'         => 'mr'               ,
-				'first_name'    => $request->request->get('username'),
+				'first_name'    => 'John'             ,
 				'last_name'     => 'Watson'           ,
-				'email'         => $request->request->get('email'),
-				'address1'      => $request->request->get('d_address'),
-				'postcode'      => $request->request->get('d_zipCode'),
-				'city'          => $request->request->get('d_city'),
+				'email'         => $dataUser['email'] ,
+				'address1'      => '221B Baker Street',
+				'postcode'      => 'NW16XE'           ,
+				'city'          => 'London'           ,
 				'country'       => 'FR'               ,
 				'language'      => 'fr'               ,
 				'delivery_type' => 'BILLING'
 			),
 			'hosted_payment' => array(
-				'return_url' => "{$_ENV['SERVER_URL']}/payment/success?id={$uniq_id}",
-				'cancel_url' => "{$_ENV['SERVER_URL']}/payment/fail?id={$uniq_id}"
+				'return_url' => $_ENV['SERVER_URL'] . "/payment/success?id=" . $uniq_id,
+				'cancel_url' => $_ENV['SERVER_URL'] . "/payment/fail?id=" . $uniq_id
 			),
 			// 'notification_url' => "{$_ENV['SERVER_URL']}/payment/notif?id={$uniq_id}"
 		));
@@ -202,12 +213,13 @@ class PaiementController extends AbstractController
 			$payment_id      = $payment->id;
 			$count           = 0;
 
-			return new RedirectResponse($payment_url);
+			$response = json_encode($payment_url);
+			return new JsonResponse($response);
     }
 
 	/**
 	 * payement_success
-     * @Route("/payment/success/{id}", name="payment_success")
+     * @Route("/payment/success", name="payment_success")
 	 * @param  integer $id corresponding to the id of the current user
 	 * @param  Symfony\Component\HttpFoundation\Request $request
 	 * @param  App\Service\Cart\CartService $cartService
@@ -215,26 +227,8 @@ class PaiementController extends AbstractController
 	 * @param  Doctrine\ORM\EntityManagerInterface $em
 	 * @return Symfony\Component\HttpFoundation\Response
      */
-
-	// public function payement_success($id, Request $request, CartService $cartService, AnonymizeService $anonymizeService, EntityManagerInterface $em ): Response {
-		public function payement_success(Request $request, CartService $cartService, AnonymizeService $anonymizeService, EntityManagerInterface $em ): Response {
-
-		// $uniq_id = $request->query->get('id');
-		// $orders  = $em->getRepository( Orders::class )->findBy( [ 'internalId' => $uniq_id ] );
-		// $user    = $em->getRepository( User::class   )->find( $id );
-		// $cart    = $user->getCart();
-
-		// foreach ( $orders as $key => $order ) {
-		// 	$order->setOrderStatus('ON_PREPARE');
-		// 	$order->setPayDateTime( new \DateTime() );
-		// 	$em->flush();
-		// }
-		// $cartService->decreaseStock( $cart );
-		// $cartService->initCart( $cart );
-		// if (in_array('ROLE_GUEST', $user->getRoles())) {
-		// 	$anonymizeService->anonymize($user);
-		// }
-		return $this->redirectToRoute('index');
+	public function payement_success(): Response {
+		return $this->redirectToRoute('index', ['paymentStatus' => 'success']);
 	}
 
 	/**
@@ -244,16 +238,8 @@ class PaiementController extends AbstractController
 	 * @param  Doctrine\ORM\EntityManagerInterface $em
 	 * @return Symfony\Component\HttpFoundation\Response
      */
-	public function payement_fail( Request $request, EntityManagerInterface $em ): Response {
-		$uniq_id = $request->query->get('id');
-		$orders  = $em->getRepository( Orders::class )->findBy( [ 'internalId' => $uniq_id ] );
-
-		foreach ( $orders as $key => $order ) {
-			$order->setOrderStatus('FAILED');
-			$em->flush();
-		}
-
-		return $this->redirectToRoute('index');
+	public function payement_fail(): Response {
+		return $this->redirectToRoute('index', ['paymentStatus' => 'fail']);
 	}
 
 	/**
