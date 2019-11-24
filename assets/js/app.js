@@ -10,6 +10,7 @@ import ProductDetails from './components/productDetails';
 import CartList from './components/cartList';
 import Checkout from './components/checkout';
 import Login from './components/login';
+import Register from './components/register';
 import Profile from './components/profile';
 import store from './store';
 import { loadUser } from './actions/authActions';
@@ -64,6 +65,7 @@ class App extends React.Component
                                     <Route path='/' exact component={ProductList} />
                                     <Route path='/show/:id' component={ProductDetails} />
                                     <Route path='/login' component={Login} />
+                                    <Route path='/register' component={Register} />
                                     <Route path='/cart' component={CartList} />
                                     <Route path='/checkout' component={Checkout} />
                                     <Route path='/account' component={Profile} />

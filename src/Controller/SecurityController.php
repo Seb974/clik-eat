@@ -22,6 +22,7 @@ use App\Repository\UserRepository;
 use App\Security\AppAuthenticator;
 use App\Service\Cart\CartService;
 use App\Service\Metadata\MetadataService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,6 +35,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
+// use "Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent"
+
 class SecurityController extends AbstractController
 {
 
@@ -44,26 +48,34 @@ class SecurityController extends AbstractController
      *
      * @return void
      */
-    public function registerApi(Request $request, UserPasswordEncoderInterface $encoder)
+    public function registerApi(Request $request, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer, JWTTokenManagerInterface $jwtManager)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $email = $request->request->get('username');
+        if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+            $data = json_decode($request->getContent(), true);
+            $request->request->replace(is_array($data) ? $data : array());
+        }
+        $username = $request->request->get('username');
+        $email = $request->request->get('email');
         $password = $request->request->get('password');
         $roles = $request->request->get('roles');
 
         if (!$roles) {
-            $roles = json_encode(["ROLE_USER"]);
+            $roles = ["ROLE_USER"];
         }
 
         $user = new User();
+        $user->setUsername($username);
         $user->setEmail($email);
         $user->setPassword($encoder->encodePassword($user, $password));
         $user->setRoles(($roles));
+        $user->setIsBanned(false);
+        $em = $this->getDoctrine()->getManager();
         $em->persist($user);
         $em->flush();
 
-        return new Response(sprintf('User %s successfully created', $user->getUsername()));
+        // return new Response(sprintf('User %s successfully created', $user->getUsername()));
+        $token = $jwtManager->create($user);
+        return JsonResponse::fromJsonString($serializer->serialize(['token' => $token], 'json'));
     }
 
     /**

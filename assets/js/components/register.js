@@ -1,17 +1,19 @@
 import React from 'react';
-import {Alert} from 'reactstrap';
+import { Alert } from 'reactstrap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { login } from '../actions/authActions';
+import { register } from '../actions/authActions';
 import { clearErrors } from '../actions/errorActions';
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
-class Login extends React.Component 
+class Register extends React.Component 
 {
     state = {
+        username: '',
         email: '',
         password: '',
+        confirmPassword: '',
         msg: null
       };
     
@@ -19,21 +21,39 @@ class Login extends React.Component
         isAuthenticated: PropTypes.bool,
         user: PropTypes.object,
         error: PropTypes.object.isRequired,
-        login: PropTypes.func.isRequired,
+        register: PropTypes.func.isRequired,
         clearErrors: PropTypes.func.isRequired
     };
 
+    componentDidUpdate = () => {
+        if (this.state.msg !== '') {
+            this.setState({msg: ''});
+        }
+    }
+
     onChange = e => {
         this.setState({ [e.target.name]: e.target.value });
-      };
+    };
     
     handleLogin = e => {
         e.preventDefault();
-        const { email, password } = this.state;
-        const user = { email, password};
-        this.setState({email: '', password: ''});
-        this.props.login(user);
-      };
+        const { username, email, password, confirmPassword } = this.state;
+        if ( password === confirmPassword ) {
+            const user = { username, email, password };
+            console.log(user);
+            this.setState({
+                username: '', 
+                email: '', 
+                password: '', 
+                confirmPassword: '',
+                msg: ''
+            });
+            this.props.register(user);
+        }
+        else {
+            this.setState({msg: 'Les mots de passes entrés ne sont pas identiques'});
+        }
+    };
 
     render() {
         if (!this.props.isAuthenticated) {
@@ -43,8 +63,9 @@ class Login extends React.Component
                         <div className="col-12 col-sm-8 col-md-4 mx-auto">
                             <div className="card m-b-0">
                                 <div className="card-header">
-                                    <h4 className="card-title">
-                                        <i className="fa fa-sign-in"></i>Se connecter
+                                    <h4 class="card-title">
+                                        <i class="fa fa-user-plus"></i>
+                                        Créer un compte utilisateur
                                     </h4>
                                 </div>
                                 <div className="card-block">
@@ -59,28 +80,35 @@ class Login extends React.Component
                                                 <a href="{{ path('logout') }}"> Logout</a>
                                             </div>
                                         }
-    
                                         <div className="form-group input-icon-left m-b-10">
                                             <i className="fa fa-user"></i>
-                                            <label className="sr-only">Email</label>
-                                            <input type="email" name="email" id="inputEmail" className="form-control" placeholder="Email" required autoFocus value={this.state.email} onChange={this.onChange}/>
+                                            <label className="sr-only">Pseudo</label>
+                                            <input type="text" name="username" id="inputUsername" className="form-control" placeholder="Pseudo" required autoFocus value={this.state.username} onChange={this.onChange}/>
                                         </div>
-    
-                                        <div className="form-group input-icon-left m-b-15">
+                                        <div className="form-group input-icon-left m-b-10">
+                                            <i className="fa fa-envelope"></i>
+                                            <label className="sr-only">Email</label>
+                                            <input type="email" name="email" id="inputEmail" className="form-control" placeholder="Email" required value={this.state.email} onChange={this.onChange}/>
+                                        </div>
+
+                                        <div className="form-group input-icon-left m-b-10">
                                             <i className="fa fa-lock"></i>
-                                            <label className="sr-only">Password</label>
+                                            <label className="sr-only">Mot de passe</label>
                                             <input type="password" name="password" id="inputPassword" className="form-control" placeholder="Mot de passe" required value={this.state.password} onChange={this.onChange}/>
                                         </div>
-    
-    
-                                        <button className="btn btn-primary btn-block m-t-10" >SE CONNECTER
-                                            <i className="fa fa-sign-in"></i>
-                                        </button>
-    
-                                        <div className="divider">
-                                            <span>Pas encore client ?</span>
+
+                                        <div className="form-group input-icon-left m-b-10">
+                                            <i className="fa fa-lock"></i>
+                                            <label className="sr-only">Confirmation du mot de passe</label>
+                                            <input type="password" name="confirmPassword" id="inputConfirmPassword" className="form-control" placeholder="Confirmation du mot de passe" required value={this.state.confirmPassword} onChange={this.onChange}/>
                                         </div>
-                                        <Link className="btn btn-secondary btn-block" to="/register" role="button">CREER UN COMPTE</Link>
+
+                                        <button type="submit" class="btn btn-primary m-t-10 btn-block">S'ENREGISTRER</button>
+
+                                        <div className="divider">
+                                            <span>Déjà client ?</span>
+                                        </div>
+                                        <Link className="btn btn-secondary btn-block" to="/login" role="button">S'IDENTIFER</Link>
                                     </form>
                                 </div>
                             </div>
@@ -99,14 +127,6 @@ const mapStateToProps = state => ({
     isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user,
     error: state.error
-  });
+});
   
-  export default connect( mapStateToProps, { login, clearErrors })(Login);
-
-{/* <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v4.0&appId=502084787008815&autoLogAppEvents=1"></script>
-<div className="fb-login-button" data-width="" data-size="medium" data-button-type="login_with" data-auto-logout-link="true" data-use-continue-as="true"></div>
-
-<div className="divider">
-    <span>ou</span>
-</div> */}
+export default connect( mapStateToProps, { register, clearErrors })(Register);
