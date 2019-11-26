@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getProducts } from '../actions/productActions';
-import { addItem, deleteCart } from '../actions/itemActions';
+import { getProducts } from '../../actions/productActions';
+import { addItem, deleteCart } from '../../actions/itemActions';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import qs from 'query-string';
@@ -18,17 +18,10 @@ class ProductList extends React.Component
     
     componentDidMount() {
         const params = qs.parse(this.props.location.search);
-        console.log(params.paymentStatus);
         if (typeof params.paymentStatus !== 'undefined' && params.paymentStatus === 'success') {
-            console.log('payment success');
             this.props.deleteCart();
-            this.props.getProducts();
         }
-        else {
-            console.log('No payment action OR payment fail');
-            this.props.getProducts();
-        }
-        
+        this.props.getProducts();
     }
 
     handleClick = (product, variant) => {

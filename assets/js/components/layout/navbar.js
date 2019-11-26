@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Cart from './cart';
+import Cart from '../cart/cart';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { logout } from '../actions/authActions';
+import { logout } from '../../actions/authActions';
 import PropTypes from 'prop-types';
 
 class Navbar extends Component {
@@ -79,8 +79,8 @@ class Navbar extends Component {
                                 <a className="dropdown-item" href="{{ path('tva_index') }}">
                                     <i className="fas fa-calculator"></i>Taxes</a>
                                 <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="{{ path('allergen_index') }}">
-                                    <i className="fas fa-exclamation-triangle"></i>Allergènes</a>
+                                <Link className="dropdown-item" to="/allergens">
+                                    <i className="fas fa-home"></i>Allergènes</Link>
                                 <div className="dropdown-divider"></div>
                             </span>
                             )

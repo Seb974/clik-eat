@@ -1,45 +1,48 @@
-import React, { Component } from 'react';
+import React from 'react';
 import axios from 'axios';
-import Cart from './cart';
-import { Link } from 'react-router-dom';
+import { Alert } from 'reactstrap';
 import { connect } from 'react-redux';
-import { logout } from '../actions/authActions';
 import PropTypes from 'prop-types';
-import { tokenConfig } from '../helpers/security';
+import { login, updateUser } from '../../actions/authActions';
+import { clearErrors } from '../../actions/errorActions';
+import { Redirect } from "react-router-dom"; 
+import { tokenConfig } from '../../helpers/security';
 
-class Checkout extends Component {
-
+class Profile extends React.Component 
+{
     state = {
         user: this.props.user || {},
-        username: this.props.user === null ? '' : this.props.user.username || '',
-        email: this.props.user === null ? '' : this.props.user.email || '',
-        phone: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'phone_number')) === 'undefined' ? 
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'phone_number')).field || '',
-        d_address: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_1')) === 'undefined' ?
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_1')).field || '',
-        d_address2: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_2')) === 'undefined' ?
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_2')).field || '',
-        d_zipCode: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_city')) === 'undefined' ? 
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'delivery_city')).field || '',
-        b_address: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_1')) === 'undefined' ?
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_1')).field || '',
-        b_address2: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_2')) === 'undefined' ?
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_2')).field || '',
-        b_zipCode: this.props.user === null ? '' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_city')) === 'undefined' ? 
-                '' : this.props.user.metadata.find(metadata => (metadata.type === 'billing_city')).field || '',
-        d_gps: this.props.user === null ? '-21.329519,55.471617' : typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_gps')) === 'undefined' ?
-                '-21.329519,55.471617' : this.props.user.metadata.find(metadata => (metadata.type === 'delivery_gps')).field || '-21.329519,55.471617',
+        username: this.props.user.username || '',
+        email: this.props.user.email || '',
+        phone: typeof this.props.user.metadata.find(metadata => (metadata.type === 'phone_number')) === 'undefined' ? '' : 
+                this.props.user.metadata.find(metadata => (metadata.type === 'phone_number')).field || '',
+        d_address: typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_1')) === 'undefined' ? '' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_1')).field || '',
+        d_address2: typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_2')) === 'undefined' ? '' : 
+                this.props.user.metadata.find(metadata => (metadata.type === 'delivery_line_2')).field || '',
+        d_zipCode: typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_city')) === 'undefined' ? '' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'delivery_city')).field || '',
+        b_address: typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_1')) === 'undefined' ? '' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_1')).field || '',
+        b_address2: typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_2')) === 'undefined' ? '' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'billing_line_2')).field || '',
+        b_zipCode: typeof this.props.user.metadata.find(metadata => (metadata.type === 'billing_city')) === 'undefined' ? '' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'billing_city')).field || '',
+        d_gps: typeof this.props.user.metadata.find(metadata => (metadata.type === 'delivery_gps')) === 'undefined' ? '-21.329519,55.471617' :
+                this.props.user.metadata.find(metadata => (metadata.type === 'delivery_gps')).field || '-21.329519,55.471617',
         identicalBillingAddress: true,
         d_city: '',
         b_city: '',
-        cities: [],
-        totalCost: this.props.item === null ? '' : this.props.item.totalToPayTTC,
-        paymentLink: '#',
-    }
-
+        cities: []
+    };
+    
     static propTypes = {
         isAuthenticated: PropTypes.bool,
         user: PropTypes.object,
+        error: PropTypes.object.isRequired,
+        login: PropTypes.func.isRequired,
+        updateUser: PropTypes.func.isRequired,
+        clearErrors: PropTypes.func.isRequired
     };
 
     componentDidMount = () => {
@@ -48,27 +51,22 @@ class Checkout extends Component {
             this.setState( { identicalBillingAddress: true } );
         else 
             this.setState( { identicalBillingAddress: false } );
-
-        if (this.state.email !== '') {
-            this.onInformationsReady();
-        }
+        
         axios.get('/api/cities', tokenConfig())
              .then((res) => {
                 this.setState({ cities : res.data['hydra:member'] });
-                if (this.props.user !== null) {
-                    if (this.props.user.metadata.length > 0) {
-                        let user_d_city = this.props.user.metadata.find(meta => meta.type === 'delivery_city');
-                        let user_b_city = this.props.user.metadata.find(meta => meta.type === 'billing_city');
-                        let d_city = (typeof user_d_city !== 'undefined') ? res.data['hydra:member'].find(city => city.zipCode === parseInt(user_d_city.field)) : '';
-                        let b_city = (user_b_city === user_d_city) ? d_city : ((typeof user_b_city !== 'undefined') ? res.data['hydra:member'].find(city => city.zipCode === parseInt(user_b_city.field)) : '');
-                        this.setState({
-                            d_city: d_city,
-                            b_city: b_city,
-                        });
-                    }
+                if (this.props.user.metadata.length > 0) {
+                    let user_d_city = this.props.user.metadata.find(meta => meta.type === 'delivery_city');
+                    let user_b_city = this.props.user.metadata.find(meta => meta.type === 'billing_city');
+                    let d_city = (typeof user_d_city !== 'undefined') ? res.data['hydra:member'].find(city => city.zipCode === parseInt(user_d_city.field)) : '';
+                    let b_city = (user_b_city === user_d_city) ? d_city : ((typeof user_b_city !== 'undefined') ? res.data['hydra:member'].find(city => city.zipCode === parseInt(user_b_city.field)) : '');
+                    this.setState({
+                        d_city: d_city,
+                        b_city: b_city,
+                    });
                 }
              });
-    }
+    };
 
     initMap = () => {
         let markers = [];
@@ -172,26 +170,6 @@ class Checkout extends Component {
         }
     }
 
-    componentDidUpdate = () => {
-        if (this.props.item.totalToPayTTC !== this.state.totalCost) {
-            this.setState({ totalCost: this.props.item.totalToPayTTC });
-            this.onInformationsReady();
-        }
-    }
-
-    onChange = e => {
-        this.setState({ [e.target.name]: e.target.value });
-    };
-
-    handleUpdateEmail = e => {
-        e.preventDefault();
-        if (e.target.name === 'email' && e.target.value !== '') {
-            let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            if (re.test(String(e.target.value).toLowerCase()))
-                this.onInformationsReady();
-        }
-    }
-
     onZipCodeChange = e => {
         this.setState({ [e.target.name]: e.target.value });
         const errorMsg = "Code postal invalide.";
@@ -206,13 +184,17 @@ class Checkout extends Component {
         cityInput.textContent = (typeof selectedCity === 'undefined') ? errorMsg : ((cityId === 'd_city' && selectedCity.isDeliverable === false) ? notDeliverableMsg : selectedCity.name);
     };
 
-    handleBillingAddress = e => {
+    onChange = e => {
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
+    handleBillingAddress = (e) => {
         this.setState({
             identicalBillingAddress: !this.state.identicalBillingAddress,
           });
     };
 
-    onMetadataSubmit = e => {
+    onSubmit = e => {
         e.preventDefault();
         let userDetails = { 
             ...this.state,
@@ -222,82 +204,16 @@ class Checkout extends Component {
             b_city: this.state.identicalBillingAddress === false ? this.state.b_city : this.state.d_city,
             cities: [],
         };
-        // this.props.updateUser(userDetails);
-    }
-
-    onInformationsReady = () => {
-        const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
-        axios.post('/pay', body, tokenConfig())
-             .then((res) => {
-                const url = JSON.parse(res.data);
-                this.setState({paymentLink: url});
-                
-             });
-    }
-
-    displayItems = () => {
-        let CartItem = (props) => {
-          return (
-            <li className="list-group-item d-flex justify-content-between lh-condensed">
-                <div>
-                    <h6 className="my-0">
-                        <strong>{ props.details.parent.name + " "}
-                        { props.details.product.name }</strong>
-                        {"    x" + props.details.quantity }
-                    </h6>
-                    <small className="text-muted">{ props.details.product.category ? props.details.product.category.name : "" }</small>
-                </div>
-                <span className="text-muted">{ props.details.product.price }€</span>
-            </li>
-          );
-        }
-        return this.props.item.items.map(item => {
-            return <CartItem key={"cartitem-" + item.product.id} details={item} />
-        });
+        this.props.updateUser(userDetails);
     }
 
     render() {
-        const { item } = this.props;
         return (
             <div className="container mt-3">
                 <div className="row">
-                    {/* Right Panel Block */}
-                    <div className="col-md-4 order-md-2 mb-4">
-                        <h4 className="d-flex justify-content-between align-items-center mb-3">
-                            <span className="text-muted">Votre panier</span>
-                            <span className="badge badge-secondary badge-pill">
-                                { item.items.reduce((cumul, current) => {
-                                    return current.quantity == null ? cumul : cumul + current.quantity;
-                                    }, 0) + " articles"
-                                }
-                            </span>
-                        </h4>
-                        <ul className="list-group mb-3">
-
-                            { this.displayItems() }
-
-                            <li className="list-group-item d-flex justify-content-between">
-                                <span>Total (HT)</span>
-                                <strong>{  Math.round(item.totalTax * 100) / 100 }€</strong>
-                            </li>
-                            <li className="list-group-item d-flex justify-content-between">
-                                <span>TVA</span>
-                                <strong>{ Math.round(item.totalToPayHT * 100) / 100 }€</strong>
-                            </li>
-                            <li className="list-group-item d-flex justify-content-between">
-                                <span>Total (TTC)</span>
-                                <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
-                            </li>
-
-                           <a href={ this.state.paymentLink }>
-                                <button className="btn btn-primary btn-lg btn-block">PAYER</button>
-                           </a>
-                        </ul>
-                    </div>
-
                     {/* Addresses panel */}
                     <div className="col-md-8 order-md-1" id="adresses-panel">
-                        <form className="needs-validation" onSubmit={ this.onMetadataSubmit }>
+                        <form className="needs-validation" onSubmit={ this.onSubmit }>
                             <div className="row">
                                 <div className="row">
                                     {/* <div className="col-md-4 mb-3"></div> */}
@@ -305,21 +221,21 @@ class Checkout extends Component {
                                         {/* User info */}
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="firstName">Nom</label>
-                                            <input type="text" className="form-control" id="firstName" name="username" value={ this.state.username } onChange={ this.onChange } required/>     {/* style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" /> */}
+                                            <input type="text" className="form-control" id="firstName" name="username" value={ this.state.username } onChange={ this.onChange }/>     {/* style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" /> */}
                                             <div className="invalid-feedback">
                                                 Un prénom est nécessaire pour la livraison.
                                             </div>
                                         </div>
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="email">Email</label>
-                                            <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange } onBlur={ this.handleUpdateEmail } required/>
+                                            <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange }/>
                                             <div className="invalid-feedback">
                                                 Merci de renseigner un email afin d'être informé de étapes de votre commande.
                                             </div>
                                         </div>
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="phone">Tel</label>
-                                            <input type="text" className="form-control" id="phone" name="phone" value={ this.state.phone } onChange={ this.onChange } required/>
+                                            <input type="text" className="form-control" id="phone" name="phone" value={ this.state.phone } onChange={ this.onChange }/>
                                             <div className="invalid-feedback">
                                                 Merci de renseigner un tel afin d'être informé de étapes de votre commande.
                                             </div>
@@ -339,38 +255,42 @@ class Checkout extends Component {
                                                 {/* <Map/> */}
                                             </div>
                                         </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="input-map">Adresse</label>
-                                            <input type="text" className="form-control" id="input-map" name="d_address" value={ this.state.d_address } onChange={ this.onChange } required />
+                                        <div className="col-md-12">
+                                            <label htmlFor="address">Adresse</label>
+                                            <input type="text" className="form-control" id="input-map" name="d_address" value={ this.state.d_address } onChange={ this.onChange }/>
                                             <div className="invalid-feedback">
                                                 Merci de saisir une adresse de livraison.
                                             </div>
                                         </div>
+                                        <div className="col-md-4 mb-3"></div>
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="complément">Complement d'adresse</label>
-                                            <input type="textarea" className="form-control" id="complément" name="d_address2" value={ this.state.d_address2 } placeholder="Appt, Immeuble, Digicode, etc" onChange={ this.onChange } />
+                                            <input type="textarea" className="form-control" id="complément" name="d_address2" value={ this.state.d_address2 } onChange={ this.onChange } placeholder="Appt, Immeuble, Digicode, etc" />
                                         </div>
                                         <div className="col-md-4 mb-3">
                                             <label htmlFor="zip">CP</label>
-                                            <input type="text" className="form-control" id="d_zip" name="d_zipCode"  value={ this.state.d_zipCode } onChange={ this.onZipCodeChange } required/>
-                                            <div className="invalid-feedback">
+                                            <input type="text" className="form-control" id="d_zip" name="d_zipCode" value={ this.state.d_zipCode } onChange={ this.onZipCodeChange }/>
+                                            <div className="invalid-feedback" id="d_zip_error">
                                                 Code Postal nécessaire.
                                             </div>
                                         </div>
                                         <div className="col-md-4 mb-3">
-                                            <span id="d_city">{ this.state. d_city.name }</span>
+                                            <span id="d_city">{ this.state.b_city.name }</span>
                                             {/* { this.state. d_city.name } */}
                                         </div>
+
+
                                         <div className="col-md-2 mt-3">
                                             <small>
-                                                <label htmlFor="complément">GPS</label>
-                                                <input type="hidden" className="form-control" id="gps" name="d_gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
+                                                <label htmlFor="gps">GPS</label>
+                                                <input type="hidden" name="d_gps" className="form-control" id="gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
                                             </small>
                                         </div>
+
                                 </div>
                             </div>
 
-
+                            {/* Billing address */}
                             <hr className="mb-4"/>
                             <div className="row">
                                 <div className="col-md-4 mb-3">
@@ -379,7 +299,7 @@ class Checkout extends Component {
 
                                 <div className="col-md-4 mb-3">
                                     <label className="custom-control custom-checkbox custom-checkbox-primary">
-                                        <input id="billingAddress-checkbox" type="checkbox" className="custom-control-input" checked={this.state.identicalBillingAddress} onChange={ this.handleBillingAddress } />
+                                         <input id="billingAddress-checkbox" type="checkbox" className="custom-control-input" checked={this.state.identicalBillingAddress} onChange={ this.handleBillingAddress } />      {/* defaultChecked */}
                                         <span className="custom-control-indicator"></span>
                                         <span className="custom-control-description">Identique à adresse de livraison</span>
                                     </label>
@@ -390,7 +310,7 @@ class Checkout extends Component {
                                         <div className="row">
                                             <div className="col-md-4 mb-3">
                                                 <label htmlFor="address">Adresse</label>
-                                                <input type="text" className="form-control" id="address" name="b_address" value={ this.state.identicalBillingAddress === false ? this.state.b_address : this.state.d_address } onChange={ this.onChange } />
+                                                <input type="text" className="form-control" id="address" name="b_address" value={ this.state.identicalBillingAddress === false ? this.state.b_address : this.state.d_address } onChange={ this.onChange }/>
                                                 <div className="invalid-feedback">
                                                     Merci de saisir une adresse de livraison.
                                                 </div>
@@ -401,8 +321,8 @@ class Checkout extends Component {
                                             </div>
                                             <div className="col-md-4 mb-3">
                                                 <label htmlFor="zip">CP</label>
-                                                <input type="text" className="form-control" id="b_zip" name="b_zipCode" value={ this.state.identicalBillingAddress === false ? this.state.b_zipCode : this.state.d_zipCode } onChange={ this.onZipCodeChange } />
-                                                <div className="invalid-feedback">
+                                                <input type="text" className="form-control" id="b_zip" name="b_zipCode" value={ this.state.identicalBillingAddress === false ? this.state.b_zipCode : this.state.d_zipCode } onChange={ this.onZipCodeChange }/>
+                                                <div className="invalid-feedback" id="b_zip_error">
                                                     Code Postal nécessaire.
                                                 </div>
                                             </div>
@@ -414,6 +334,7 @@ class Checkout extends Component {
                                     </span>)
                                 }
                             </div>
+                            <button className="btn btn-primary btn-lg btn-block" type="submit">Mettre à jour</button>
                         </form>
                     </div>
                 </div>
@@ -424,8 +345,8 @@ class Checkout extends Component {
 
 const mapStateToProps = state => ({
     isAuthenticated: state.auth.isAuthenticated,
-    item: state.item,
     user: state.auth.user,
+    error: state.error
   });
   
-export default connect( mapStateToProps )(Checkout);
+  export default connect( mapStateToProps, { login, updateUser, clearErrors })(Profile);

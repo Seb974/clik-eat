@@ -1,9 +1,9 @@
 import React from 'react';
-import {Alert} from 'reactstrap';
+import { Alert } from 'reactstrap';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { login } from '../actions/authActions';
-import { clearErrors } from '../actions/errorActions';
+import { login } from '../../actions/authActions';
+import { clearErrors } from '../../actions/errorActions';
 import {Redirect} from "react-router-dom";
 import { Link } from 'react-router-dom';
 

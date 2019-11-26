@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getItems, addItem, deleteItem, updateItem } from '../actions/itemActions';
-import { getProduct } from '../actions/productActions';
+import { getItems, addItem, deleteItem, updateItem } from '../../actions/itemActions';
+import { getProduct } from '../../actions/productActions';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
 class CartList extends React.Component 
 {
     state = {

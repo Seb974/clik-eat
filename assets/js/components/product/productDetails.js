@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getItems, addItem, deleteItem } from '../actions/itemActions';
-import { getProduct } from '../actions/productActions';
+import { getItems, addItem, deleteItem } from '../../actions/itemActions';
+import { getProduct } from '../../actions/productActions';
 import PropTypes from 'prop-types';
 
 class ProductDetails extends React.Component 
