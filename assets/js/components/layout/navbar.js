@@ -73,10 +73,10 @@ class Navbar extends Component {
                                 <a className="dropdown-item" href="{{ path('variant_index') }}">
                                         <i className="fas fa-sort"></i>Variantes</a>
                                 <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="{{ path('category_index') }}">
-                                    <i className="fas fa-columns"></i>Catégories</a>
-                                <div className="dropdown-divider"></div>
 
+                                <Link className="dropdown-item" to="/categories">
+                                    <i className="fas fa-columns"></i>Catégories</Link>
+                                <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/taxes">
                                     <i className="fas fa-calculator"></i>Taxes</Link>
                                 <div className="dropdown-divider"></div>
