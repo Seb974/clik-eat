@@ -15,6 +15,9 @@ import Profile from './components/user/profile';
 import AllergenList from './components/admin/allergen/allergenList';
 import AllergenDetails from './components/admin/allergen/allergenDetails';
 import AllergenForm from './components/admin/allergen/allergenForm';
+import TaxList from './components/admin/tax/taxList';
+import TaxDetails from './components/admin/tax/taxDetails';
+import TaxForm from './components/admin/tax/taxForm';
 import store from './store';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
@@ -75,6 +78,9 @@ class App extends React.Component
                                     <Route path='/allergens' component={AllergenList} />
                                     <Route path='/allergens-show/:id' component={AllergenDetails} />
                                     <Route path='/allergens-add-or-edit/:id?' component={AllergenForm} />
+                                    <Route path='/taxes' component={TaxList} />
+                                    <Route path='/taxes-show/:id' component={TaxDetails} />
+                                    <Route path='/taxes-add-or-edit/:id?' component={TaxForm} />
                                     <Route path="*" render={() => (<Redirect to="/" />)} /> 
                                 </Switch>
                             </ScrollToTop>

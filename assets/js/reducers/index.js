@@ -4,11 +4,13 @@ import authReducer from './authReducer';
 import productReducer from './productReducer';
 import itemReducer from './itemReducer';
 import allergenReducer from './allergenReducer';
+import taxReducer from './taxReducer';
 
 export default combineReducers({
   product: productReducer,
   item: itemReducer,
   error: errorReducer,
   auth: authReducer,
-  allergen: allergenReducer
+  allergen: allergenReducer,
+  tax: taxReducer
 });
