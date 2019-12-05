@@ -24,6 +24,9 @@ import CategoryForm from './components/admin/category/categoryForm';
 import CityList from './components/admin/city/cityList';
 import CityDetails from './components/admin/city/cityDetails';
 import CityForm from './components/admin/city/cityForm';
+import UserList from './components/admin/user/userList';
+import UserDetails from './components/admin/user/userDetails';
+import UserForm from './components/admin/user/userForm';
 import store from './store';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
@@ -93,6 +96,9 @@ class App extends React.Component
                                     <Route path='/cities' component={CityList} />
                                     <Route path='/cities-show/:id' component={CityDetails} />
                                     <Route path='/cities-add-or-edit/:id?' component={CityForm} />
+                                    <Route path='/users' component={UserList} />
+                                    <Route path='/users-show/:id' component={UserDetails} />
+                                    <Route path='/users-add-or-edit/:id?' component={UserForm} />
                                     <Route path="*" render={() => (<Redirect to="/" />)} /> 
                                 </Switch>
                             </ScrollToTop>

@@ -14,7 +14,11 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
- * @ApiResource
+ * @ApiResource(
+ *     attributes={
+ *          "normalization_context"={"groups"={"user"}}
+ *     }
+ * )
  */
 class User implements UserInterface
 {
@@ -77,7 +81,7 @@ class User implements UserInterface
     private $cart;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Metadata", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\Metadata", mappedBy="user", cascade={"remove"})
      * @Groups({"product", "user", "supplier", "variant", "metadata"})
      * @ApiSubresource
      */

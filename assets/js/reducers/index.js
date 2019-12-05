@@ -7,6 +7,7 @@ import allergenReducer from './allergenReducer';
 import taxReducer from './taxReducer';
 import categoryReducer from './categoryReducer';
 import cityReducer from './cityReducer';
+import userReducer from './userReducer';
 
 export default combineReducers({
   product: productReducer,
@@ -16,5 +17,6 @@ export default combineReducers({
   allergen: allergenReducer,
   tax: taxReducer,
   category: categoryReducer,
-  city: cityReducer
+  city: cityReducer,
+  user: userReducer
 });

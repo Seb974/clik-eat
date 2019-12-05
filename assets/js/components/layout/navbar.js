@@ -61,10 +61,9 @@ class Navbar extends Component {
                         }
                         { typeof props.user === 'undefined' ? "" : (props.user.roles.indexOf('ROLE_ADMIN') === -1) ? "" : (
                             <span>
-                                <a className="dropdown-item" href="{{ path('user_index') }}">
-                                    <i className="fas fa-users"></i>Users</a>
+                                <Link className="dropdown-item" to="/users">
+                                    <i className="fas fa-users"></i>Utilisateurs</Link>
                                 <div className="dropdown-divider"></div>
-
                                 <Link className="dropdown-item" to="/cities">
                                     <i className="fas fa-city"></i>Villes</Link>
                                 <div className="dropdown-divider"></div>
