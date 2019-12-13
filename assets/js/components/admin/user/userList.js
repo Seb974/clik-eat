@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getUsers } from '../../../actions/userActions';
+import { getUsers, deleteUser } from '../../../actions/userActions';
 import { getCities } from '../../../actions/cityActions';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -14,7 +14,8 @@ class UserList extends React.Component
 
     static propTypes = {
         getUsers: PropTypes.func.isRequired,
-        getCities: PropTypes.func.isRequired
+        getCities: PropTypes.func.isRequired,
+        deleteUser: PropTypes.func.isRequired
     };
     
     componentDidMount() {
@@ -22,11 +23,19 @@ class UserList extends React.Component
         this.props.getCities();
     }
 
+    handleDelete = (id, e) => {
+        e.preventDefault();
+        this.props.deleteUser(id);
+        // this.props.history.push(`/users`);
+    };
+
     displayUsers = () => {
         let User = (props) => {
+            const id = props.details.id;
             return (
                 <tr>
-                    <td>{ props.details.id }</td>
+                    {/* <td>{ props.details.id }</td> */}
+                    <td>{ id }</td>
                     <td>{ props.details.username }</td>
                     <td>{ props.details.email }</td>
                     <td>
@@ -39,7 +48,8 @@ class UserList extends React.Component
                     <td>{ props.details.isBanned == true ? "BANNI" : "-" }</td>
                     <td>
                         {/* <Link to={ "/users-show/" + props.details.id }>Show</Link> -  */}
-                        <Link to={ "/users-add-or-edit/" + props.details.id }>Edit</Link>
+                        <Link to={ "/users-add-or-edit/" + id }>Edit</Link>
+                        <Link to={ "/users" } onClick={(e) => this.handleDelete(id, e)}>Delete</Link>
                     </td>
                 </tr>
             );
@@ -88,4 +98,4 @@ const mapStateToProps = state => ({
     user: state.auth.user
   });
 
-export default connect(mapStateToProps, { getUsers, getCities })(UserList);
+export default connect(mapStateToProps, { getUsers, getCities, deleteUser })(UserList);

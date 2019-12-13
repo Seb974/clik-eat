@@ -57,7 +57,7 @@ class UserForm extends React.Component
                 const delivery_city = this.selectedUser.metadata.find(meta => meta.type === 'delivery_city');
                 const billing_city = this.selectedUser.metadata.find(meta => meta.type === 'billing_city');
                 const d_city = (typeof delivery_city !== 'undefined') ? this.state.cities.find(city => parseInt(city.zipCode) === parseInt(delivery_city.field)) : '';
-                const b_city = (billing_city.field === delivery_city.field) ? d_city : ((typeof billing_city !== 'undefined') ? this.state.cities.find(city => parseInt(city.zipCode) === parseInt(billing_city.field)) : '');
+                const b_city = (typeof billing_city !== 'undefined') ? '' : ((billing_city.field === delivery_city.field) ? d_city : ((typeof billing_city !== 'undefined') ? this.state.cities.find(city => parseInt(city.zipCode) === parseInt(billing_city.field)) : ''));
                 this.setState({
                     d_city: d_city,
                     b_city: b_city,
@@ -214,7 +214,7 @@ class UserForm extends React.Component
     };
 
     handleRoleSelection = (e) => {
-        this.setState({roles: e.target.value});
+        this.setState({roles: [e.target.value]});
     }
 
     onSubmit = e => {
@@ -330,10 +330,11 @@ class UserForm extends React.Component
                                                     Code Postal nécessaire.
                                                 </div>
                                             </div>
-                                            <div className="col-md-4 mb-3">
-                                                <span id="d_city">{ this.state.b_city.name }</span>
-                                                {/* { this.state. d_city.name } */}
-                                            </div>
+                                            { typeof this.state.d_city === 'undefined' ? '' : 
+                                                <div className="col-md-4 mb-3">
+                                                    <span id="d_city">{ this.state.b_city.name }</span>
+                                                </div>
+                                            }
     
     
                                             <div className="col-md-2 mt-3">
@@ -382,9 +383,11 @@ class UserForm extends React.Component
                                                         Code Postal nécessaire.
                                                     </div>
                                                 </div>
-                                                <div className="col-md-4 mb-3">
-                                                    <span id="b_city">{ this.state.b_city.name }</span>
-                                                </div>
+                                                { typeof this.state.b_city === 'undefined' ? '' : 
+                                                    <div className="col-md-4 mb-3">
+                                                        <span id="b_city">{ this.state.b_city.name }</span>
+                                                    </div>
+                                                }
                                             </div>
                                         </span>)
                                     }

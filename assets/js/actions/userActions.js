@@ -2,9 +2,6 @@ import axios from 'axios';
 import { GET_USERS, GET_USER, ADD_USER, DELETE_USER, UPDATE_USER } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
-// import { resolve } from 'dns';
-// import MetadataRecorder from '../helpers/MetadataRecorder';
-
 
 export const getUsers = () => dispatch => {
     axios
@@ -118,14 +115,15 @@ export const registerMetas = async (fromState, userId) => {
     const billing_line_2_id = typeof billing_line_2 !== 'undefined' ? billing_line_2.id : -1;
     const billing_city_id = typeof billing_city !== 'undefined' ? billing_city.id : -1;
     const delivery_gps_id = typeof delivery_gps !== 'undefined' ? delivery_gps.id : -1;
-    if ((typeof phone_number === 'undefined' || phone_number.field !== fromState.phone) && fromState.phone !== '') {
+
+    if ((typeof phone_number === 'undefined' && fromState.phone !== '') || (typeof phone_number !== 'undefined' && phone_number.field !== fromState.phone)) {
         if (phone_number_id === -1)
             axios.post('/api/metadata', JSON.stringify({type:'phone_number', field: fromState.phone, user: '/api/users/' + userId}), tokenConfig())
         else
             axios.put('/api/metadata/' + phone_number_id, JSON.stringify({field: fromState.phone}), tokenConfig())
     }
     
-    if ((typeof delivery_line_1 === 'undefined' || delivery_line_1.field !== fromState.d_address) && fromState.d_address !== '') {
+    if ((typeof delivery_line_1 === 'undefined' && fromState.d_address !== '') || (typeof delivery_line_1 !== 'undefined' && delivery_line_1.field !== fromState.d_address)) {
         if (delivery_line_1_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'delivery_line_1', field: fromState.d_address, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -133,7 +131,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof delivery_line_2 === 'undefined' || delivery_line_2.field !== fromState.d_address2) && fromState.d_address2 !== '') {
+    if ((typeof delivery_line_2 === 'undefined' && fromState.d_address2 !== '') || (typeof delivery_line_2 !== 'undefined' && delivery_line_2.field !== fromState.d_address2)) {
         if (delivery_line_2_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'delivery_line_2', field: fromState.d_address2, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -141,7 +139,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof delivery_city === 'undefined' || delivery_city.field !== fromState.d_zipCode) && fromState.d_zipCode !== '') {
+    if ((typeof delivery_city === 'undefined' && fromState.d_zipCode !== '') || (typeof delivery_city !== 'undefined' && delivery_city.field !== fromState.d_zipCode)) {
         if (delivery_city_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'delivery_city', field: fromState.d_zipCode, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -149,7 +147,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof delivery_gps === 'undefined' || delivery_gps.field !== fromState.d_gps) && fromState.d_gps !== '') {
+    if ((typeof delivery_gps === 'undefined' && fromState.d_gps !== '') || (typeof delivery_gps !== 'undefined' && delivery_gps.field !== fromState.d_gps)) {
         if (delivery_gps_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'delivery_gps', field: fromState.d_gps, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -157,7 +155,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof billing_line_1 === 'undefined' || billing_line_1.field !== fromState.b_address) && fromState.b_address !== '') {
+    if ((typeof billing_line_1 === 'undefined' && fromState.b_address !== '') || (typeof billing_line_1 !== 'undefined' && billing_line_1.field !== fromState.b_address)) {
         if (billing_line_1_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'billing_line_1', field: fromState.b_address, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -165,7 +163,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof billing_line_2 === 'undefined' || billing_line_2.field !== fromState.b_address2) && fromState.b_address2 !== '') {
+    if ((typeof billing_line_2 === 'undefined' && fromState.b_address2 !== '') || (typeof billing_line_2 !== 'undefined' && billing_line_2.field !== fromState.b_address2)) {
         if (billing_line_2_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'billing_line_2', field: fromState.b_address2, user: '/api/users/' + userId}), tokenConfig())
         } else {
@@ -173,7 +171,7 @@ export const registerMetas = async (fromState, userId) => {
         }
     }
     
-    if ((typeof billing_city === 'undefined' || billing_city.field !== fromState.b_zipCode) && fromState.b_zipCode !== '') {
+    if ((typeof billing_city === 'undefined' && fromState.b_zipCode !== '') || (typeof billing_city !== 'undefined' && billing_city.field !== fromState.b_zipCode)) {
         if (billing_city_id === -1) {
             axios.post('/api/metadata', JSON.stringify({type:'billing_city', field: fromState.b_zipCode, user: '/api/users/' + userId}), tokenConfig())
         } else {

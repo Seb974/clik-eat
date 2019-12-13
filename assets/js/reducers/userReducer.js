@@ -18,7 +18,14 @@ export default function(state = initialState, action) {
                 selected: action.payload
             };
         case ADD_USER:
-            const enlargedUsers = [action.payload, ...state.users];
+            let enlargedUsers = [];
+            const newUser = state.users.filter(user => user.id === action.payload.id);
+            if (typeof newUser === 'undefined') {
+                enlargedUsers = [action.payload, ...state.users].sort((a, b) => (a.id > b.id) ? 1 : -1);
+            }
+            else {
+                enlargedUsers = [action.payload, ...state.users.filter(user => user.id !== action.payload.id)].sort((a, b) => (a.id > b.id) ? 1 : -1);
+            }
             return {
                 ...state,
                 users: enlargedUsers,
@@ -33,7 +40,7 @@ export default function(state = initialState, action) {
             const previousUsers = state.users.filter(user => user.id !== action.payload.id);
             return {
                 ...state,
-                users: [action.payload, ...previousUsers],
+                users: [action.payload, ...previousUsers].sort((a, b) => (a.id > b.id) ? 1 : -1),
             }
 
         default:
