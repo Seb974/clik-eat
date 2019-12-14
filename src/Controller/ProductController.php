@@ -57,12 +57,13 @@ class ProductController extends AbstractController
     {
         $product = new Product();
         $user = $this->getUser();
-        $greaterRole = (in_array('ROLE_ADMIN', $user->getRoles())) ? 'ROLE_ADMIN' : 'ROLE_SUPPLIER';
-        $form = $this->createForm(ProductType::class, $product, ['role' => $greaterRole]);
-        if ($greaterRole === 'ROLE_SUPPLIER') {
-            $supplier = $user->getSupplier();
-            $form->get('supplier')->setData($supplier);
-        }
+        // $greaterRole = (in_array('ROLE_ADMIN', $user->getRoles())) ? 'ROLE_ADMIN' : 'ROLE_SUPPLIER';
+        // $form = $this->createForm(ProductType::class, $product, ['role' => $greaterRole]);
+        $form = $this->createForm(ProductType::class, $product, ['role' => "ROLE_ADMIN"]);
+        // if ($greaterRole === 'ROLE_SUPPLIER') {
+        //     $supplier = $user->getSupplier();
+        //     $form->get('supplier')->setData($supplier);
+        // }
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

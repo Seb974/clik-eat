@@ -27,6 +27,12 @@ import CityForm from './components/admin/city/cityForm';
 import UserList from './components/admin/user/userList';
 import UserDetails from './components/admin/user/userDetails';
 import UserForm from './components/admin/user/userForm';
+import SupplierList from './components/admin/supplier/supplierList';
+import SupplierDetails from './components/admin/supplier/supplierDetails';
+import SupplierForm from './components/admin/supplier/supplierForm';
+import ProductAdminList from './components/admin/product/productAdminList';
+// import ProductAdminDetails from './components/admin/product/productAdminDetails';
+import ProductForm from './components/admin/product/productForm';
 import store from './store';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
@@ -90,6 +96,9 @@ class App extends React.Component
                                     <Route path='/taxes' component={TaxList} />
                                     <Route path='/taxes-show/:id' component={TaxDetails} />
                                     <Route path='/taxes-add-or-edit/:id?' component={TaxForm} />
+                                    <Route path='/suppliers' component={SupplierList} />
+                                    <Route path='/suppliers-show/:id' component={SupplierDetails} />
+                                    <Route path='/suppliers-add-or-edit/:id?' component={SupplierForm} />
                                     <Route path='/categories' component={CategoryList} />
                                     <Route path='/categories-show/:id' component={CategoryDetails} />
                                     <Route path='/categories-add-or-edit/:id?' component={CategoryForm} />
@@ -99,6 +108,8 @@ class App extends React.Component
                                     <Route path='/users' component={UserList} />
                                     <Route path='/users-show/:id' component={UserDetails} />
                                     <Route path='/users-add-or-edit/:id?' component={UserForm} />
+                                    <Route path='/products' component={ProductAdminList} />
+                                    <Route path='/products-add-or-edit/:id?' component={ProductForm} />
                                     <Route path="*" render={() => (<Redirect to="/" />)} /> 
                                 </Switch>
                             </ScrollToTop>

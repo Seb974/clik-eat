@@ -64,12 +64,15 @@ class Navbar extends Component {
                                 <Link className="dropdown-item" to="/users">
                                     <i className="fas fa-users"></i>Utilisateurs</Link>
                                 <div className="dropdown-divider"></div>
+                                <Link className="dropdown-item" to="/suppliers">
+                                    <i className="fas fa-factory"></i>Fournisseurs</Link>
+                                <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/cities">
                                     <i className="fas fa-city"></i>Villes</Link>
                                 <div className="dropdown-divider"></div>
 
-                                <a className="dropdown-item" href="{{ path('product_index') }}">
-                                    <i className="fas fa-utensils"></i>Produits</a>
+                                <Link className="dropdown-item" to="/products">
+                                    <i className="fas fa-columns"></i>Produits</Link>
                                 <div className="dropdown-divider"></div>
                                 <a className="dropdown-item" href="{{ path('variant_index') }}">
                                         <i className="fas fa-sort"></i>Variantes</a>

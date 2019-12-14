@@ -11,7 +11,11 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SupplierRepository")
- * @ApiResource(subresourceOperations={
+ * @ApiResource(
+ *    attributes={
+ *          "normalization_context"={"groups"={"supplier"}}
+ *     },
+ *    subresourceOperations={
  *     "api_products_supplier_get_subresource"={
  *         "method"="GET",
  *         "normalization_context"={"groups"={"product"}}
@@ -36,6 +40,7 @@ class Supplier
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="supplier")
+     * @Groups({"supplier"})
      * @ApiSubresource
      */
     private $users;
@@ -48,6 +53,7 @@ class Supplier
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"supplier"})
      */
     private $address;
 
@@ -56,6 +62,12 @@ class Supplier
      * @Groups({"product", "supplier"})
      */
     private $preparationPeriod;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     * @Groups({"supplier"})
+     */
+    private $gps;
 
     public function __construct()
     {
@@ -162,6 +174,18 @@ class Supplier
     public function setPreparationPeriod(\DateTimeInterface $preparationPeriod): self
     {
         $this->preparationPeriod = $preparationPeriod;
+
+        return $this;
+    }
+
+    public function getGps(): ?string
+    {
+        return $this->gps;
+    }
+
+    public function setGps(?string $gps): self
+    {
+        $this->gps = $gps;
 
         return $this;
     }

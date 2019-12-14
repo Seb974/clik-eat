@@ -17,7 +17,13 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  * @ApiResource(
  *     attributes={
  *          "normalization_context"={"groups"={"user"}}
- *     }
+ *     },
+ *      subresourceOperations={
+ *          "api_suppliers_user_get_subresource"={
+ *              "method"="GET",
+ *              "normalization_context"={"groups"={"supplier"}}
+ *          }
+ *      }
  * )
  */
 class User implements UserInterface
@@ -75,7 +81,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Cart", mappedBy="user", cascade={"persist", "remove"})
-     * @Groups({"product", "user", "supplier", "variant"})
+     * @Groups({"product", "user", "variant"})
      * @ApiSubresource
      */
     private $cart;
