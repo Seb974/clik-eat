@@ -11,6 +11,7 @@ class ProductForm extends React.Component
 {
     id = this.props.match.params.id;
     selectedProduct = this.props.products.find(product => (parseInt(product.id)) === parseInt(this.props.match.params.id));
+    index = typeof this.id === 'undefined' ? 0 : (typeof this.selectedProduct.variants === 'undefined' ? 0 : this.selectedProduct.variants.length);
 
     state = {
         isNew: typeof this.id === 'undefined' ? true : false,
@@ -25,7 +26,6 @@ class ProductForm extends React.Component
         tax: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.tva === 'undefined' ? {} : this.selectedProduct.tva),
         allergens: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.allergens === 'undefined' ? [] : this.selectedProduct.allergens),
         variants: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.variants === 'undefined' ? [] : this.selectedProduct.variants),
-        index: typeof this.id === 'undefined' ? 0 : (typeof this.selectedProduct.variants === 'undefined' ? 0 : this.selectedProduct.variants.length),
         protein: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.protein),
         carbohydrates: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.carbohydrates),
         sugar: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.sugar),
@@ -41,46 +41,85 @@ class ProductForm extends React.Component
     };
     
     componentDidMount() {
-        if (this.state.index === 0) {
+        if (this.index === 0)
             this.handleAddVariant();
-        } else {
-            let container = document.getElementById("product_variants");
-            for (let i = 0, children = container.childNodes; i < children.length; i++) {
-                console.log(children[i]);
-                this.addDeleteLink(children[i]);
-            }
-        }
     }
 
-    handleAddVariant = () => {
+    onChange = e => {
+        this.setState({ [e.target.name]: e.target.value });
+        console.log(e.target.value);
+    };
+
+    onSelectChange = (items, e) => {
+        // let selectedItem = items.filter(item => {
+        //     parseInt(item.id) === parseInt(e.target.value);
+        // });
+        console.log(this.getSelectedItem(e.target.value, items));
+        let selectedItem = this.getSelectedItem(e.target.value, items);
+        this.setState({ [e.target.name]: selectedItem});
+    }
+
+    onAllergensChange = e => {
+        const options = e.target.options;
+        let value = [];
+        for (let i = 0, l = options.length; i < l; i++) {
+            if (options[i].selected) {
+                // value.push(this.getSelectedAllergen(options[i].value));
+                value.push(this.getSelectedItem(options[i].value, this.props.allergens));
+            }
+        }
+        this.setState( { allergens: value } );
+        console.log(value);
+    }
+
+    // getSelectedAllergen = id => {
+    //     for (let i = 0, allergens = this.props.allergens; i < allergens.length; i++) {
+    //         if (parseInt(allergens[i].id) === parseInt(id)) {
+    //             return allergens[i];
+    //         }
+    //     }
+    //     return false;
+    // }
+
+    getSelectedItem = (id, items) => {
+        for (let i = 0; i < items.length; i++) {
+            if (parseInt(items[i].id) === parseInt(id)) {
+                return items[i];
+            }
+        }
+        return false;
+    }
+
+    handleAddVariant = (e) => {
+        e.preventDefault();
         let container = document.getElementById("product_variants");
         let template = container.getAttribute('data-prototype')
-                                  .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.state.index)+1))
-                                  .replace(/__name__/g, parseInt(this.state.index));
+                                  .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.index)+1))
+                                  .replace(/__name__/g, parseInt(this.index));
         let prototype = new DOMParser().parseFromString(template, 'text/html').documentElement.querySelector("div");
-        console.log('in handleAddVariant : ');
-        console.log(prototype);
         this.addDeleteLink(prototype);
         container.append(prototype);
-        container.append(document.createElement('hr'));
-        this.setState({ index: parseInt(this.state.index) + 1 });
+        this.index++;
     }
 
     addDeleteLink(prototype) {
         let deleteLink = new DOMParser().parseFromString('<a href="#" class="btn btn-danger">Supprimer</a>', 'text/html').documentElement.querySelector("a");
         prototype.append(deleteLink);
-        console.log('in addDeleteLink : ');
-        console.log(prototype);
-        // prototype.append(document.createElement('hr'));
-        deleteLink.addEventListener('click', (event) => {
-            event.preventDefault();
+        deleteLink.addEventListener('click', (e) => {
+            e.preventDefault();
             prototype.remove();
         });
     }
 
+    handleDeleteVariant = (event) => {
+        event.preventDefault();
+        let prototype = event.target.parentNode;
+        prototype.remove();
+    }
+
     displaySuppliers = (suppliers) => {
         return (
-        <select id="suppliers" name="suppliers" onChange={ this.onChange }>
+        <select id="supplier" name="supplier" onChange={ (e) => this.onSelectChange(suppliers, e) }>
             {suppliers.map(supplier => {
                     if (this.state.supplier.id === supplier.id) {
                         return <option value={supplier.id} selected>{ supplier.name }</option>
@@ -95,7 +134,7 @@ class ProductForm extends React.Component
 
     displayCategories = (categories) => {
         return (
-        <select id="categories" name="categories" onChange={ this.onChange }>
+        <select id="category" name="category" onChange={ (e) => this.onSelectChange(categories, e) }>
             {categories.map(category => {
                     if (this.state.category.id === category.id) {
                         return <option value={category.id} selected>{ category.name }</option>
@@ -110,7 +149,7 @@ class ProductForm extends React.Component
 
     displayAllergens = (allergens) => {
         return (
-        <select id="allergens" name="allergens" multiple="multiple" onChange={ this.onChange }>
+        <select id="allergens" name="allergens" multiple="multiple" onChange={ this.onAllergensChange }>
             {allergens.map(allergen => {
                     if (this.state.allergens.filter(elt => elt.id === allergen.id).length > 0) {
                         return <option value={allergen.id} selected>{ allergen.name }</option>
@@ -125,7 +164,7 @@ class ProductForm extends React.Component
 
     displayTaxes = (taxes) => {
         return (
-        <select id="taxes" name="taxes" onChange={ this.onChange }>
+        <select id="taxes" name="taxes" onChange={ (e) => this.onSelectChange(taxes, e) }>
             {taxes.map(tax => {
                     if (this.state.tax.id === tax.id) {
                         return <option value={tax.id} selected>{ tax.name }</option>
@@ -143,7 +182,7 @@ class ProductForm extends React.Component
             return (
                 <div>
                     <label>{ "Variante N°" + (props.index + 1) }</label>
-                    <div id="product_variants_0">
+                    <div id={"product_variants_" + props.index }>
                         <div>
                             <label for={"variants[" + props.index + "]_name"}>Nom</label>
                             <input type="text" id={"variants[" + props.index + "]_name"} name={"variants[" + props.index + "]_name"} required="required" maxlength="60" value={ props.details.name }/>
@@ -152,18 +191,12 @@ class ProductForm extends React.Component
                             <label for={"variants[" + props.index + "]_price"}>Price</label>
                             <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
                         </div>
+                        <a href="#" class="btn btn-danger" onClick={ (e) => this.handleDeleteVariant(e, document.getElementById("variant_" + props.index)) }>Supprimer</a>
                     </div>
                 </div>
             );
         };
-        return variants.map((variant, index) => {
-            return (
-                <span key={"variant-span-" + variant.id} >
-                    {/* <hr/> */}
-                    <Variant details={variant} index={index}/>
-                </span>
-            )
-        });
+        return variants.map((variant, index) => <Variant details={variant} index={index}/>);
     }
 
     render = () => {
@@ -247,6 +280,7 @@ class ProductForm extends React.Component
                             </div>
                         </div>
                         <input type="hidden" id="product__token" name="product[_token]" value="8Bc8PRm8WyrO7AH69sVEuaIWv8u3VYCTro8tvEPwP9I" />
+                        <hr/>
                         <a href="#" id="add_variant" class="btn btn-default" onClick={ this.handleAddVariant } >Add a variant</a>
                         <button class="btn">Save</button>
                     </form>
