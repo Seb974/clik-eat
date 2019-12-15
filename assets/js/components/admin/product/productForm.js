@@ -46,6 +46,7 @@ class ProductForm extends React.Component
         } else {
             let container = document.getElementById("product_variants");
             for (let i = 0, children = container.childNodes; i < children.length; i++) {
+                console.log(children[i]);
                 this.addDeleteLink(children[i]);
             }
         }
@@ -57,6 +58,7 @@ class ProductForm extends React.Component
                                   .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.state.index)+1))
                                   .replace(/__name__/g, parseInt(this.state.index));
         let prototype = new DOMParser().parseFromString(template, 'text/html').documentElement.querySelector("div");
+        console.log('in handleAddVariant : ');
         console.log(prototype);
         this.addDeleteLink(prototype);
         container.append(prototype);
@@ -67,6 +69,8 @@ class ProductForm extends React.Component
     addDeleteLink(prototype) {
         let deleteLink = new DOMParser().parseFromString('<a href="#" class="btn btn-danger">Supprimer</a>', 'text/html').documentElement.querySelector("a");
         prototype.append(deleteLink);
+        console.log('in addDeleteLink : ');
+        console.log(prototype);
         // prototype.append(document.createElement('hr'));
         deleteLink.addEventListener('click', (event) => {
             event.preventDefault();
@@ -138,22 +142,20 @@ class ProductForm extends React.Component
         let Variant = (props) => {
             return (
                 <div>
-                    <div>
-                        <label>{ "Variante N°" + (props.index + 1) }</label>
-                        <div id="product_variants_0">
-                            <div>
-                                <label for={"variants[" + props.index + "]_name"}>Nom</label>
-                                <input type="text" id={"variants[" + props.index + "]_name"} name={"variants[" + props.index + "]_name"} required="required" maxlength="60" value={ props.details.name }/>
-                            </div>
+                    <label>{ "Variante N°" + (props.index + 1) }</label>
+                    <div id="product_variants_0">
+                        <div>
+                            <label for={"variants[" + props.index + "]_name"}>Nom</label>
+                            <input type="text" id={"variants[" + props.index + "]_name"} name={"variants[" + props.index + "]_name"} required="required" maxlength="60" value={ props.details.name }/>
                         </div>
-                    </div>
-                    <div>
-                        <label for={"variants[" + props.index + "]_price"}>Price</label>
-                        <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
+                        <div>
+                            <label for={"variants[" + props.index + "]_price"}>Price</label>
+                            <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
+                        </div>
                     </div>
                 </div>
             );
-        }
+        };
         return variants.map((variant, index) => {
             return (
                 <span key={"variant-span-" + variant.id} >
