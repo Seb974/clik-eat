@@ -25,6 +25,7 @@ class ProductForm extends React.Component
         tax: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.tva === 'undefined' ? {} : this.selectedProduct.tva),
         allergens: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.allergens === 'undefined' ? [] : this.selectedProduct.allergens),
         variants: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.variants === 'undefined' ? [] : this.selectedProduct.variants),
+        index: typeof this.id === 'undefined' ? 0 : (typeof this.selectedProduct.variants === 'undefined' ? 0 : this.selectedProduct.variants.length),
         protein: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.protein),
         carbohydrates: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.carbohydrates),
         sugar: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.sugar),
@@ -40,8 +41,37 @@ class ProductForm extends React.Component
     };
     
     componentDidMount() {
-        if (typeof this.id !== 'undefined') {
+        if (this.state.index === 0) {
+            this.handleAddVariant();
+        } else {
+            let container = document.getElementById("product_variants");
+            for (let i = 0, children = container.childNodes; i < children.length; i++) {
+                this.addDeleteLink(children[i]);
+            }
         }
+    }
+
+    handleAddVariant = () => {
+        let container = document.getElementById("product_variants");
+        let template = container.getAttribute('data-prototype')
+                                  .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.state.index)+1))
+                                  .replace(/__name__/g, parseInt(this.state.index));
+        let prototype = new DOMParser().parseFromString(template, 'text/html').documentElement.querySelector("div");
+        console.log(prototype);
+        this.addDeleteLink(prototype);
+        container.append(prototype);
+        container.append(document.createElement('hr'));
+        this.setState({ index: parseInt(this.state.index) + 1 });
+    }
+
+    addDeleteLink(prototype) {
+        let deleteLink = new DOMParser().parseFromString('<a href="#" class="btn btn-danger">Supprimer</a>', 'text/html').documentElement.querySelector("a");
+        prototype.append(deleteLink);
+        // prototype.append(document.createElement('hr'));
+        deleteLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            prototype.remove();
+        });
     }
 
     displaySuppliers = (suppliers) => {
@@ -107,7 +137,7 @@ class ProductForm extends React.Component
     displayVariants = (variants) => {
         let Variant = (props) => {
             return (
-                <span>
+                <div>
                     <div>
                         <label>{ "Variante N°" + (props.index + 1) }</label>
                         <div id="product_variants_0">
@@ -121,14 +151,13 @@ class ProductForm extends React.Component
                         <label for={"variants[" + props.index + "]_price"}>Price</label>
                         <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
                     </div>
-                    <a href="#" class="btn btn-danger">Supprimer</a>
-                </span>
+                </div>
             );
         }
         return variants.map((variant, index) => {
             return (
                 <span key={"variant-span-" + variant.id} >
-                    <hr/>
+                    {/* <hr/> */}
                     <Variant details={variant} index={index}/>
                 </span>
             )
@@ -207,15 +236,16 @@ class ProductForm extends React.Component
                                 <label for="product_picture">Illustration</label>
                                 <input type="file" id="product_picture" name="product[picture]"/>
                             </div>
-
+                            <hr/>
                             <div>
                                 <label class="required">Variants</label>
-                                <div id="product_variants" data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>"></div>
+                                <div id="product_variants" data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>">
+                                    { typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.variants === 'undefined' ? '' : this.displayVariants(this.selectedProduct.variants)) }
+                                </div>
                             </div>
-                            { typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.variants === 'undefined' ? '' : this.displayVariants(this.selectedProduct.variants)) }
                         </div>
                         <input type="hidden" id="product__token" name="product[_token]" value="8Bc8PRm8WyrO7AH69sVEuaIWv8u3VYCTro8tvEPwP9I" />
-                        <a href="#" id="add_variant" class="btn btn-default">Add a variant</a>
+                        <a href="#" id="add_variant" class="btn btn-default" onClick={ this.handleAddVariant } >Add a variant</a>
                         <button class="btn">Save</button>
                     </form>
                 </div>
