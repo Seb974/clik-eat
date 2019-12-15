@@ -9,11 +9,28 @@ import userExtractor from '../../../helpers/userExtractor';
 
 class ProductForm extends React.Component 
 {
+    id = this.props.match.params.id;
+    selectedProduct = this.props.products.find(product => (parseInt(product.id)) === parseInt(this.props.match.params.id));
+
     state = {
         isNew: typeof this.id === 'undefined' ? true : false,
-        selection: typeof this.id === 'undefined' ? {} : this.selectedUser, 
-        title: typeof this.id === 'undefined' ? 'Créer une nouvel utilisateur' : 'Modifier l\'utilisateur ' + this.selectedUser.username,
+        selection: typeof this.id === 'undefined' ? {} : this.selectedProduct, 
+        title: typeof this.id === 'undefined' ? 'Créer une nouvel utilisateur' : 'Modifier l\'utilisateur ' + this.selectedProduct.username,
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
+        name: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.name === 'undefined' ? '' : this.selectedProduct.name),
+        description: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.description === 'undefined' ? '' : this.selectedProduct.description),
+        nutritionals: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals),
+        supplier: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.supplier === 'undefined' ? {} : this.selectedProduct.supplier),
+        category: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.category === 'undefined' ? {} : this.selectedProduct.category),
+        tax: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.tva === 'undefined' ? {} : this.selectedProduct.tva),
+        allergens: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.allergens === 'undefined' ? [] : this.selectedProduct.allergens),
+        variants: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.variants === 'undefined' ? [] : this.selectedProduct.variants),
+        protein: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.protein),
+        carbohydrates: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.carbohydrates),
+        sugar: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.sugar),
+        fat: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.fat),
+        saturated: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.transAG),
+        sodium: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.salt),
     };
 
     static propTypes = {
@@ -23,125 +40,167 @@ class ProductForm extends React.Component
     };
     
     componentDidMount() {
-        this.initMap();
         if (typeof this.id !== 'undefined') {
-            if ( this.selectedUser.metadata.length > 0 ) {
-                const delivery_city = this.selectedUser.metadata.find(meta => meta.type === 'delivery_city');
-                const billing_city = this.selectedUser.metadata.find(meta => meta.type === 'billing_city');
-                const d_city = (typeof delivery_city !== 'undefined') ? this.state.cities.find(city => parseInt(city.zipCode) === parseInt(delivery_city.field)) : '';
-                const b_city = (typeof billing_city !== 'undefined') ? '' : ((billing_city.field === delivery_city.field) ? d_city : ((typeof billing_city !== 'undefined') ? this.state.cities.find(city => parseInt(city.zipCode) === parseInt(billing_city.field)) : ''));
-                this.setState({
-                    d_city: d_city,
-                    b_city: b_city,
-                });
-            }
         }
-        if (this.state.b_address === this.state.d_address && this.state.b_address2 === this.state.d_address2 && this.state.b_zipCode === this.state.d_zipCode )
-            this.setState( { identicalBillingAddress: true } );
-        else 
-            this.setState( { identicalBillingAddress: false } );
-        
-        const roleInput = document.getElementById('role');
-        this.state.roles.find(role => role === 'ROLE_ADMIN') !== undefined ? roleInput.value = 'ROLE_ADMIN' :
-            (this.state.roles.find(role => role === 'ROLE_SUPPLIER') !== undefined ? roleInput.value = 'ROLE_SUPPLIER' :
-            (this.state.roles.find(role => role === 'ROLE_DELIVERER') !== undefined ? roleInput.value = 'ROLE_DELIVERER' : 'ROLE_USER'));
+    }
+
+    displaySuppliers = (suppliers) => {
+        return (
+        <select id="suppliers" name="suppliers" onChange={ this.onChange }>
+            {suppliers.map(supplier => {
+                    if (this.state.supplier.id === supplier.id) {
+                        return <option value={supplier.id} selected>{ supplier.name }</option>
+                    } else {
+                        return <option value={supplier.id}>{ supplier.name }</option>
+                    }
+                })
+            }
+        </select>
+        );
+    }
+
+    displayCategories = (categories) => {
+        return (
+        <select id="categories" name="categories" onChange={ this.onChange }>
+            {categories.map(category => {
+                    if (this.state.category.id === category.id) {
+                        return <option value={category.id} selected>{ category.name }</option>
+                    } else {
+                        return <option value={category.id}>{ category.name }</option>
+                    }
+                })
+            }
+        </select>
+        );
+    }
+
+    displayAllergens = (allergens) => {
+        return (
+        <select id="allergens" name="allergens" multiple="multiple" onChange={ this.onChange }>
+            {allergens.map(allergen => {
+                    if (this.state.allergens.filter(elt => elt.id === allergen.id).length > 0) {
+                        return <option value={allergen.id} selected>{ allergen.name }</option>
+                    } else {
+                        return <option value={allergen.id}>{ allergen.name }</option>
+                    }
+                })
+            }
+        </select>
+        );
+    }
+
+    displayTaxes = (taxes) => {
+        return (
+        <select id="taxes" name="taxes" onChange={ this.onChange }>
+            {taxes.map(tax => {
+                    if (this.state.tax.id === tax.id) {
+                        return <option value={tax.id} selected>{ tax.name }</option>
+                    } else {
+                        return <option value={tax.id}>{ tax.name }</option>
+                    }
+                })
+            }
+        </select>
+        );
+    }
+
+    displayVariants = (variants) => {
+        let Variant = (props) => {
+            return (
+                <span>
+                    <div>
+                        <label>{ "Variante N°" + (props.index + 1) }</label>
+                        <div id="product_variants_0">
+                            <div>
+                                <label for={"variants[" + props.index + "]_name"}>Nom</label>
+                                <input type="text" id={"variants[" + props.index + "]_name"} name={"variants[" + props.index + "]_name"} required="required" maxlength="60" value={ props.details.name }/>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for={"variants[" + props.index + "]_price"}>Price</label>
+                        <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
+                    </div>
+                    <a href="#" class="btn btn-danger">Supprimer</a>
+                </span>
+            );
+        }
+        return variants.map((variant, index) => {
+            return (
+                <span key={"variant-span-" + variant.id} >
+                    <hr/>
+                    <Variant details={variant} index={index}/>
+                </span>
+            )
+        });
     }
 
     render = () => {
         if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
-                <span>
+                <div className="container mt-3">
                     <h1>Create new Product</h1>
                     <form name="product" method="post" enctype="multipart/form-data">
-                        <div id="product">
+                        <div id="product" className="container">
 
                             <div>
-                                <label for="product_supplier" class="required">Supplier</label>
-                                <select id="product_supplier" name="product[supplier]">
-                                    <option value="1">Osaka</option>
-                                    <option value="2">La Maison du Whisky</option>
-                                    <option value="3">BurgerMary</option>
-                                </select>
+                                <label for="product_supplier" class="required">Fournisseur</label>
+                                { this.displaySuppliers(this.props.suppliers) }
                             </div>
 
                             <div>
                                 <label for="product_category" class="required">Category</label>
-                                <select id="product_category" name="product[category]">
-                                    <option value="1">burger</option>
-                                    <option value="2">boisson</option>
-                                    <option value="3">produits laitiers</option>
-                                    <option value="4">légumes</option>
-                                    <option value="5">fruits</option>
-                                    <option value="6">plats cuisinés</option>
-                                </select>
+                                { this.displayCategories(this.props.categories) }
                             </div>
 
                             <div>
                                 <label for="product_name" class="required">Name</label>
-                                <input type="text" id="product_name" name="product[name]" required="required" maxlength="150" />
+                                <input type="text" id="name" name="name" required="required" maxlength="150" value={ this.state.name } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_description">Description</label>
-                                <textarea id="product_description" name="product[description]"></textarea>
+                                <textarea id="description" name="description" onChange={ this.onChange }>{ this.state.description }</textarea>
                             </div>
 
                             <div>
                                 <label for="product_allergens">Allergens</label>
-                                <select id="product_allergens" name="product[allergens][]" multiple="multiple">
-                                    <option value="1">anhydride sulfureux et sulfites</option>
-                                    <option value="2">arachides</option>
-                                    <option value="3">crustacés</option>
-                                    <option value="4">gluten</option>
-                                    <option value="5">oeufs</option>
-                                    <option value="6">poissons</option>
-                                    <option value="7">soja</option>
-                                    <option value="8">lait</option>
-                                    <option value="9">fruits à coques</option>
-                                    <option value="10">céleri</option>
-                                    <option value="11">moutarde</option>
-                                    <option value="12">graines de sésame</option>
-                                    <option value="13">lupin</option>
-                                    <option value="14">mollusques</option>
-                                </select>
+                                { this.displayAllergens(this.props.allergens) }
                             </div>
 
                             <div>
                                 <label for="product_proteins">Proteins</label>
-                                <input type="text" id="product_proteins" name="product[proteins]"/>
+                                <input type="text" id="proteins" name="proteins" value={ this.state.protein } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_carbohydrates">Carbohydrates</label>
-                                <input type="text" id="product_carbohydrates" name="product[carbohydrates]" />
+                                <input type="text" id="carbohydrates" name="carbohydrates" value={ this.state.carbohydrates } onChange={ this.onChange } />
                             </div>
 
                             <div>
                                 <label for="product_sugar">Sugar</label>
-                                <input type="text" id="product_sugar" name="product[sugar]"/>
+                                <input type="text" id="sugar" name="sugar" value={ this.state.sugar } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_fat">Fat</label>
-                                <input type="text" id="product_fat" name="product[fat]"/>
+                                <input type="text" id="fat" name="fat" value={ this.state.fat } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_saturated">Saturated</label>
-                                <input type="text" id="product_saturated" name="product[saturated]"/>
+                                <input type="text" id="saturated" name="saturated" value={ this.state.saturated } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_sodium">Sodium</label>
-                                <input type="text" id="product_sodium" name="product[sodium]"/>
+                                <input type="text" id="sodium" name="sodium" value={ this.state.sodium } onChange={ this.onChange }/>
                             </div>
 
                             <div>
                                 <label for="product_tva" class="required">Tva</label>
-                                <select id="product_tva" name="product[tva]">
-                                    <option value="1">2.1</option>
-                                    <option value="2">8.5</option>
-                                </select>
+                                { this.displayTaxes(this.props.taxes) }
                             </div>
 
                             <div>
@@ -152,33 +211,19 @@ class ProductForm extends React.Component
                             <div>
                                 <label class="required">Variants</label>
                                 <div id="product_variants" data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>"></div>
-                                <div>
-                                    <label class="required">Variant N°1</label>
-                                    <div id="product_variants_0">
-                                        <div>
-                                            <label for="product_variants_0_name" class="required">Name</label>
-                                            <input type="text" id="product_variants_0_name" name="product[variants][0][name]" required="required" maxlength="60"/>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                            <div>
-                                <label for="product_variants_0_price" class="required">Price</label>
-                                <input type="text" id="product_variants_0_price" name="product[variants][0][price]" required="required"/>
-                            </div>
+                            { typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.variants === 'undefined' ? '' : this.displayVariants(this.selectedProduct.variants)) }
                         </div>
-                        <a href="#" class="btn btn-danger">Supprimer</a>
                         <input type="hidden" id="product__token" name="product[_token]" value="8Bc8PRm8WyrO7AH69sVEuaIWv8u3VYCTro8tvEPwP9I" />
                         <a href="#" id="add_variant" class="btn btn-default">Add a variant</a>
                         <button class="btn">Save</button>
                     </form>
-                </span>
+                </div>
             )
         } else {
             return <Redirect to='/'/>
         }
     }
-
 }
 
 const mapStateToProps = state => ({
@@ -187,6 +232,11 @@ const mapStateToProps = state => ({
     token: state.auth.token,
     cities: state.city.cities,
     user: state.auth.user,
+    products: state.productAdmin.products,
+    suppliers: state.supplier.suppliers,
+    categories: state.category.categories,
+    allergens: state.allergen.allergens,
+    taxes: state.tax.taxes
 });
 
 export default connect(mapStateToProps, { addSupplier, updateSupplier, deleteSupplier })(ProductForm);

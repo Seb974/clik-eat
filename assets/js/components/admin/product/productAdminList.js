@@ -1,6 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getAdminProducts, deleteProduct } from '../../../actions/productAdminActions';
+import { getSuppliers } from '../../../actions/supplierActions';
+import { getCategories } from '../../../actions/categoryActions';
+import { getAllergens } from '../../../actions/allergenActions';
+import { getTaxes } from '../../../actions/taxActions';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
@@ -13,17 +17,24 @@ class ProductAdminList extends React.Component
 
     static propTypes = {
         getAdminProducts: PropTypes.func.isRequired,
-        deleteProduct: PropTypes.func.isRequired
+        deleteProduct: PropTypes.func.isRequired,
+        getSuppliers: PropTypes.func.isRequired,
+        getCategories: PropTypes.func.isRequired,
+        getAllergens: PropTypes.func.isRequired,
+        getTaxes: PropTypes.func.isRequired,
     };
     
     componentDidMount() {
         this.props.getAdminProducts();
+        this.props.getSuppliers();
+        this.props.getCategories();
+        this.props.getAllergens();
+        this.props.getTaxes();
     }
 
     handleDelete = (id, e) => {
         e.preventDefault();
         this.props.deleteProduct(id);
-        // this.props.history.push(`/products`);
     };
 
     displayProducts = () => {
@@ -81,7 +92,11 @@ const mapStateToProps = state => ({
     productsAdmin: state.productAdmin.products,
     isAuthenticated: state.auth.isAuthenticated,
     token: state.auth.token,
-    user: state.auth.user
+    user: state.auth.user,
+    suppliers: state.supplier.suppliers,
+    category: state.category.getCategories,
+    allergen: state.allergen.allergens,
+    tax: state.tax.taxes
   });
 
-export default connect(mapStateToProps, { getAdminProducts, deleteProduct })(ProductAdminList);
+export default connect(mapStateToProps, { getAdminProducts, deleteProduct, getSuppliers, getCategories, getAllergens, getTaxes })(ProductAdminList);
