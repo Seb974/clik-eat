@@ -11,10 +11,10 @@ class ProductForm extends React.Component
 {
     id = this.props.match.params.id;
     selectedProduct = this.props.products.find(product => (parseInt(product.id)) === parseInt(this.props.match.params.id));
-    index = typeof this.id === 'undefined' ? 0 : (typeof this.selectedProduct.variants === 'undefined' ? 0 : this.selectedProduct.variants.length);
 
     state = {
         isNew: typeof this.id === 'undefined' ? true : false,
+        newIndex: 100,
         selection: typeof this.id === 'undefined' ? {} : this.selectedProduct, 
         title: typeof this.id === 'undefined' ? 'Créer une nouvel utilisateur' : 'Modifier l\'utilisateur ' + this.selectedProduct.username,
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
@@ -41,20 +41,26 @@ class ProductForm extends React.Component
     };
     
     componentDidMount() {
-        if (this.index === 0)
-            this.handleAddVariant();
+        // if (this.index === 0) {
+        //     this.handleAddVariant();
+        // }
+        // for (let i = 0, variants = this.state.variants; i < variants.length; i++) {
+        //     let name = "variants[" + i + "]_name";
+        //     let price = "variants[" + i + "]_price";
+        //     // let stock = "variants[" + i + "]_stock";
+        //         this.setState({
+        //             [name]: variants[i].name,
+        //             [price]: variants[i].price,
+        //             // [stock]: variants[i].stock.quantity,
+        //         });
+        // }
     }
 
     onChange = e => {
         this.setState({ [e.target.name]: e.target.value });
-        console.log(e.target.value);
     };
 
     onSelectChange = (items, e) => {
-        // let selectedItem = items.filter(item => {
-        //     parseInt(item.id) === parseInt(e.target.value);
-        // });
-        console.log(this.getSelectedItem(e.target.value, items));
         let selectedItem = this.getSelectedItem(e.target.value, items);
         this.setState({ [e.target.name]: selectedItem});
     }
@@ -64,22 +70,37 @@ class ProductForm extends React.Component
         let value = [];
         for (let i = 0, l = options.length; i < l; i++) {
             if (options[i].selected) {
-                // value.push(this.getSelectedAllergen(options[i].value));
                 value.push(this.getSelectedItem(options[i].value, this.props.allergens));
             }
         }
         this.setState( { allergens: value } );
-        console.log(value);
     }
 
-    // getSelectedAllergen = id => {
-    //     for (let i = 0, allergens = this.props.allergens; i < allergens.length; i++) {
-    //         if (parseInt(allergens[i].id) === parseInt(id)) {
-    //             return allergens[i];
-    //         }
-    //     }
-    //     return false;
-    // }
+    onVariantsChange = e => {
+        e.preventDefault();
+        let container = document.getElementById("product_variants");
+        let children = container.childNodes;
+        for (let i = 0; i < children.length; i++) {
+            let name = document.getElementById("variants[" + i +"]_name").value;
+            let price = document.getElementById("variants[" + i +"]_price").value;
+            console.log("name[" + i + "] = " + name);
+            console.log("price[" + i + "] = " + price);
+        }
+    }
+
+    onVariantsInputChange = e => {
+        e.preventDefault();
+        const input = e.target.name.includes("name") ? "name" : (e.target.name.includes("price") ? "price" : "stock");
+        const id = parseInt(e.target.name.substring(e.target.name.lastIndexOf("[") + 1, e.target.name.lastIndexOf("]")));
+        let variants = this.state.variants;
+        for (let i = 0; i < variants.length; i++) {
+            if (parseInt(variants[i].id) === id) {
+                variants[i][input] = e.target.value;
+                break;
+            }
+        }
+        this.setState({ variants });
+    }
 
     getSelectedItem = (id, items) => {
         for (let i = 0; i < items.length; i++) {
@@ -90,26 +111,49 @@ class ProductForm extends React.Component
         return false;
     }
 
-    handleAddVariant = (e) => {
+    handleAddVariant2 = (e) => {
         e.preventDefault();
-        let container = document.getElementById("product_variants");
-        let template = container.getAttribute('data-prototype')
-                                  .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.index)+1))
-                                  .replace(/__name__/g, parseInt(this.index));
-        let prototype = new DOMParser().parseFromString(template, 'text/html').documentElement.querySelector("div");
-        this.addDeleteLink(prototype);
-        container.append(prototype);
-        this.index++;
-    }
-
-    addDeleteLink(prototype) {
-        let deleteLink = new DOMParser().parseFromString('<a href="#" class="btn btn-danger">Supprimer</a>', 'text/html').documentElement.querySelector("a");
-        prototype.append(deleteLink);
-        deleteLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            prototype.remove();
+        let variants = this.state.variants;
+        const newVariant = {
+            id: this.state.newIndex,         //  /!\ OnDelete ==> decrease newIndex
+            name: '', 
+            price: 0, 
+            stock: {quantity: 0}
+        };
+        variants.push(newVariant);
+        this.setState({
+            variants: variants,
+            newIndex: this.state.newIndex++
         });
     }
+
+    // handleAddVariant = (e) => {
+    //     e.preventDefault();
+    //     let container = document.getElementById("product_variants");
+    //     let template = container.getAttribute('data-prototype')
+    //                               .replace(/__name__label__/g, 'Variant N°' + (parseInt(this.index)+1))
+    //                               .replace(/__name__/g, parseInt(this.index));
+    //     const domElement = new DOMParser().parseFromString(template, 'text/html').documentElement;
+    //     let prototype = domElement.querySelector("div");
+    //     let name = domElement.querySelector("input[name*=name]");
+    //     let price = domElement.querySelector("input[name*=price]");
+    //     // let stock = domElement.querySelector("input[name*=stock]");
+    //     name.addEventListener('change', this.onChange);
+    //     price.addEventListener('change', this.onChange);
+    //     // stock.addEventListener('change', this.onChange);
+    //     this.addDeleteLink(prototype);
+    //     container.append(prototype);
+    //     this.index++;
+    // }
+
+    // addDeleteLink(prototype) {
+    //     let deleteLink = new DOMParser().parseFromString('<a href="#" class="btn btn-danger">Supprimer</a>', 'text/html').documentElement.querySelector("a");
+    //     prototype.append(deleteLink);
+    //     deleteLink.addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         prototype.remove();
+    //     });
+    // }
 
     handleDeleteVariant = (event) => {
         event.preventDefault();
@@ -181,22 +225,24 @@ class ProductForm extends React.Component
         let Variant = (props) => {
             return (
                 <div>
-                    <label>{ "Variante N°" + (props.index + 1) }</label>
-                    <div id={"product_variants_" + props.index }>
+                    <label>{ "Variante N°" + (props.details.id) }</label>
+                    <div id={"product_variants_" + props.details.id } key={"variant_" + props.details.id}>
                         <div>
-                            <label for={"variants[" + props.index + "]_name"}>Nom</label>
-                            <input type="text" id={"variants[" + props.index + "]_name"} name={"variants[" + props.index + "]_name"} required="required" maxlength="60" value={ props.details.name }/>
+                            <label for={"variants[" + props.details.id + "]_name"}>Nom</label>
+                            <input type="text" key={"variant_name_" + props.details.id} id={"variants[" + props.details.id + "]_name"} name={"variants[" + props.details.id + "]_name"} required="required" maxlength="60" value={ props.details.name } onChange={ this.onVariantsInputChange }/>
                         </div>
                         <div>
-                            <label for={"variants[" + props.index + "]_price"}>Price</label>
-                            <input type="text" id={"variants[" + props.index + "]_price"} name={"variants[" + props.index + "]_price"} required="required" value={ props.details.price }/>
+                            <label for={"variants[" + props.details.id + "]_price"}>Prix</label>
+                            <input type="text" key={"variant_price_" + props.details.id} id={"variants[" + props.details.id + "]_price"} name={"variants[" + props.details.id + "]_price"} required="required" value={ props.details.price } onChange={ this.onVariantsInputChange }/>
                         </div>
-                        <a href="#" class="btn btn-danger" onClick={ (e) => this.handleDeleteVariant(e, document.getElementById("variant_" + props.index)) }>Supprimer</a>
+                        <a href="#" class="btn btn-danger" onClick={ this.handleDeleteVariant }>Supprimer</a>
                     </div>
                 </div>
             );
         };
-        return variants.map((variant, index) => <Variant details={variant} index={index}/>);
+        return variants.map((variant) => {
+            return <Variant details={variant}/>
+        });
     }
 
     render = () => {
@@ -234,7 +280,7 @@ class ProductForm extends React.Component
 
                             <div>
                                 <label for="product_proteins">Proteins</label>
-                                <input type="text" id="proteins" name="proteins" value={ this.state.protein } onChange={ this.onChange }/>
+                                <input type="text" id="protein" name="protein" value={ this.state.protein } onChange={ this.onChange }/>
                             </div>
 
                             <div>
@@ -274,15 +320,15 @@ class ProductForm extends React.Component
                             <hr/>
                             <div>
                                 <label class="required">Variants</label>
-                                <div id="product_variants" data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>">
-                                    { typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.variants === 'undefined' ? '' : this.displayVariants(this.selectedProduct.variants)) }
+                                <div id="product_variants" data-prototype="<div><label>__name__label__</label><div id=&quot;product_variants___name__&quot;><div><label for=&quot;variants[__name__]_name&quot;>Nom</label><input type=&quot;text&quot; id=&quot;variants[__name__]_name&quot; name=&quot;variants[__name__]_name&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div><label for=&quot;variants[__name__]_price&quot;>Prix</label><input type=&quot;text&quot; id=&quot;variants[__name__]_price&quot; name=&quot;variants[__name__]_price&quot; required=&quot;required&quot;/></div></div></div>">
+                                    { typeof this.id === 'undefined' ? '' : (typeof this.state.selection.variants === 'undefined' ? '' : this.displayVariants(this.state.selection.variants)) }
                                 </div>
                             </div>
                         </div>
                         <input type="hidden" id="product__token" name="product[_token]" value="8Bc8PRm8WyrO7AH69sVEuaIWv8u3VYCTro8tvEPwP9I" />
                         <hr/>
-                        <a href="#" id="add_variant" class="btn btn-default" onClick={ this.handleAddVariant } >Add a variant</a>
-                        <button class="btn">Save</button>
+                        <a href="#" id="add_variant" class="btn btn-default" onClick={ this.handleAddVariant2 } >Add a variant</a>
+                        <button class="btn" onClick={ this.onVariantsChange }>Save</button>
                     </form>
                 </div>
             )
@@ -306,3 +352,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, { addSupplier, updateSupplier, deleteSupplier })(ProductForm);
+
+// "<div><label>__name__label__</label><div id=&quot;product_variants___name__&quot;><div><label for=&quot;variants[__name__]_name&quot;>Nom</label><input type=&quot;text&quot; id=&quot;variants[__name__]_name&quot; name=&quot;variants[__name__]_name&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div><label for=&quot;variants[__name__]_price&quot;>Prix</label><input type=&quot;text&quot; id=&quot;variants[__name__]_price&quot; name=&quot;variants[__name__]_price&quot; required=&quot;required&quot;/></div></div></div>"
+// data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>">
