@@ -12,20 +12,20 @@ class ProductForm extends React.Component
 {
     id = this.props.match.params.id;
     selectedProduct = this.props.products.find(product => (parseInt(product.id)) === parseInt(this.props.match.params.id));
-    newVariant = { name: "", price: "" };
+    newVariant = { name: "", price: "", stock: {quantity: 0} };
 
     state = {
         isNew: typeof this.id === 'undefined' ? true : false,
         newIndex: 100,
         selection: typeof this.id === 'undefined' ? {} : this.selectedProduct, 
-        title: typeof this.id === 'undefined' ? 'Créer une nouvel utilisateur' : 'Modifier l\'utilisateur ' + this.selectedProduct.username,
+        title: typeof this.id === 'undefined' ? 'Créer un nouvau produit' : 'Modifier le produit ' + this.selectedProduct.name,
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
         name: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.name === 'undefined' ? '' : this.selectedProduct.name),
         description: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.description === 'undefined' ? '' : this.selectedProduct.description),
         nutritionals: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals),
-        supplier: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.supplier === 'undefined' ? {} : this.selectedProduct.supplier),
-        category: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.category === 'undefined' ? {} : this.selectedProduct.category),
-        tax: typeof this.id === 'undefined' ? {} : (typeof this.selectedProduct.tva === 'undefined' ? {} : this.selectedProduct.tva),
+        supplier: typeof this.id === 'undefined' ? this.props.suppliers[0] : (typeof this.selectedProduct.supplier === 'undefined' ? this.props.suppliers[0] : this.selectedProduct.supplier),
+        category: typeof this.id === 'undefined' ? this.props.categories[0] : (typeof this.selectedProduct.category === 'undefined' ? this.props.categories[0] : this.selectedProduct.category),
+        tax: typeof this.id === 'undefined' ? this.props.taxes[0] : (typeof this.selectedProduct.tva === 'undefined' ? this.props.taxes[0] : this.selectedProduct.tva),
         allergens: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.allergens === 'undefined' ? [] : this.selectedProduct.allergens),
         variants: typeof this.id === 'undefined' ? [this.newVariant] : (typeof this.selectedProduct.variants === 'undefined' ? [this.newVariant] : this.selectedProduct.variants),
         protein: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.protein),
@@ -68,7 +68,7 @@ class ProductForm extends React.Component
     onVariantChange = (e, i) => {
         const { name, value } = e.target;
         let variants = [...this.state.variants];
-        variants[i] = {...variants[i], [name]: value};
+        (name !== "stock") ? ( variants[i] = {...variants[i], [name]: value} ) : ( variants[i] = {...variants[i], [name]: {quantity: value}} );
         this.setState({ variants });
     }
 
@@ -80,13 +80,14 @@ class ProductForm extends React.Component
 
     onVariantAdd = () => {
         this.setState(prevState => ({ 
-            variants: [...prevState.variants, this.newVariant]  //{ name: "", price: "" }]
+            variants: [...prevState.variants, this.newVariant]
         }))
       }
 
     onSubmit = e => {
         e.preventDefault();
-        console.log(this.state);
+        let product = this.createProduct();
+        console.log(product);
     }
 
     getSelectedItem = (id, items) => {
@@ -96,6 +97,35 @@ class ProductForm extends React.Component
             }
         }
         return false;
+    }
+
+    createProduct = () => {
+        let product = {
+            name: this.state.name,
+            description: this.state.description,
+            nutritionals: this.createNutritionals(),
+            category: this.state.category,
+            tva: this.state.tax,
+            allergens: this.state.allergens,
+            variants: this.state.variants,
+            supplier: this.state.supplier
+        }
+        return product;
+    }
+
+    createNutritionals = () => {
+        let calories = 4 * (parseFloat(this.state.protein) + parseFloat(this.state.carbohydrates)) + (9 * parseFloat(this.state.fat)) || 0;
+        let nutritionals = {
+            protein: this.state.protein, 
+            carbohydrates: this.state.carbohydrates, 
+            sugar: this.state.sugar, 
+            fat: this.state.fat, 
+            transAG: this.state.saturated, 
+            salt: this.state.sodium,
+            kCal: calories,
+            kJ: 4.184 * calories
+        }
+        return nutritionals;
     }
 
     displaySuppliers = (suppliers) => {
@@ -145,7 +175,7 @@ class ProductForm extends React.Component
 
     displayTaxes = (taxes) => {
         return (
-        <select id="taxes" name="taxes" onChange={ (e) => this.onSelectChange(taxes, e) }>
+        <select id="tax" name="tax" onChange={ (e) => this.onSelectChange(taxes, e) }>
             {taxes.map(tax => {
                     if (this.state.tax.id === tax.id) {
                         return <option value={tax.id} selected>{ tax.name }</option>
@@ -172,6 +202,10 @@ class ProductForm extends React.Component
                         <label>Prix</label>
                         <input type="text" data-id={index} placeholder="price" name="price" value={variant.price ||''} onChange={(e) => this.onVariantChange(e, index) } />
                     </div>
+                    <div>
+                        <label>Quantité en stock</label>
+                        <input type="text" data-id={index} placeholder="quantity" name="stock" value={variant.stock.quantity || 0} onChange={(e) => this.onVariantChange(e, index) } />
+                    </div>
                     <a href="#" class="btn btn-danger" onClick={ (e) => this.onVariantDelete(e, index) }>Supprimer</a>
                 </div>
             );
@@ -183,7 +217,7 @@ class ProductForm extends React.Component
 
             return (
                 <div className="container mt-3">
-                    <h1>Create new Product</h1>
+                    <h1>{ this.state.title }</h1>
                     <form name="product" method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
 
@@ -256,7 +290,6 @@ class ProductForm extends React.Component
                                 <label class="required">Variants</label>
                                 <div id="product_variants">
                                     { this.displayVariants(this.state.variants) }
-                                    {/* { typeof this.id === 'undefined' ? '' : (typeof this.state.variants === 'undefined' ? '' : this.displayVariants(this.state.variants) ) } */}
                                 </div>
                             </div>
                         </div>
@@ -286,6 +319,3 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, { addSupplier, updateSupplier, deleteSupplier })(ProductForm);
-
-// "<div><label>__name__label__</label><div id=&quot;product_variants___name__&quot;><div><label for=&quot;variants[__name__]_name&quot;>Nom</label><input type=&quot;text&quot; id=&quot;variants[__name__]_name&quot; name=&quot;variants[__name__]_name&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div><label for=&quot;variants[__name__]_price&quot;>Prix</label><input type=&quot;text&quot; id=&quot;variants[__name__]_price&quot; name=&quot;variants[__name__]_price&quot; required=&quot;required&quot;/></div></div></div>"
-// data-prototype="<div ><label class=&quot;required&quot;>__name__label__</label><div id=&quot;product_variants___name__&quot;><div ><label for=&quot;product_variants___name___name&quot; class=&quot;required&quot;>Name</label><input type=&quot;text&quot; id=&quot;product_variants___name___name&quot; name=&quot;product[variants][__name__][name]&quot; required=&quot;required&quot; maxlength=&quot;60&quot; /></div><div ><label for=&quot;product_variants___name___price&quot; class=&quot;required&quot;>Price</label><input type=&quot;text&quot; id=&quot;product_variants___name___price&quot; name=&quot;product[variants][__name__][price]&quot; required=&quot;required&quot;/></div></div></div>">

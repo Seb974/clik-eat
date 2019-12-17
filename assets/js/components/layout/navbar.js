@@ -65,18 +65,18 @@ class Navbar extends Component {
                                     <i className="fas fa-users"></i>Utilisateurs</Link>
                                 <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/suppliers">
-                                    <i className="fas fa-factory"></i>Fournisseurs</Link>
+                                    <i className="fas fa-industry"></i>Fournisseurs</Link>
                                 <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/cities">
                                     <i className="fas fa-city"></i>Villes</Link>
                                 <div className="dropdown-divider"></div>
 
                                 <Link className="dropdown-item" to="/products">
-                                    <i className="fas fa-columns"></i>Produits</Link>
+                                    <i class="fas fa-utensils"></i>Produits</Link>
                                 <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="{{ path('variant_index') }}">
+                                {/* <a className="dropdown-item" href="{{ path('variant_index') }}">
                                         <i className="fas fa-sort"></i>Variantes</a>
-                                <div className="dropdown-divider"></div>
+                                <div className="dropdown-divider"></div> */}
 
                                 <Link className="dropdown-item" to="/categories">
                                     <i className="fas fa-columns"></i>Catégories</Link>
@@ -85,7 +85,7 @@ class Navbar extends Component {
                                     <i className="fas fa-calculator"></i>Taxes</Link>
                                 <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/allergens">
-                                    <i className="fas fa-home"></i>Allergènes</Link>
+                                    <i className="fas fa-exclamation-triangle"></i>Allergènes</Link>
                                 <div className="dropdown-divider"></div>
                             </span>
                             )
