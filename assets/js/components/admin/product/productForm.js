@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { addSupplier, updateSupplier, deleteSupplier } from '../../../actions/supplierActions';
+import { addProduct, updateProduct } from '../../../actions/productActions';
 import { Link } from 'react-router-dom';
 import { Redirect } from "react-router-dom";
 import PropTypes from 'prop-types';
@@ -37,9 +37,8 @@ class ProductForm extends React.Component
     };
 
     static propTypes = {
-        addSupplier: PropTypes.func.isRequired,
-        updateSupplier: PropTypes.func.isRequired,
-        deleteSupplier: PropTypes.func.isRequired
+        addProduct: PropTypes.func.isRequired,
+        updateProduct: PropTypes.func.isRequired
     };
     
     componentDidMount() {
@@ -87,7 +86,11 @@ class ProductForm extends React.Component
     onSubmit = e => {
         e.preventDefault();
         let product = this.createProduct();
-        console.log(product);
+        if (typeof this.id !== 'undefined') {
+            this.props.updateProduct(product);
+        } else {
+            this.props.addProduct(product);
+        }
     }
 
     getSelectedItem = (id, items) => {
@@ -108,7 +111,8 @@ class ProductForm extends React.Component
             tva: this.state.tax,
             allergens: this.state.allergens,
             variants: this.state.variants,
-            supplier: this.state.supplier
+            supplier: this.state.supplier,
+            initialProduct: this.state.selection
         }
         return product;
     }
@@ -116,12 +120,12 @@ class ProductForm extends React.Component
     createNutritionals = () => {
         let calories = 4 * (parseFloat(this.state.protein) + parseFloat(this.state.carbohydrates)) + (9 * parseFloat(this.state.fat)) || 0;
         let nutritionals = {
-            protein: this.state.protein, 
-            carbohydrates: this.state.carbohydrates, 
-            sugar: this.state.sugar, 
-            fat: this.state.fat, 
-            transAG: this.state.saturated, 
-            salt: this.state.sodium,
+            protein: this.state.protein !== "" ? parseFloat(this.state.protein.replace(',','.')) : 0, 
+            carbohydrates: this.state.carbohydrates !== "" ? parseFloat(this.state.carbohydrates.replace(',','.')) : 0, 
+            sugar: this.state.sugar !== "" ? parseFloat(this.state.sugar.replace(',','.')) : 0, 
+            fat: this.state.fat !== "" ? parseFloat(this.state.fat.replace(',','.')) : 0, 
+            transAG: this.state.saturated !== "" ? parseFloat(this.state.saturated.replace(',','.')) : 0, 
+            salt: this.state.sodium !== "" ? parseFloat(this.state.sodium.replace(',','.')) : 0,
             kCal: calories,
             kJ: 4.184 * calories
         }
@@ -311,11 +315,11 @@ const mapStateToProps = state => ({
     token: state.auth.token,
     cities: state.city.cities,
     user: state.auth.user,
-    products: state.productAdmin.products,
+    products: state.product.products,
     suppliers: state.supplier.suppliers,
     categories: state.category.categories,
     allergens: state.allergen.allergens,
     taxes: state.tax.taxes
 });
 
-export default connect(mapStateToProps, { addSupplier, updateSupplier, deleteSupplier })(ProductForm);
+export default connect(mapStateToProps, { addProduct, updateProduct })(ProductForm);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getAdminProducts, deleteProduct } from '../../../actions/productAdminActions';
+import { getProducts, deleteProduct } from '../../../actions/productActions';
 import { getSuppliers } from '../../../actions/supplierActions';
 import { getCategories } from '../../../actions/categoryActions';
 import { getAllergens } from '../../../actions/allergenActions';
@@ -16,7 +16,7 @@ class ProductAdminList extends React.Component
     };
 
     static propTypes = {
-        getAdminProducts: PropTypes.func.isRequired,
+        getProducts:  PropTypes.func.isRequired,
         deleteProduct: PropTypes.func.isRequired,
         getSuppliers: PropTypes.func.isRequired,
         getCategories: PropTypes.func.isRequired,
@@ -25,7 +25,7 @@ class ProductAdminList extends React.Component
     };
     
     componentDidMount() {
-        this.props.getAdminProducts();
+        this.props.getProducts();
         this.props.getSuppliers();
         this.props.getCategories();
         this.props.getAllergens();
@@ -42,7 +42,6 @@ class ProductAdminList extends React.Component
             const id = props.details.id;
             return (
                 <tr>
-                    {/* <td>{ props.details.id }</td> */}
                     <td>{ id }</td>
                     <td>{ props.details.name }</td>
                     <td>{ props.details.description }</td>
@@ -54,7 +53,7 @@ class ProductAdminList extends React.Component
                 </tr>
             );
         }
-        return this.props.productsAdmin.map( product => <Product details={product} /> );
+        return this.props.products.map( product => <Product details={product} /> );
     }
 
     render() {
@@ -73,7 +72,7 @@ class ProductAdminList extends React.Component
                         </thead>
                         <tbody>
                             {
-                                (typeof this.props.productsAdmin !== 'undefined' && this.props.productsAdmin.length > 0) ? 
+                                (typeof this.props.products !== 'undefined' && this.props.products.length > 0) ? 
                                 this.displayProducts() : <tr> <td colspan="3">no records found</td> </tr>
                             }
                         </tbody>
@@ -89,7 +88,7 @@ class ProductAdminList extends React.Component
 }
 
 const mapStateToProps = state => ({
-    productsAdmin: state.productAdmin.products,
+    products: state.product.products,
     isAuthenticated: state.auth.isAuthenticated,
     token: state.auth.token,
     user: state.auth.user,
@@ -99,4 +98,4 @@ const mapStateToProps = state => ({
     tax: state.tax.taxes
   });
 
-export default connect(mapStateToProps, { getAdminProducts, deleteProduct, getSuppliers, getCategories, getAllergens, getTaxes })(ProductAdminList);
+export default connect(mapStateToProps, { getProducts, deleteProduct, getSuppliers, getCategories, getAllergens, getTaxes })(ProductAdminList);

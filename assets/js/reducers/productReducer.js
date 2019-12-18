@@ -1,4 +1,4 @@
-import { GET_PRODUCTS, GET_PRODUCT, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK, UPDATE_PRODUCT_STOCK } from '../actions/types';
+import { GET_PRODUCTS, GET_PRODUCT, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK, UPDATE_PRODUCT_STOCK, ADD_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT } from '../actions/types';
   
   const initialState = {
     products: [],
@@ -21,6 +21,24 @@ import { GET_PRODUCTS, GET_PRODUCT, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STO
             ...state,
             selected: action.payload
           };
+      case ADD_PRODUCT:
+        const enlargedProducts = [action.payload, ...state.products];
+        return {
+            ...state,
+            products: enlargedProducts,
+        };
+      case DELETE_PRODUCT:
+          const reducedProducts = state.products.filter(product => product.id !== action.payload.id);
+          return {
+              ...state,
+              products: reducedProducts,
+          };
+      case UPDATE_PRODUCT:
+          const previousProducts = state.products.filter(product => product.id !== action.payload.id);
+          return {
+              ...state,
+              products: [action.payload, ...previousProducts],
+          }
       case UPDATE_PRODUCT_STOCK:
           let p = -1;
           let s = -1;
