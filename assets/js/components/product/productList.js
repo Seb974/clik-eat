@@ -32,18 +32,22 @@ class ProductList extends React.Component
     displayVariants = (product) => {
         let Variant = (props) => {
             return (
-                <span>
-                    <li key={"variant-item-" + props.details.id}>
-                        <i className="fas fa-dolly"></i> 
-                        {" "} {props.details.stock.quantity} {" "}
-                        {props.details.stock.quantity <= 0 ? <span>En rupture de stock !</span> : 
-                            (<button className="btn btn-primary btn-sm" onClick={() => this.handleClick(product, props.details)} id={props.details.id}>
-                                <i className="fas fa-shopping-cart"></i>
-                                {props.details.name}  à {props.details.price}€
-                            </button>)
+                     <li key={"variant-item-" + props.details.id} className="d-flex flex-row-reverse variant-list">
+                        {/* <form> */}
+                        {props.details.stock.quantity <= 0 ? <span class="react-stock">Rupture de stock !</span> : 
+                            (<span>
+                                <span class="stock-info">
+                                    <i className="fas fa-dolly"></i> 
+                                    {" "} {props.details.stock.quantity} {" "}
+                                </span>
+                                <button className="btn btn-primary btn-sm" onClick={() => this.handleClick(product, props.details)} id={props.details.id}>
+                                    <i className="fas fa-shopping-cart"></i>
+                                    {props.details.name}  à {props.details.price}€
+                                </button>
+                            </span>)
                         }
+                        {/* </form> */}
                     </li>
-                </span>
               );
             }
         return product.variants.map(variant => {
@@ -59,16 +63,16 @@ class ProductList extends React.Component
     displayProducts = () => {
         let Product = (props) => {
           return (
-            <div className="col-12 col-sm-6 col-md-4 react-product">
+            <div className="col-12 col-sm-6 col-lg-4 react-product">
                 <div className="card card-lg">
                     <div className="card-img">
-                        <Link to={ "/show/" + props.details.id }>
+                        <Link to={ "/show/" + props.details.id } className="article-details-link">
                             { 
                                 (props.details.picture !== null && props.details.picture !== "" && typeof props.details.picture !== 'undefined') ? <img src={ 'uploads/pictures/' + props.details.picture.b64 } className="card-img-top" alt={ props.details.picture.b64 }/> : ""
                             }
                         </Link>
                     </div>
-                    <div className="card-block">
+                    <div className="card-text">
                         <ul>
                             <li key={"product-item-" + props.details.id}>
                                 <Link to={ "/show/" + props.details.id }>
@@ -80,7 +84,9 @@ class ProductList extends React.Component
                                 </Link>
                             </li>
                         </ul>
-                        <ul>
+                    </div>
+                    <div className="card-block">
+                        <ul className="d-flex flex-column">
                             { this.displayVariants(props.details) }
                         </ul>
                     </div>
@@ -95,16 +101,14 @@ class ProductList extends React.Component
 
     render() {
         return (
-            <div id="content-wrap">
-                <div className="product-wrapper">
-                    <section className="p-t-30" id="react-product-list">
-                        <div className="container">
-                            <div className="row">
-                                { this.displayProducts() }
-                            </div>
+            <div className="product-wrapper">
+                <section className="p-t-30" id="react-product-list">
+                    <div className="container">
+                        <div className="row">
+                            { this.displayProducts() }
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
         );
     }

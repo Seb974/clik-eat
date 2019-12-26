@@ -1,0 +1,9 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+       pictures:
+           uri_prefix: '%app.path.pictures%'
+           upload_destination: '%pics_directory%'
+           namer: Vich\UploaderBundle\Naming\OrignameNamer
+

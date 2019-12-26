@@ -664,6 +664,7 @@ img {
   padding: 65px 0 20px 0;
   position: absolute;
   width: 100%;
+  margin-top: 15px;
   /* height: 2.5rem; */
 }
 
@@ -4522,6 +4523,7 @@ input[type="file"] {
           box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.07);
   margin-bottom: 30px;
   border-radius: 6px;
+  height: 94%;
 }
 
 .card .card-img {
@@ -4568,6 +4570,7 @@ input[type="file"] {
   height: auto;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
+  padding: 1px;
 }
 
 .card .card-block {
@@ -4730,6 +4733,20 @@ input[type="file"] {
   -webkit-box-shadow: none;
           box-shadow: none;
   background-color: transparent;
+}
+
+.card-img {
+  height: 50%;
+}
+
+.card-block {
+  height: auto;
+}
+
+.card-text {
+  height: auto;
+  z-index: 200;
+  padding-left: 15px;
 }
 
 .card-review .card-img {
