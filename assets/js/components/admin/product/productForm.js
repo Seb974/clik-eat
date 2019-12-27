@@ -34,6 +34,7 @@ class ProductForm extends React.Component
         fat: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.fat),
         saturated: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.transAG),
         sodium: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.salt),
+        picture: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.picture === 'undefined' ? '' : this.selectedProduct.picture),
     };
 
     static propTypes = {
@@ -69,6 +70,10 @@ class ProductForm extends React.Component
         let variants = [...this.state.variants];
         (name !== "stock") ? ( variants[i] = {...variants[i], [name]: value} ) : ( variants[i] = {...variants[i], [name]: {quantity: value}} );
         this.setState({ variants });
+    }
+
+    onImageChange = (e) => {
+        this.setState({ picture: e.target.files[0] });
     }
 
     onVariantDelete = (e, i) => {
@@ -112,7 +117,8 @@ class ProductForm extends React.Component
             allergens: this.state.allergens,
             variants: this.state.variants,
             supplier: this.state.supplier,
-            initialProduct: this.state.selection
+            initialProduct: this.state.selection,
+            picture: this.state.picture
         }
         return product;
     }
@@ -241,6 +247,11 @@ class ProductForm extends React.Component
                             </div>
 
                             <div>
+                                <label for="product_illustration" class="picture-label">Image</label>
+                                <input type="file" id="picture" name="picture" onChange={ this.onImageChange }/>
+                            </div>
+
+                            <div>
                                 <label for="product_description">Description</label>
                                 <textarea id="description" name="description" onChange={ this.onChange }>{ this.state.description }</textarea>
                             </div>
@@ -283,11 +294,6 @@ class ProductForm extends React.Component
                             <div>
                                 <label for="product_tva" class="required">Tva</label>
                                 { this.displayTaxes(this.props.taxes) }
-                            </div>
-
-                            <div>
-                                <label for="product_picture">Illustration</label>
-                                <input type="file" id="product_picture" name="product[picture]"/>
                             </div>
                             <br/>
                             <div>

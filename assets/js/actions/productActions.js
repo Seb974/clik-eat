@@ -119,10 +119,12 @@ export const deleteProduct = id => dispatch => {
 
 export const addProduct = (fromState) => dispatch =>{
   (async () => {
+      const pictureToUpload = fromState.picture;
+      let picture = fromState.picture !== '' ? await registerPicture(pictureToUpload) : null;
+      console.log("id = " + picture.data["@id"].substring( parseInt(picture.data["@id"].lastIndexOf("/")) + 1));
       const nutritionals = await registerNutritionals(fromState);
       const variants = await registerVariants(fromState);
       const registeredVariants = await Promise.all(variants);
-      console.log(registeredVariants);
       let product = {
           name: fromState.name,
           description: fromState.description,
@@ -131,22 +133,23 @@ export const addProduct = (fromState) => dispatch =>{
           tva: '/api/tvas/' + fromState.tva.id,
           allergens: fromState.allergens.map(allergen => '/api/allergens/' + allergen.id),
           variants: registeredVariants.map(variant => '/api/variants/' + variant.data.id),
-          supplier: '/api/suppliers/' + fromState.supplier.id
+          supplier: '/api/suppliers/' + fromState.supplier.id,
+          picture: fromState.picture === '' ? null : "api/pics/" + picture.data["@id"].substring( parseInt(picture.data["@id"].lastIndexOf("/")) + 1)
       };
       await axios.post('/api/products', 
           JSON.stringify(product), tokenConfig())
-          .then( (res) => {
-              console.log(res);
-              dispatch({
-                  type: ADD_PRODUCT,
-                  payload: res.data
-              })
-          });
+              .then( (res) => {
+                  console.log(res);
+                  dispatch({
+                      type: ADD_PRODUCT,
+                      payload: res.data
+                  })
+              });
   })();
 };
 
 export const updateProduct = (fromState) => dispatch => {
-  const config = { headers: { 'Content-Type': 'application/json' } };
+  const config = { headers: { 'Content-Type': 'multipart/form-data' } };
   const product = fromState.selection;
   const body = JSON.stringify({ 
       name: fromState.name, 
@@ -170,7 +173,6 @@ export const updateProduct = (fromState) => dispatch => {
 };
 
 export const registerVariants = async (fromState) => {
-    // for (let i = 0, variants = fromState.variants; i < variants.length; i++) {
       return await fromState.variants.map( async variant => {
           let newVariant  = { 
               name: variant.name, 
@@ -191,7 +193,6 @@ export const registerVariants = async (fromState) => {
                                 });
           }
       })
-    // }
 };
 
 export const registerNutritionals = async (fromState) => {
@@ -201,6 +202,25 @@ export const registerNutritionals = async (fromState) => {
         return await axios.put('/api/nutritionals' + fromState.initialProduct.nutritionals.id, JSON.stringify(fromState.nutritionals), tokenConfig());
     }
 };
+
+export const registerMedia = async (media) => {
+    let formData = new FormData();
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+          'Content-type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+    }
+    formData.append('file', media);
+    return await axios.post('/api/media_objects', formData, config);
+}
+
+export const registerPicture = async (media) => {
+  const mediaObject = await registerMedia(media);
+  const picture = {b64: mediaObject.data.contentUrl};
+  return await axios.post('api/pics', JSON.stringify(picture), tokenConfig());
+}
 
 export const registerStock = async (id, variant) => {
     let stock = {

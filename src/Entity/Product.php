@@ -2,20 +2,24 @@
 
 namespace App\Entity;
 
+use App\Entity\MediaObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-// attributes={
-//  *          "normalization_context"={"groups"={"product", "variant"}}
-//  *     },
+// iri="http://schema.org/Book",
+//@ApiProperty(iri="http://schema.org/image")
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  * @ApiResource(
+ *      iri="http://schema.org/Product",
  *     attributes={
  *          "normalization_context"={"groups"={"product"}}
  *     },
@@ -50,11 +54,22 @@ class Product
     private $description;
 
     /**
+     * 
      * @ORM\OneToOne(targetEntity="App\Entity\Pics", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"product", "category", "allergen", "supplier", "variant"})
      * @ApiSubresource
      */
     private $picture;
+
+    /**
+     * @var MediaObject|null
+     * 
+     * @ORM\OneToOne(targetEntity="App\Entity\MediaObject")
+     * @ORM\JoinColumn(nullable=true)
+     * @ApiProperty(iri="http://schema.org/image")
+     */
+    private $image;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Nutritionals", cascade={"persist", "remove"})

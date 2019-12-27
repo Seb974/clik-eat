@@ -31,7 +31,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 		$users = array(
 			array(
 				'email'     => 'm_seb@icloud.com',
-				'roles'     => 'ROLE_ADMIN',
+				'roles'     => ['ROLE_ADMIN'],
 				'password'  => 'Soleil01',
 				'username'  => 'sebastien',
 				'is_banned' => false,
@@ -40,7 +40,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'anne-marion.vitry@coding-academy.fr',
-				'roles'     => 'ROLE_ADMIN',
+				'roles'     => ['ROLE_ADMIN'],
 				'password'  => 'azerty',
 				'username'  => 'Anna',
 				'is_banned' => false,
@@ -49,7 +49,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'yen.linkwang@nigao.re',
-				'roles'     => 'ROLE_ADMIN',
+				'roles'     => ['ROLE_ADMIN'],
 				'password'  => 'azerty',
 				'username'  => 'Yen',
 				'is_banned' => false,
@@ -58,7 +58,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'contact@osaka.re',
-				'roles'     => 'ROLE_SUPPLIER',
+				'roles'     => ['ROLE_SUPPLIER'],
 				'password'  => 'azerty',
 				'username'  => 'OSAKA',
 				'is_banned' => false,
@@ -67,7 +67,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'brenda@osaka.re',
-				'roles'     => 'ROLE_SUPPLIER',
+				'roles'     => ['ROLE_SUPPLIER'],
 				'password'  => 'azerty',
 				'username'  => 'Brenda',
 				'is_banned' => false,
@@ -76,7 +76,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'contact@burger.re',
-				'roles'     => 'ROLE_SUPPLIER',
+				'roles'     => ['ROLE_SUPPLIER'],
 				'password'  => 'azerty',
 				'username'  => 'BurgerMary',
 				'is_banned' => false,
@@ -85,7 +85,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'cyclist@uber.com',
-				'roles'     => 'ROLE_DELIVERER',
+				'roles'     => ['ROLE_DELIVERER'],
 				'password'  => 'azerty',
 				'username'  => 'UberEats',
 				'is_banned' => false,
@@ -94,7 +94,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'kevin@epitech.eu',
-				'roles'     => 'ROLE_USER',
+				'roles'     => ['ROLE_USER'],
 				'password'  => 'azerty',
 				'username'  => 'Kevin',
 				'is_banned' => false,
@@ -103,7 +103,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 
 			array(
 				'email'     => 'marvin@epitech.eu',
-				'roles'     => 'ROLE_USER',
+				'roles'     => ['ROLE_USER'],
 				'password'  => 'azerty',
 				'username'  => 'Marvin',
 				'is_banned' => true,
@@ -119,7 +119,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
 			$user->setUsername( $value['username'] );
 			$user->setIsBanned( $value['is_banned'] );
 
-			$user->setRoles( array( $value['roles'] ) );
+			$user->setRoles( $value['roles'] );
 			$user->setPassword( $this->encoder->encodePassword( $user, $value['password'] ) );
 			$user->setSupplier( $value['supplier'] );
 
