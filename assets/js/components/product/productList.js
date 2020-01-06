@@ -33,7 +33,6 @@ class ProductList extends React.Component
         let Variant = (props) => {
             return (
                      <li key={"variant-item-" + props.details.id} className="d-flex flex-row-reverse variant-list">
-                        {/* <form> */}
                         {props.details.stock.quantity <= 0 ? <span class="react-stock">Rupture de stock !</span> : 
                             (<span>
                                 <span class="stock-info">
@@ -46,7 +45,6 @@ class ProductList extends React.Component
                                 </button>
                             </span>)
                         }
-                        {/* </form> */}
                     </li>
               );
             }
@@ -60,11 +58,11 @@ class ProductList extends React.Component
         });
     }
 
-    displayProducts = () => {
+    displayProducts = (productsToDisplay) => {
         let Product = (props) => {
           return (
-            <div className="col-12 col-sm-6 col-lg-4 react-product">
-                <div className="card card-lg">
+            <div className={"col-12 col-sm-6 col-lg-4 react-product category-" + props.details.category.name }>
+                <div className="card card-lg home-card">
                     <div className="card-img">
                         <Link to={ "/show/" + props.details.id } className="article-details-link">
                             { 
@@ -95,7 +93,7 @@ class ProductList extends React.Component
             </div>
           );
         }
-        return this.props.product.products.map(product => {
+        return productsToDisplay.map(product => {
             return <Product key={"product-" + product.id} details={product} />
         });
     }
@@ -106,7 +104,13 @@ class ProductList extends React.Component
                 <section className="p-t-30" id="react-product-list">
                     <div className="container">
                         <div className="row">
-                            { this.displayProducts() }
+                            { 
+                                Object.entries(this.props.selectedCategory).length === 0 && this.props.selectedCategory.constructor === Object ? 
+                                    this.displayProducts(this.props.product.products) : 
+                                    this.displayProducts(this.props.product.products.filter( product => {
+                                        return product.category.name === this.props.selectedCategory.name;
+                                    }))
+                            }
                         </div>
                     </div>
                 </section>
@@ -117,7 +121,8 @@ class ProductList extends React.Component
 
 const mapStateToProps = state => ({
     product: state.product,
-    isAuthenticated: state.auth.isAuthenticated
+    isAuthenticated: state.auth.isAuthenticated,
+    selectedCategory: state.category.selected,
   });
   
   export default connect(

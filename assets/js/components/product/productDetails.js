@@ -157,7 +157,7 @@ class ProductDetails extends React.Component
                                 <div className="post-thumbnail">
                                     { (!product.picture || product.picture === "" ) ? "" :
                                         <div className="embed-responsive embed-responsive-16by9">
-                                            <img className="embed-responsive-item" src={ '../uploads/pictures/' + product.picture.b64 } alt={ product.picture.b64 }/>
+                                            <img className="embed-responsive-item" src={ product.picture.b64 } alt={ product.picture.b64 }/>
                                         </div>
                                     }
                                 </div>

@@ -22,11 +22,15 @@ export const getCategory = (id, categories) => dispatch => {
         if (parseInt(categories[i].id) === parseInt(id)) {
             dispatch({
                 type: GET_CATEGORY,
-                payload: categories[i]
-            })
-            break;
+                payload: categories[i],
+            });
+            return ;
         }
     }
+    dispatch({
+        type: GET_CATEGORY,
+        payload: {},
+    });
 };
 
 export const addCategory = category => dispatch =>{

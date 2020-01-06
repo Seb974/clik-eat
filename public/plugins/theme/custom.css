@@ -11,6 +11,11 @@ table.dataTable thead .sorting_desc_disabled:before {
 	bottom: .5em;
 }
 
+.selected-Category {
+	color: #74be6b;
+    background-color: #e1f7de;
+}
+
 .comment-wrapper {
 	max-height: 650px;
 	overflow: auto;
@@ -77,20 +82,29 @@ table.dataTable thead .sorting_desc_disabled:before {
 }
 
 @media (max-width: 767px) {
-	.card {
-		height: 595px!important;
+	.home-card {
+		height: 580px!important;
+	}
+	.card-img {
+		height: 237.19px!important;
 	}
   }
 
   @media (min-width: 768px) {
-	.card {
-		height: 660px!important;
+	.home-card {
+		height: 590px!important;
+	}
+	.card-img {
+		height: 263.19px!important;
 	}
   }
 
   @media (min-width: 1024px) {
-	.card {
-		height: 645px!important;
+	.home-card {
+		height: 565px!important;
+	}
+	.card-img {
+		height: 257.19px!important;
 	}
   }
 
@@ -103,4 +117,6 @@ table.dataTable thead .sorting_desc_disabled:before {
 		font-size: 18px;
 	}
 }
+
+
 

@@ -199,7 +199,7 @@ img {
 #header {
   width: 100%;
   height: 62px;
-  background: #b5067f;
+  background: #202020; /* #b5067f; */
   position: relative;
   z-index: 999;
 }
@@ -275,7 +275,7 @@ img {
 
 #header .nav > ul > li > a,
 #header .nav > ul > li > a {
-  color: #FFD710;
+  color:#FFC003; /*#7DBF40;*/
   font-size: 15px;
   font-weight: 500;
   padding: 0 10px;
@@ -595,11 +595,11 @@ img {
 }
 
 #header .navbar-backdrop {
-  background-color: #b5067f;
+  background-color: #202020; /* #b5067f; */
 }
 
 .navbar-search {
-  background-color: #b5067f;
+  background-color: #202020; /* #b5067f; */
   padding: 5px 15px 15px 15px;
   position: absolute;
   width: 100%;
@@ -658,7 +658,7 @@ img {
 }
 
 #footer {
-  background-color: #B5067F;
+  background-color: #202020; /* #b5067f; */
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
   padding: 65px 0 20px 0;
@@ -1714,8 +1714,8 @@ section.error-404 form {
 
 .btn-primary {
   color: #fff;
-  background-color: #B5067F;
-  border-color: #B5067F;
+  background-color: #FF1C1C; /*#B5067F;*/
+  border-color: #FF1C1C; /*#B5067F;*/
 }
 
 .btn-primary:focus, .btn-primary:hover,
@@ -1723,8 +1723,8 @@ section.error-404 form {
 .show > .btn-primary.dropdown-toggle:hover,
 .show > .btn-primary.dropdown-toggle:focus {
   color: #fff;
-  background-color: #FFD710;
-  border-color: #FFD710;
+  background-color: #FFC003; /*#FFD710;*/
+  border-color: #FFC003; /*#FFD710;*/
   outline: 0;
 }
 
@@ -2658,7 +2658,7 @@ fieldset[disabled]
 
 .btn-github:hover, .btn-github:focus, .btn-github:active {
   color: #fff;
-  background: #404040;
+  background: #252525;
 }
 
 .btn-github.btn-link:focus, .btn-github.btn-link:hover {
@@ -3994,7 +3994,7 @@ input[type="file"] {
 }
 
 .badge-cart {
-  background-color: #222222;
+  background-color: #6baf62; /*#74BE6B;*/ /*#222222;*/
 }
 
 .badge-xbox-one,
@@ -4735,9 +4735,9 @@ input[type="file"] {
   background-color: transparent;
 }
 
-.card-img {
+/* .card-img {
   height: 50%;
-}
+} */
 
 .card-block {
   height: auto;
@@ -10149,7 +10149,7 @@ figure {
   #header .logo,
   #header .navbar,
   #header {
-    height: 50px;
+    height: 50px;   /*header-height initial = 50px*/
   }
   #header .nav > ul > li > a {
     line-height: 50px;
@@ -10157,9 +10157,9 @@ figure {
   .navbar-search-open .navbar-search {
     top: 50px;
   }
-  #header .logo {
-    padding: 12px 0;
-  }
+  /* #header .logo {
+    padding: 6px 0;
+  } */
   #header .nav > ul > li > a > .badge {
     top: 5px;
   }
@@ -10310,7 +10310,9 @@ figure {
     right: 0;
     display: inline-block;
     padding-left: 5px;
+    padding-top: 12px;
   }
+
   #header .logo img {
     height: 30px;
   }

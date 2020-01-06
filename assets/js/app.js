@@ -31,7 +31,6 @@ import SupplierList from './components/admin/supplier/supplierList';
 import SupplierDetails from './components/admin/supplier/supplierDetails';
 import SupplierForm from './components/admin/supplier/supplierForm';
 import ProductAdminList from './components/admin/product/productAdminList';
-// import ProductAdminDetails from './components/admin/product/productAdminDetails';
 import ProductForm from './components/admin/product/productForm';
 import store from './store';
 import { loadUser } from './actions/authActions';

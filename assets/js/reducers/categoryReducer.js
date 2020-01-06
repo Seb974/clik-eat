@@ -13,6 +13,7 @@ export default function(state = initialState, action) {
                 categories: action.payload,
             };
         case GET_CATEGORY:
+            console.log(action.payload);
             return {
                 ...state,
                 selected: action.payload
