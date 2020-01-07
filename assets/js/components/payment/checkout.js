@@ -363,7 +363,7 @@ class Checkout extends Component {
                                         </div>
                                         <div className="col-md-2 mt-3">
                                             <small>
-                                                <label htmlFor="complément">GPS</label>
+                                                {/* <label htmlFor="complément">GPS</label> */}
                                                 <input type="hidden" className="form-control" id="gps" name="d_gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
                                             </small>
                                         </div>

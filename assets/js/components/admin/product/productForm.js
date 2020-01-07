@@ -126,12 +126,12 @@ class ProductForm extends React.Component
     createNutritionals = () => {
         let calories = 4 * (parseFloat(this.state.protein) + parseFloat(this.state.carbohydrates)) + (9 * parseFloat(this.state.fat)) || 0;
         let nutritionals = {
-            protein: this.state.protein !== "" ? parseFloat(this.state.protein.replace(',','.')) : 0, 
-            carbohydrates: this.state.carbohydrates !== "" ? parseFloat(this.state.carbohydrates.replace(',','.')) : 0, 
-            sugar: this.state.sugar !== "" ? parseFloat(this.state.sugar.replace(',','.')) : 0, 
-            fat: this.state.fat !== "" ? parseFloat(this.state.fat.replace(',','.')) : 0, 
-            transAG: this.state.saturated !== "" ? parseFloat(this.state.saturated.replace(',','.')) : 0, 
-            salt: this.state.sodium !== "" ? parseFloat(this.state.sodium.replace(',','.')) : 0,
+            protein: this.state.protein !== "" ? ((typeof this.state.protein === "string") ? parseFloat(this.state.protein.replace(',','.')) : this.state.protein) : 0, 
+            carbohydrates: this.state.carbohydrates !== "" ? ((typeof this.state.carbohydrates === "string") ? parseFloat(this.state.carbohydrates.replace(',','.'))  : this.state.carbohydrates) : 0, 
+            sugar: this.state.sugar !== "" ? ((typeof this.state.sugar === "string") ? parseFloat(this.state.sugar.replace(',','.'))  : this.state.sugar) : 0, 
+            fat: this.state.fat !== "" ? ((typeof this.state.fat === "string") ? parseFloat(this.state.fat.replace(',','.'))  : this.state.fat) : 0, 
+            transAG: this.state.saturated !== "" ? ((typeof this.state.saturated === "string") ? parseFloat(this.state.saturated.replace(',','.'))  : this.state.saturated) : 0, 
+            salt: this.state.sodium !== "" ? ((typeof this.state.sodium === "string") ? parseFloat(this.state.sodium.replace(',','.'))  : this.state.sodium) : 0,
             kCal: calories,
             kJ: 4.184 * calories
         }

@@ -87,41 +87,10 @@ export const deleteProduct = id => dispatch => {
   });
 };
 
-// export const addProduct = (fromState) => dispatch =>{
-//   const config = { headers: { 'Content-Type': 'application/json' } };
-//   let product = {
-//     name: fromState.name,
-//     description: fromState.description,
-//     // nutritionals: fromState.nutritionals,
-//     category: fromState.category,
-//     tva: '/api/tvas/' + fromState.tva.id,
-//     allergens: fromState.allergens.map(allergen => '/api/allergens/' + allergen.id),
-//     variants: fromState.variants,
-//     supplier: '/api/suppliers/' + fromState.supplier.id
-//   };
-//   axios.post('/api/products', JSON.stringify(product), config)
-//       .then((res) => {
-//           const newProductId = res.data.id;
-//           (async () => {
-//               await registerVariants(fromState, newProductId);
-//               const newProduct = await getProductFromDb(newProductId);
-//               dispatch({
-//                   type: ADD_PRODUCT,
-//                   payload: newProduct.data
-//               })
-//           })();
-//           console.log(res.data);
-//       })
-//       .catch(err => {
-//           console.log(err);
-//       });
-// };
-
 export const addProduct = (fromState) => dispatch =>{
   (async () => {
       const pictureToUpload = fromState.picture;
       let picture = fromState.picture !== '' ? await registerPicture(pictureToUpload) : null;
-      console.log("id = " + picture.data["@id"].substring( parseInt(picture.data["@id"].lastIndexOf("/")) + 1));
       const nutritionals = await registerNutritionals(fromState);
       const variants = await registerVariants(fromState);
       const registeredVariants = await Promise.all(variants);
@@ -139,7 +108,6 @@ export const addProduct = (fromState) => dispatch =>{
       await axios.post('/api/products', 
           JSON.stringify(product), tokenConfig())
               .then( (res) => {
-                  console.log(res);
                   dispatch({
                       type: ADD_PRODUCT,
                       payload: res.data
@@ -149,27 +117,22 @@ export const addProduct = (fromState) => dispatch =>{
 };
 
 export const updateProduct = (fromState) => dispatch => {
-  const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-  const product = fromState.selection;
-  const body = JSON.stringify({ 
-      name: fromState.name, 
-      description: fromState.description
-  });
-  axios.put('/api/users/' + product.id, body, config)
-      .then((res) => {
-          const updatedProductId = res.data.id;
-          (async () => {
-              await registerMetas(fromState, updatedProductId);
-              const updatedUser = await getProductFromDb(updatedUserId);
-              await dispatch({
-                  type: UPDATE_USER,
-                  payload: updatedUser.data
-              })
-          })();
-      })
-      .catch(err => {
-          console.log(err);
-      });
+      (async () => {
+          const config = { headers: { 'Content-Type': 'application/merge-patch+json' } };
+          const pictureToUpload = fromState.picture;
+          const picture = fromState.picture !== '' && fromState.picture.id !== fromState.initialProduct.picture.id ? await registerPicture(pictureToUpload) : null;
+          const updatedProperties = await defineUpdatedProperties(fromState);
+          if (picture !== null) {
+            updatedProperties['picture'] = picture;
+          }
+          await axios.patch('/api/products/' + fromState.initialProduct.id, JSON.stringify(updatedProperties), config)
+                    .then( (res) => {
+                        dispatch({
+                            type: UPDATE_PRODUCT,
+                            payload: res.data
+                        })
+                    });
+      })();
 };
 
 export const registerVariants = async (fromState) => {
@@ -199,7 +162,7 @@ export const registerNutritionals = async (fromState) => {
     if (typeof fromState.initialProduct.nutritionals === 'undefined') {
         return await axios.post('/api/nutritionals', JSON.stringify(fromState.nutritionals), tokenConfig());
     } else {
-        return await axios.put('/api/nutritionals' + fromState.initialProduct.nutritionals.id, JSON.stringify(fromState.nutritionals), tokenConfig());
+        return await axios.put('/api/nutritionals/' + fromState.initialProduct.nutritionals.id, JSON.stringify(fromState.nutritionals), tokenConfig());
     }
 };
 
@@ -208,7 +171,8 @@ export const registerMedia = async (media) => {
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'multipart/form-data',
+          //'Content-type': 'application/json',
           'Authorization': 'Bearer ' + token
         }
     }
@@ -236,4 +200,61 @@ export const registerStock = async (id, variant) => {
 
 export const getProductFromDb = async (id) => {
   return await axios.get('/api/products/' + id);
+}
+
+export const defineUpdatedProperties = async (fromState) => {
+    const initialProduct = {
+      name: fromState.initialProduct.name,
+      description: fromState.initialProduct.description,
+      nutritionals: fromState.initialProduct.nutritionals,
+      category: fromState.initialProduct.category,
+      tva: fromState.initialProduct.tva,
+      allergens: fromState.initialProduct.allergens,
+      variants: fromState.initialProduct.variants,
+      supplier: fromState.initialProduct.supplier,
+    }
+    const updatedProduct = {
+      name: fromState.name,
+      description: fromState.description,
+      nutritionals: fromState.nutritionals,
+      category: fromState.category,
+      tva: fromState.tva,
+      allergens: fromState.allergens,
+      variants: fromState.variants,
+      supplier: fromState.supplier,
+    }
+    return await registerNewValues(initialProduct, updatedProduct, fromState);
+}
+
+export const registerNewValues = async (initialProduct, updatedProduct, fromState) => {
+    const updatedProperties = {};
+    for (let property in initialProduct) {
+          if ( JSON.stringify(initialProduct[property]) !== JSON.stringify(updatedProduct[property])) {
+            switch (property) {
+              case 'nutritionals':
+                  const newNutritionals = await registerNutritionals(fromState);
+                  updatedProperties[property] = '/api/nutritionals/' + newNutritionals.data.id;
+                  break;
+              case 'variants':
+                  const variants = await registerVariants(fromState);
+                  const registeredVariants = await Promise.all(variants);
+                  updatedProperties[property] = registeredVariants.map(variant => '/api/variants/' + variant.data.id);
+                  break;
+              case 'allergens':
+                  updatedProperties[property] = updatedProduct[property].map(allergen => '/api/allergens/' + allergen.id);
+                  break;
+              case 'category':
+              case 'tva':
+              case 'supplier':
+                  let root = (property === 'category' ? '/api/categories/' : (property === 'supplier' ? '/api/suppliers/' : '/api/tvas/'));
+                  updatedProperties[property] = root + updatedProduct[property].id;
+                  break;
+              case 'name':
+              case 'description':
+                  updatedProperties[property] = updatedProduct[property];
+                  break;
+            }
+        }
+    }
+    return updatedProperties;
 }
