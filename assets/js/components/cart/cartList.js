@@ -101,7 +101,7 @@ class CartList extends React.Component
                             
                             <div>
                                 {/* <button className="btn btn-success btn-sm ml-auto" >Payer</button> */}
-                                <Link to={ "/checkout" } className="btn btn-success btn-sm ml-auto">Payer</Link>
+                                <Link to={ "/checkout" } className="btn btn-success btn-sm ml-auto" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false }>Payer</Link>
                             </div>
                         </div>
                     </div>

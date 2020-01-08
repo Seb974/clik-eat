@@ -81,12 +81,27 @@ table.dataTable thead .sorting_desc_disabled:before {
 	justify-content: end;
 }
 
+.category-section {
+	width: 100%;
+	position:	fixed;
+	z-index:998;
+	background-color: #fafafa;
+	display:flex;
+	flex-direction: row;
+	justify-content: space-around ;
+	align-items: center;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.07);
+}
+
 @media (max-width: 767px) {
 	.home-card {
 		height: 580px!important;
 	}
 	.card-img {
 		height: 237.19px!important;
+	}
+	.category-section {
+		top: 50px!important;
 	}
   }
 
@@ -97,6 +112,9 @@ table.dataTable thead .sorting_desc_disabled:before {
 	.card-img {
 		height: 263.19px!important;
 	}
+	.category-section {
+		top: 62px!important;
+	  }
   }
 
   @media (min-width: 1024px) {

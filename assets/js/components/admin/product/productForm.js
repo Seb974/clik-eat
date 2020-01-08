@@ -96,6 +96,7 @@ class ProductForm extends React.Component
         } else {
             this.props.addProduct(product);
         }
+        this.props.history.push(`/products`);
     }
 
     getSelectedItem = (id, items) => {

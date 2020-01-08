@@ -9,6 +9,11 @@ import { tokenConfig } from '../../helpers/security';
 
 class Checkout extends Component {
 
+    constructor(props) {
+        super(props);
+        this.paymentButton = React.createRef();
+    }
+
     state = {
         user: this.props.user || {},
         username: this.props.user === null ? '' : this.props.user.username || '',
@@ -34,7 +39,9 @@ class Checkout extends Component {
         b_city: '',
         cities: [],
         totalCost: this.props.item === null ? '' : this.props.item.totalToPayTTC,
+        initialTotalCost: 0,
         paymentLink: '#',
+        isWaiting: false,
     }
 
     static propTypes = {
@@ -175,7 +182,7 @@ class Checkout extends Component {
     componentDidUpdate = () => {
         if (this.props.item.totalToPayTTC !== this.state.totalCost) {
             this.setState({ totalCost: this.props.item.totalToPayTTC });
-            this.onInformationsReady();
+            // this.onInformationsReady();
         }
     }
 
@@ -225,14 +232,30 @@ class Checkout extends Component {
         // this.props.updateUser(userDetails);
     }
 
-    onInformationsReady = () => {
+    onInformationsReady = async () => {
         const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
         axios.post('/pay', body, tokenConfig())
              .then((res) => {
                 const url = JSON.parse(res.data);
                 this.setState({paymentLink: url});
-                
              });
+    }
+
+    checkTotalToPay = (e) => {
+        e.preventDefault();
+        this.setState({isWaiting: true});
+        if (this.state.totalCost !== this.state.initialTotalCost) {
+            const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
+            axios.post('/pay', body, tokenConfig())
+             .then((res) => {
+                const url = JSON.parse(res.data);
+                this.setState({
+                    paymentLink: url,
+                    initialTotalCost: this.state.totalCost,
+                });
+                window.open(url, "_self");
+             });
+        }
     }
 
     displayItems = () => {
@@ -289,9 +312,13 @@ class Checkout extends Component {
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
 
-                           <a href={ this.state.paymentLink }>
+                           {/* <a href={ this.state.paymentLink } hidden={ item.totalToPayTTC <= 0 ? true : false } >
                                 <button className="btn btn-primary btn-lg btn-block">PAYER</button>
-                           </a>
+                           </a> */}
+                           <Link to={ this.state.paymentLink } ref={ this.paymentButton } className="btn btn-primary btn-lg btn-block" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false}  onClick={ this.checkTotalToPay } >
+                                <span className="spinner-border spinner-border-sm" role="status" hidden={ !this.state.isWaiting }></span> 
+                                <span hidden={ this.state.isWaiting }>PAYER</span>
+                            </Link>
                         </ul>
                     </div>
 

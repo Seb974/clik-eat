@@ -56,11 +56,10 @@ class Cart extends React.Component
                         <span className="ml-auto font-weight-bold text-success">{ this.props.item.totalToPayTTC }€</span>
                     </div>
 
-                    <div className="d-flex px-3">
-                        <Link to={ "/cart" } className="btn btn-outline btn-sm">Editer quantité</Link>
-                        {/* <button className="btn btn-outline btn-sm" >Editer quantité</button> */}
-                        <Link to={ "/checkout" } className="btn btn-success btn-sm ml-auto">Payer</Link>
-                        {/* <button className="btn btn-success btn-sm ml-auto" >Payer</button> */}
+                    <div className="d-flex px-3" >
+                        <Link to={ "/cart" } className="btn btn-outline btn-sm" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false }>Editer quantité</Link>
+                        <Link to={ "/checkout" } className="btn btn-success btn-sm ml-auto" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false }>Payer</Link>
+
                     </div>
                 </div>
             </span>

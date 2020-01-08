@@ -123,8 +123,7 @@ class Navbar extends Component {
                 <li className="dropdown">
                     <Link to="/" data-toggle="dropdown">
                         <img src="" alt=""/>
-                        <span> <i class="fas fa-filter" ></i>
-                        </span>
+                        <span> <i class="fas fa-filter" ></i><i className="fas fa-chevron-down"></i></span>
                     </Link>
                         <div className="dropdown-menu dropdown-menu-right">
                             <div id="-1" data-name="Tous" className={ this.state.selectedCategory == "Tous" ? "selected-Category" : "not-selected-Category" } onClick={ this.onChange } >     {/* style={ this.state.selectedCategory = "Tous" ? selectedStyle : notSelectedStyle } */}

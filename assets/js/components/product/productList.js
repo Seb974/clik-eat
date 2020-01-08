@@ -8,12 +8,13 @@ import qs from 'query-string';
 
 class ProductList extends React.Component 
 {
+
     static propTypes = {
         getProducts: PropTypes.func.isRequired,
         addItem: PropTypes.func.isRequired,
         deleteCart: PropTypes.func.isRequired,
         product: PropTypes.object.isRequired,
-        isAuthenticated: PropTypes.bool
+        isAuthenticated: PropTypes.bool,
     };
     
     componentDidMount() {
@@ -27,6 +28,12 @@ class ProductList extends React.Component
     handleClick = (product, variant) => {
         const newItem = { product: product, variant: variant, quantity: 1 };
         this.props.addItem(newItem);
+    };
+
+    onCategoryChange = e => {
+        e.preventDefault();
+        this.setState({ selectedCat: e.currentTarget.dataset["name"] });
+        this.props.getCategory(e.currentTarget.id, this.props.categories);
     };
 
     displayVariants = (product) => {
@@ -123,6 +130,7 @@ const mapStateToProps = state => ({
     product: state.product,
     isAuthenticated: state.auth.isAuthenticated,
     selectedCategory: state.category.selected,
+    categories: state.category.categories,
   });
   
   export default connect(

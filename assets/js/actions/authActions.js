@@ -38,7 +38,6 @@ export const register = ({ username, email, password }) => dispatch => {
 
   const config = { headers: {'Content-Type': 'application/json'} };
   const body = JSON.stringify({ username, email, password });
-  console.log(body);
   axios.post('/api/register', body, config)
        .then(res =>
           dispatch({

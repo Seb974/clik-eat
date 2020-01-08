@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -43,5 +44,12 @@ class ApiAppController extends AbstractController
 	return JsonResponse::fromJsonString($response);
     }
 
+    /**
+     * @Route("/error", name="error_action", methods={"GET","POST"})
+     */
+    public function errorAction(): RedirectResponse
+    {
+        return $this->redirectToRoute('index');
+    }
 
 }
