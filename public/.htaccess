@@ -53,6 +53,10 @@ DirectoryIndex index.php
     RewriteRule ^(.*) - [E=BASE:%1]
     #RewriteRule .? %{ENV:BASE}index.php [L]
     RewriteRule .? %{ENV:BASE}index.php [L]
+
+    # Sets the HTTP_AUTHORIZATION header removed by Apache
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
 
 <IfModule !mod_rewrite.c>

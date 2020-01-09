@@ -19,7 +19,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  * @ApiResource(
- *      iri="http://schema.org/Product",
+ *     iri="http://schema.org/Product",
  *     attributes={
  *          "normalization_context"={"groups"={"product"}}
  *     },
@@ -28,7 +28,17 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *              "method"="GET",
  *              "normalization_context"={"groups"={"variant"}}
  *          }
- *     }
+ *     },
+  *     collectionOperations={
+  *         "get",
+  *         "post"={"security"="is_granted('ROLE_SUPPLIER')"}
+  *     },
+  *     itemOperations={
+  *         "get",
+  *         "put"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "patch"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "delete"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *     }
  * )
  */
 class Product

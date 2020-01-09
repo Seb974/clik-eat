@@ -1,21 +1,20 @@
 import axios from 'axios';
 import { GET_ADMIN_PRODUCTS, GET_ADMIN_PRODUCT, ADD_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT } from './types';
-import { tokenConfig } from './authActions';
+import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import productAdminReducer from '../reducers/productAdminReducer';
 
 export const getAdminProducts = () => dispatch => {
-    axios
-        .get('/api/products')
-        .then((res) => {
+    axios.get('/api/products', tokenConfig())
+         .then((res) => {
             dispatch({
                 type: GET_ADMIN_PRODUCTS,
                 payload: res.data['hydra:member']
             })
-        })
-        .catch(err => {
+         })
+         .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))
-        });
+         });
 };
 
 export const getAdminProduct = (id, products) => dispatch => {
@@ -31,25 +30,24 @@ export const getAdminProduct = (id, products) => dispatch => {
 };
 
 export const deleteProduct = id => dispatch => {
-    axios.delete('/api/products/' + id)
-        .then((res) => {
-            dispatch({
-                type: DELETE_PRODUCT,
-                payload: res.data
-            })
-        })
-        .catch(err => {
-            console.log(err);
-    });
+    axios.delete('/api/products/' + id, tokenConfig())
+          .then((res) => {
+                dispatch({
+                    type: DELETE_PRODUCT,
+                    payload: res.data
+                })
+          })
+          .catch(err => {
+                console.log(err);
+          });
 };
 
 export const addProduct = (fromState) => dispatch =>{
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: fromState.name, 
         description: fromState.description
     })
-    axios.post('/api/products', body, config)
+    axios.post('/api/products', body, tokenConfig())
         .then((res) => {
             const newUserId = res.data.id;
             (async () => {
@@ -68,13 +66,12 @@ export const addProduct = (fromState) => dispatch =>{
 };
 
 export const updateProduct = (fromState) => dispatch => {
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const product = fromState.selection;
     const body = JSON.stringify({ 
         name: fromState.name, 
         description: fromState.description
     });
-    axios.put('/api/users/' + product.id, body, config)
+    axios.put('/api/users/' + product.id, body, tokenConfig())
         .then((res) => {
             const updatedUserId = res.data.id;
             (async () => {

@@ -23,7 +23,17 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *              "method"="GET",
  *              "normalization_context"={"groups"={"supplier"}}
  *          }
- *      }
+ *      },
+  *     collectionOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "post"
+  *     },
+  *     itemOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN') or object == user"},
+  *         "put"={"security"="is_granted('ROLE_ADMIN') or object == user"},
+  *         "patch"={"security"="is_granted('ROLE_ADMIN') or object == user"},
+  *         "delete"={"security"="is_granted('ROLE_ADMIN') or object == user"},
+  *     }
  * )
  */
 class User implements UserInterface

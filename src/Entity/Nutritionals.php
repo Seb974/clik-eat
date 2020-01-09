@@ -8,12 +8,24 @@ use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\NutritionalsRepository")
- * @ApiResource(subresourceOperations={
- *     "api_products_nutritionals_get_subresource"={
- *         "method"="GET",
- *         "normalization_context"={"groups"={"product"}}
- *     }
- * })
+ * @ApiResource(
+ *      subresourceOperations={
+ *          "api_products_nutritionals_get_subresource"={
+ *              "method"="GET",
+ *              "normalization_context"={"groups"={"product"}}
+ *          }
+ *      },
+  *     collectionOperations={
+  *         "get",
+  *         "post"={"security"="is_granted('ROLE_SUPPLIER')"}
+  *     },
+  *     itemOperations={
+  *         "get",
+  *         "put"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "patch"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "delete"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *     }
+ * )
  */
 class Nutritionals
 {

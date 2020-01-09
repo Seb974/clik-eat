@@ -13,14 +13,26 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  * @ORM\Entity(repositoryClass="App\Repository\SupplierRepository")
  * @ApiResource(
  *    attributes={
+ *          "security"="is_granted('ROLE_SUPPLIER')",
  *          "normalization_context"={"groups"={"supplier"}}
  *     },
  *    subresourceOperations={
- *     "api_products_supplier_get_subresource"={
- *         "method"="GET",
- *         "normalization_context"={"groups"={"product"}}
- *     }
- * })
+ *          "api_products_supplier_get_subresource"={
+ *              "method"="GET",
+ *              "normalization_context"={"groups"={"product"}}
+ *          }
+ *     },
+  *     collectionOperations={
+  *         "get",
+  *         "post"={"security"="is_granted('ROLE_ADMIN')"}
+  *     },
+  *     itemOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
+  *         "put"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
+  *         "patch"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
+  *         "delete"={"security"="is_granted('ROLE_ADMIN')"},
+  *     }
+ * )
  */
 class Supplier
 {

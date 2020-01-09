@@ -312,7 +312,7 @@ class Checkout extends Component {
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
 
-                           {/* <a href={ this.state.paymentLink } hidden={ item.totalToPayTTC <= 0 ? true : false } >
+                           {/* <a href={ this.state.paymentLink }>
                                 <button className="btn btn-primary btn-lg btn-block">PAYER</button>
                            </a> */}
                            <Link to={ this.state.paymentLink } ref={ this.paymentButton } className="btn btn-primary btn-lg btn-block" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false}  onClick={ this.checkTotalToPay } >

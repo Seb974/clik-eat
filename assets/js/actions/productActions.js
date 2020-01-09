@@ -15,14 +15,13 @@ export const getProducts = () => dispatch => {
     })
   } else {
     dispatch(setProductsLoading());
-    axios
-      .get('api/products')
-      .then((res) => {
-          dispatch({
-            type: GET_PRODUCTS,
-            payload: res.data['hydra:member']
-          })
-      }
+    axios.get('api/products', tokenConfig())
+         .then((res) => {
+              dispatch({
+                type: GET_PRODUCTS,
+                payload: res.data['hydra:member']
+              })
+         }
       )
       .catch(err =>
         dispatch(returnErrors(err.response.data, err.response.status))
@@ -45,17 +44,16 @@ export const getProduct = id => dispatch => {
     }
   } else {
     dispatch(setProductsLoading());
-    axios
-      .get('/api/products/' + id)
-      .then((res) => {
-        dispatch({
-          type: GET_PRODUCT,
-          payload: res.data
+    axios.get('/api/products/' + id, tokenConfig())
+         .then((res) => {
+            dispatch({
+              type: GET_PRODUCT,
+              payload: res.data
+            })
         })
-      })
-      .catch(err =>
-        dispatch(returnErrors(err.response.data, err.response.status))
-      );
+        .catch(err =>
+            dispatch(returnErrors(err.response.data, err.response.status))
+        );
   }
 };
 
@@ -75,16 +73,16 @@ export const updateProductStock = variant => dispatch => {
 }
 
 export const deleteProduct = id => dispatch => {
-  axios.delete('/api/products/' + id)
-      .then((res) => {
+  axios.delete('/api/products/' + id, tokenConfig())
+       .then((res) => {
           dispatch({
               type: DELETE_PRODUCT,
               payload: res.data
           })
-      })
-      .catch(err => {
+       })
+       .catch(err => {
           console.log(err);
-  });
+       });
 };
 
 export const addProduct = (fromState) => dispatch =>{
@@ -105,33 +103,32 @@ export const addProduct = (fromState) => dispatch =>{
           supplier: '/api/suppliers/' + fromState.supplier.id,
           picture: fromState.picture === '' ? null : "api/pics/" + picture.data["@id"].substring( parseInt(picture.data["@id"].lastIndexOf("/")) + 1)
       };
-      await axios.post('/api/products', 
-          JSON.stringify(product), tokenConfig())
-              .then( (res) => {
-                  dispatch({
-                      type: ADD_PRODUCT,
-                      payload: res.data
-                  })
-              });
+      await axios.post('/api/products', JSON.stringify(product), tokenConfig())
+                 .then( (res) => {
+                    dispatch({
+                        type: ADD_PRODUCT,
+                        payload: res.data
+                    })
+                 });
   })();
 };
 
 export const updateProduct = (fromState) => dispatch => {
       (async () => {
-          const config = { headers: { 'Content-Type': 'application/merge-patch+json' } };
+          // const config = { headers: { 'Content-Type': 'application/merge-patch+json' } };
           const pictureToUpload = fromState.picture;
           const picture = fromState.picture !== '' && fromState.picture.id !== fromState.initialProduct.picture.id ? await registerPicture(pictureToUpload) : null;
           const updatedProperties = await defineUpdatedProperties(fromState);
           if (picture !== null) {
-            updatedProperties['picture'] = picture;
+            updatedProperties['picture'] = "api/pics/" + picture.data["@id"].substring( parseInt(picture.data["@id"].lastIndexOf("/")) + 1);
           }
-          await axios.patch('/api/products/' + fromState.initialProduct.id, JSON.stringify(updatedProperties), config)
-                    .then( (res) => {
+          await axios.patch('/api/products/' + fromState.initialProduct.id, JSON.stringify(updatedProperties), tokenConfigForUploadFile())
+                     .then( (res) => {
                         dispatch({
                             type: UPDATE_PRODUCT,
                             payload: res.data
                         })
-                    });
+                     });
       })();
 };
 
@@ -139,7 +136,7 @@ export const registerVariants = async (fromState) => {
       return await fromState.variants.map( async variant => {
           let newVariant  = { 
               name: variant.name, 
-              price: parseFloat(variant.price.replace(',','.')),
+              price: typeof variant.price === "string" ? parseFloat(variant.price.replace(',','.')) : variant.price,
               tva: '/api/tvas/' + fromState.tva.id,
           };
           if (typeof variant.id === 'undefined') {
@@ -149,14 +146,26 @@ export const registerVariants = async (fromState) => {
                                     return res;
                                 });
           } else {
-              return await axios.put('/api/variants' + variant.id, JSON.stringify(newVariant), tokenConfig())
+              return await axios.put('/api/variants/' + variant.id, JSON.stringify(newVariant), tokenConfig())
                                 .then( (res) => {
-                                    registerStock(res.data.id, variant);
+                                    registerStock(variant.id, res.data);
                                     return res;
                                 });
           }
       })
 };
+
+export const registerStock = async (id, variant) => {
+  let stock = {
+      quantity: typeof variant.stock.quantity === "string" ? parseFloat(variant.stock.quantity.replace(',','.')) : variant.stock.quantity,
+      product: '/api/variants/' + id
+  }
+  if (typeof variant.stock.id === 'undefined') {
+      axios.post('/api/stocks', JSON.stringify(stock), tokenConfig());
+  } else {
+      axios.put('/api/stocks/' + variant.stock.id, JSON.stringify(stock), tokenConfig());
+  }
+}
 
 export const registerNutritionals = async (fromState) => {
     if (typeof fromState.initialProduct.nutritionals === 'undefined') {
@@ -186,20 +195,8 @@ export const registerPicture = async (media) => {
   return await axios.post('api/pics', JSON.stringify(picture), tokenConfig());
 }
 
-export const registerStock = async (id, variant) => {
-    let stock = {
-        quantity: parseFloat(variant.stock.quantity.replace(',','.')),
-        product: '/api/variants/' + id
-    }
-    if (typeof variant.stock.id === 'undefined') {
-        axios.post('/api/stocks', JSON.stringify(stock), tokenConfig());
-    } else {
-        axios.put('/api/stocks/' + variant.stock.id, JSON.stringify(stock), tokenConfig());
-    }
-}
-
 export const getProductFromDb = async (id) => {
-  return await axios.get('/api/products/' + id);
+  return await axios.get('/api/products/' + id, tokenConfig());
 }
 
 export const defineUpdatedProperties = async (fromState) => {
@@ -258,3 +255,17 @@ export const registerNewValues = async (initialProduct, updatedProduct, fromStat
     }
     return updatedProperties;
 }
+
+export const tokenConfigForUploadFile = () => {
+
+  const token = localStorage.getItem('token');
+    const config = {
+      headers: {
+        'Content-type': 'application/merge-patch+json'
+      }
+    }
+    if (token) {
+      config.headers['Authorization'] = 'Bearer ' + token;
+    }  
+    return config;
+};

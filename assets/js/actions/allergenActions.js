@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { GET_ALLERGENS, GET_ALLERGEN, ADD_ALLERGEN, DELETE_ALLERGEN, UPDATE_ALLERGEN } from '../actions/types';
-import { tokenConfig } from './authActions';
+import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import allergenReducer from '../reducers/productReducer';
 import { push } from 'react-router-redux'
 
 export const getAllergens = () => dispatch => {
     axios
-        .get('/api/allergens')
+        .get('/api/allergens', tokenConfig())
         .then((res) => {
             dispatch({
                 type: GET_ALLERGENS,
@@ -32,18 +32,16 @@ export const getAllergen = (id, allergens) => dispatch => {
 };
 
 export const addAllergen = allergen => dispatch =>{
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: allergen.name, 
         products: allergen.products
     })
-    axios.post('/api/allergens', body, config)
+    axios.post('/api/allergens', body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: ADD_ALLERGEN,
                 payload: res.data
             })
-            // dispatch(push('/allergens'));
         })
         .catch(err => {
             dispatch(
@@ -53,7 +51,7 @@ export const addAllergen = allergen => dispatch =>{
 };
 
 export const deleteAllergen = id => dispatch => {
-    axios.delete('/api/allergens/' + id)
+    axios.delete('/api/allergens/' + id, tokenConfig())
         .then((res) => {
             dispatch({
                 type: DELETE_ALLERGEN,
@@ -69,18 +67,16 @@ export const deleteAllergen = id => dispatch => {
 };
 
 export const updateAllergen = allergen => dispatch => {
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: allergen.name, 
         products: allergen.products
     })
-    axios.put('/api/allergens/' + allergen.id, body, config)
+    axios.put('/api/allergens/' + allergen.id, body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: UPDATE_ALLERGEN,
                 payload: res.data
             })
-            // dispatch(push('/allergens'));
         })
         .catch(err => {
             dispatch(

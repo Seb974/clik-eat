@@ -1,20 +1,19 @@
 import axios from 'axios';
 import { GET_CITIES, GET_CITY, ADD_CITY, DELETE_CITY, UPDATE_CITY } from '../actions/types';
-import { tokenConfig } from './authActions';
+import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getCities = () => dispatch => {
-    axios
-        .get('/api/cities')
-        .then((res) => {
+    axios.get('/api/cities', tokenConfig())
+         .then((res) => {
             dispatch({
                 type: GET_CITIES,
                 payload: res.data['hydra:member']
             })
-        })
-        .catch(err => {
+         })
+         .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))
-        });
+         });
 };
 
 export const getCity = (id, cities) => dispatch => {
@@ -30,13 +29,12 @@ export const getCity = (id, cities) => dispatch => {
 };
 
 export const addCity = city => dispatch =>{
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: city.name, 
         zipCode: city.zipCode,
         isDeliverable: city.isDeliverable
     })
-    axios.post('/api/cities', body, config)
+    axios.post('/api/cities', body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: ADD_CITY,
@@ -51,7 +49,7 @@ export const addCity = city => dispatch =>{
 };
 
 export const deleteCity = id => dispatch => {
-    axios.delete('/api/cities/' + id)
+    axios.delete('/api/cities/' + id, tokenConfig())
         .then((res) => {
             dispatch({
                 type: DELETE_CITY,
@@ -66,13 +64,12 @@ export const deleteCity = id => dispatch => {
 };
 
 export const updateCity = city => dispatch => {
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: city.name, 
         zipCode: city.zipCode,
         isDeliverable: city.isDeliverable
     })
-    axios.put('/api/cities/' + city.id, body, config)
+    axios.put('/api/cities/' + city.id, body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: UPDATE_CITY,

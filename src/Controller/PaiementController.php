@@ -149,12 +149,7 @@ class PaiementController extends AbstractController
 
     /**
      * checkout
-     * @Route("/pay", name="pay", methods={"POST"})
-     * @param  integer $id corresponding to the id of the current user
-     * @param  App\Service\Cart\CartService $cartService
-     * @param  Doctrine\ORM\EntityManagerInterface $em
-     *
-     * @return void
+     * @Route("/pay", name="pay", methods={"GET", "POST"})
      */
     public function paymentProcess( Request $request )
     {

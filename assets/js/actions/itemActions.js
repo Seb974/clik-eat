@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, DELETE_CART, ITEMS_LOADING, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK } from './types';
-import { tokenConfig } from './authActions';
+import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import userExtractor from '../helpers/userExtractor';
 import store from '../store';
@@ -25,9 +25,8 @@ export const getItems = () => dispatch => {
 
 export const addItem = item => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
-  const config = { headers: { 'Content-Type': 'application/json' } };
   const body = JSON.stringify( { action: DECREASE_PRODUCT_STOCK, id: item.variant.id, quantity: item.quantity } )
-  axios.post('/app/ping', body, config)
+  axios.post('/app/ping', body, tokenConfig())
        .catch(err => {
         dispatch(
           returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
@@ -56,9 +55,8 @@ export const addItem = item => (dispatch, getState) => {
 
 export const deleteItem = item => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
-  const config = { headers: { 'Content-Type': 'application/json' } };
   const body = JSON.stringify( { action: INCREASE_PRODUCT_STOCK, id: item.product.id, quantity: item.quantity } )
-  axios.post('/app/ping', body, config)
+  axios.post('/app/ping', body, tokenConfig())
          .catch(err => {
           dispatch(
             returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
@@ -83,9 +81,8 @@ export const deleteItem = item => (dispatch, getState) => {
 export const updateItem = (item, qty) => (dispatch, getState) => {
   const action = (qty > 0) ? DECREASE_PRODUCT_STOCK : INCREASE_PRODUCT_STOCK;
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
-  const config = { headers: { 'Content-Type': 'application/json' } };
   const body = JSON.stringify( { action: action, id: item.product.id, quantity: Math.abs(qty) } )
-  axios.post('/app/ping', body, config)
+  axios.post('/app/ping', body, tokenConfig())
          .catch(err => {
           dispatch(
             returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')       
@@ -112,7 +109,7 @@ export const deleteCart = () => (dispatch, getState) => {
 }
 
 // axios
-  //   .delete(`/api/items/${id}`, tokenConfig(getState))
+  //   .delete(`/api/items/${id}`, tokenConfig())
   //   .then(res =>
   //     dispatch({
   //       type: DELETE_ITEM,

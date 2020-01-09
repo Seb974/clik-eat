@@ -10,7 +10,18 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OrderRepository")
- * @ApiResource
+ * @ApiResource(
+  *     collectionOperations={
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "post"
+  *     },
+  *     itemOperations={
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "put"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "patch"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "delete"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *     }
+ * )
  */
 class Orders
 {

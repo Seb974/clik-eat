@@ -23,6 +23,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *     },
  *     collectionOperations={
  *         "post"={
+ *             "security"="is_granted('ROLE_SUPPLIER')",
  *             "controller"=CreateMediaObjectAction::class,
  *             "deserialize"=false,
  *             "validation_groups"={"Default", "media_object_create"},
@@ -46,7 +47,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *         },
  *         "get"
  *     },
- *     itemOperations={"get"={"method"="GET"}}
+ *     itemOperations={
+ *          "get",
+ *          "put"={"security"="is_granted('ROLE_SUPPLIER')"},
+ *          "patch"={"security"="is_granted('ROLE_SUPPLIER')"},
+ *          "delete"={"security"="is_granted('ROLE_SUPPLIER')"},
+ *     }
  * )
  * @Vich\Uploadable
  */

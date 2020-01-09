@@ -17,7 +17,17 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *              "method"="GET",
  *              "normalization_context"={"groups"={"product"}}
  *          }
- *      }
+ *      },
+  *     collectionOperations={
+  *         "get",
+  *         "post"={"security"="is_granted('ROLE_SUPPLIER')"}
+  *     },
+  *     itemOperations={
+  *         "get",
+  *         "put"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "patch"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *         "delete"={"security"="is_granted('ROLE_SUPPLIER')"},
+  *     }
  * )
  */
 class Pics

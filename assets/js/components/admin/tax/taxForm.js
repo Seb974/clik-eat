@@ -50,7 +50,7 @@ class TaxForm extends React.Component
         e.preventDefault();
         const tax = this.state.selection;
         tax.name = this.state.name;
-        tax.taux = parseFloat(this.state.taux.replace(',','.'));
+        tax.taux = typeof this.state.taux === "string" ? parseFloat(this.state.taux.replace(',','.')) : this.state.taux;
         if (typeof this.props.match.params.id !== 'undefined') {
             this.props.updateTax(tax);
         } else {

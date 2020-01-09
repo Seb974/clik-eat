@@ -8,7 +8,18 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CartItemRepository")
- * @ApiResource
+ * @ApiResource(
+  *     collectionOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "post"
+  *     },
+  *     itemOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN') or object.cart.user == user"},
+  *         "put"={"security"="is_granted('ROLE_ADMIN') or object.cart.user == user"},
+  *         "patch"={"security"="is_granted('ROLE_ADMIN') or object.cart.user == user"},
+  *         "delete"={"security"="is_granted('ROLE_ADMIN') or object.cart.user == user"},
+  *     }
+ * )
  */
 class CartItem
 {

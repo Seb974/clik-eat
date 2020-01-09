@@ -1,20 +1,19 @@
 import axios from 'axios';
 import { GET_CATEGORIES, GET_CATEGORY, ADD_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY } from '../actions/types';
-import { tokenConfig } from './authActions';
+import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getCategories = () => dispatch => {
-    axios
-        .get('/api/categories')
-        .then((res) => {
+    axios.get('/api/categories', tokenConfig())
+         .then((res) => {
             dispatch({
                 type: GET_CATEGORIES,
                 payload: res.data['hydra:member']
             })
-        })
-        .catch(err => {
+         })
+         .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))
-        });
+         });
 };
 
 export const getCategory = (id, categories) => dispatch => {
@@ -34,12 +33,11 @@ export const getCategory = (id, categories) => dispatch => {
 };
 
 export const addCategory = category => dispatch =>{
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: category.name, 
         products: category.products
     })
-    axios.post('/api/categories', body, config)
+    axios.post('/api/categories', body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: ADD_CATEGORY,
@@ -54,7 +52,7 @@ export const addCategory = category => dispatch =>{
 };
 
 export const deleteCategory = id => dispatch => {
-    axios.delete('/api/categories/' + id)
+    axios.delete('/api/categories/' + id, tokenConfig())
         .then((res) => {
             dispatch({
                 type: DELETE_CATEGORY,
@@ -69,12 +67,11 @@ export const deleteCategory = id => dispatch => {
 };
 
 export const updateCategory = category => dispatch => {
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         name: category.name, 
         products: category.products
     })
-    axios.put('/api/categories/' + category.id, body, config)
+    axios.put('/api/categories/' + category.id, body, tokenConfig())
         .then((res) => {
             dispatch({
                 type: UPDATE_CATEGORY,

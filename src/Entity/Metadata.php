@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass="App\Repository\MetadataRepository")
  * @ApiResource(
  *     attributes={
+ *          "security"="is_granted('ROLE_USER')",
  *          "normalization_context"={"groups"={"metadata"}}
  *     },
  *      subresourceOperations={
@@ -17,7 +18,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *              "method"="GET",
  *              "normalization_context"={"groups"={"user"}}
  *          }
- *      }
+ *      },
+  *     collectionOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "post"
+  *     },
+  *     itemOperations={
+  *         "get"={"security"="is_granted('ROLE_ADMIN') or object in user.metadata"},
+  *         "put"={"security"="is_granted('ROLE_ADMIN') or object in user.metadata"},
+  *         "patch"={"security"="is_granted('ROLE_ADMIN') or object in user.metadata"},
+  *         "delete"={"security"="is_granted('ROLE_ADMIN') or object in user.metadata"},
+  *     }
  * )
  */
 class Metadata

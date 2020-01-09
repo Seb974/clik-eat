@@ -4,9 +4,8 @@ import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getUsers = () => dispatch => {
-    axios
-        .get('/api/users')
-        .then((res) => {
+    axios.get('/api/users', tokenConfig())
+         .then((res) => {
             dispatch({
                 type: GET_USERS,
                 payload: res.data['hydra:member']
@@ -30,7 +29,7 @@ export const getUser = (id, users) => dispatch => {
 };
 
 export const deleteUser = id => dispatch => {
-    axios.delete('/api/users/' + id)
+    axios.delete('/api/users/' + id, tokenConfig())
         .then((res) => {
             dispatch({
                 type: DELETE_USER,
@@ -45,7 +44,6 @@ export const deleteUser = id => dispatch => {
 };
 
 export const addUser = (fromState) => dispatch =>{
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const body = JSON.stringify({ 
         username: fromState.username, 
         email: fromState.email,
@@ -53,7 +51,7 @@ export const addUser = (fromState) => dispatch =>{
         password: fromState.password,
         isBanned: fromState.isBanned
     })
-    axios.post('/api/users', body, config)
+    axios.post('/api/users', body, tokenConfig())
         .then((res) => {
             const newUserId = res.data.id;
             (async () => {
@@ -71,7 +69,6 @@ export const addUser = (fromState) => dispatch =>{
 };
 
 export const updateUser = (fromState) => dispatch => {
-    const config = { headers: { 'Content-Type': 'application/json' } };
     const user = fromState.selection;
     const body = JSON.stringify({ 
         username: fromState.username, 
@@ -80,7 +77,7 @@ export const updateUser = (fromState) => dispatch => {
         password: fromState.password,
         isBanned: fromState.isBanned,
     });
-    axios.put('/api/users/' + user.id, body, config)
+    axios.put('/api/users/' + user.id, body, tokenConfig())
         .then((res) => {
             const updatedUserId = res.data.id;
             (async () => {
@@ -181,5 +178,5 @@ export const registerMetas = async (fromState, userId) => {
 };
 
 export const getUserFromDb = async (id) => {
-    return await axios.get('/api/users/' + id);
+    return await axios.get('/api/users/' + id, tokenConfig());
 }

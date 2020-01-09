@@ -56,7 +56,7 @@ class CityForm extends React.Component
         e.preventDefault();
         const city = this.state.selection;
         city.name = this.state.name;
-        city.zipCode = this.state.zipCode;
+        city.zipCode = parseInt(this.state.zipCode);
         city.isDeliverable = this.state.isDeliverable;
         if (typeof this.props.match.params.id !== 'undefined') {
             this.props.updateCity(city);
