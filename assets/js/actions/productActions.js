@@ -156,11 +156,16 @@ export const updateProduct = (fromState) => dispatch => {
 //       })
 // };
 
-export const registerStock = async (id, variant) => {
+export const registerStock = async (id, variant, fromState) => {
   console.log(variant);
+  let newVariant = fromState.variants.filter(element => parseInt(element.id) === parseInt(id));
+  console.log(newVariant);
   let stock = {
-      quantity: typeof variant.stock.quantity === "string" ? parseFloat(variant.stock.quantity.replace(',','.')) : variant.stock.quantity,
-      product: '/api/variants/' + id
+      // quantity: (typeof variant.stock.quantity === "string" ? parseFloat(variant.stock.quantity.replace(',','.')) : variant.stock.quantity),
+      product: '/api/variants/' + id,
+      quantity: newVariant.length > 0 ? 
+          (typeof newVariant[0].stock.quantity === "string" ? parseFloat(newVariant[0].stock.quantity.replace(',','.')) : newVariant[0].stock.quantity) :
+          (typeof variant.stock.quantity === "string" ? parseFloat(variant.stock.quantity.replace(',','.')) : variant.stock.quantity),
   }
   if (typeof variant.stock.id === 'undefined') {
       return await axios.post('/api/stocks', JSON.stringify(stock), tokenConfig());
@@ -179,15 +184,15 @@ export const registerVariants = async (fromState) => {
       if (typeof variant.id === 'undefined') {
           return await axios.post('/api/variants', JSON.stringify(newVariant), tokenConfig())
                             .then( (res) => {
-                                console.log("Création");
-                                await registerStock(res.data.id, variant);
+                                registerStock(res.data.id, variant, fromState);
                                 return res;
                             });
       } else {
           return await axios.put('/api/variants/' + variant.id, JSON.stringify(newVariant), tokenConfig())
-                            .then( (res) => {
-                                console.log("Mise à jour");
-                                await registerStock(variant.id, res.data);
+                            .then( async (res) => {
+                                // newVariant = fromState.variants.filter(element => element.id === variant.id);
+                                await registerStock(variant.id, res.data, fromState);
+                                // await registerStock(variant.id, newVariant[0], fromState);
                                 return res;
                             })
           ;
