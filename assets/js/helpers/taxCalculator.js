@@ -1,19 +1,19 @@
 function getTotalTTC(cartItems)
 {
-    let totalTTC = 0;
+    let totalTTC = 0.0;
     cartItems.forEach(item => {
-        totalTTC += (item.product.price * item.quantity);
+        totalTTC += (parseFloat(item.product.price) * parseInt(item.quantity));
     });
-    return totalTTC;
+    return Math.round(parseFloat(totalTTC) * 100) / 100;
 }
 
 function getTotalTax(cartItems)
 {
-    let totalTax = 0;
+    let totalTax = 0.0;
     cartItems.forEach(item => {
-        totalTax += ((item.product.price * item.quantity)/(item.product.tva.taux + 1));
+        totalTax += ((parseFloat(item.product.price) * parseInt(item.quantity))/(parseFloat(item.product.tva.taux) + 1));
     });
-    return totalTax;
+    return Math.round(parseFloat(totalTax) * 100) / 100;
 }
 
 function getTotalHT(cartItems)

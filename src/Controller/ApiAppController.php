@@ -24,24 +24,22 @@ class ApiAppController extends AbstractController
      */
     public function ping(Request $request, MessageBusInterface $bus, VariantRepository $variantRepository, SerializerService $serializer)      // 
     {
-
         if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
             $data = json_decode($request->getContent(), true);
             $request->request->replace(is_array($data) ? $data : array());
         }
         $article = $variantRepository->find($request->request->get("id"));
-        $quantity = $request->request->get("quantity");
         if ($request->request->get("action") === 'DECREASE_PRODUCT_STOCK') {
-            $newQty = $article->getStock()->getQuantity() - $quantity;
+            $newQty = $article->getStock()->getQuantity() - $request->request->get("quantity");
             $newQty > 0 ? $article->getStock()->setQuantity($newQty): $article->getStock()->setQuantity(0);
         } else {
-            $article->getStock()->setQuantity($article->getStock()->getQuantity() + $quantity);
+            $article->getStock()->setQuantity( $article->getStock()->getQuantity() + $request->request->get("quantity") );
         }
         $this->getDoctrine()->getManager()->flush();
         $response = $serializer->serializeEntity($article, 'variant');
         $update = new Update("pong/ping", $response);
         $bus->dispatch($update);
-	return JsonResponse::fromJsonString($response);
+	    return JsonResponse::fromJsonString($response);
     }
 
     /**

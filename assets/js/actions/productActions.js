@@ -115,7 +115,6 @@ export const addProduct = (fromState) => dispatch =>{
 
 export const updateProduct = (fromState) => dispatch => {
       (async () => {
-          // const config = { headers: { 'Content-Type': 'application/merge-patch+json' } };
           const pictureToUpload = fromState.picture;
           const picture = fromState.picture !== '' && fromState.picture.id !== fromState.initialProduct.picture.id ? await registerPicture(pictureToUpload) : null;
           const updatedProperties = await defineUpdatedProperties(fromState);
@@ -132,40 +131,69 @@ export const updateProduct = (fromState) => dispatch => {
       })();
 };
 
-export const registerVariants = async (fromState) => {
-      return await fromState.variants.map( async variant => {
-          let newVariant  = { 
-              name: variant.name, 
-              price: typeof variant.price === "string" ? parseFloat(variant.price.replace(',','.')) : variant.price,
-              tva: '/api/tvas/' + fromState.tva.id,
-          };
-          if (typeof variant.id === 'undefined') {
-              return await axios.post('/api/variants', JSON.stringify(newVariant), tokenConfig())
-                                .then( (res) => {
-                                    registerStock(res.data.id, variant);
-                                    return res;
-                                });
-          } else {
-              return await axios.put('/api/variants/' + variant.id, JSON.stringify(newVariant), tokenConfig())
-                                .then( (res) => {
-                                    registerStock(variant.id, res.data);
-                                    return res;
-                                });
-          }
-      })
-};
+// export const registerVariants = async (fromState) => {
+//       return await fromState.variants.map( async variant => {
+//           let newVariant  = { 
+//               name: variant.name, 
+//               price: typeof variant.price === "string" ? parseFloat(variant.price.replace(',','.')) : variant.price,
+//               tva: '/api/tvas/' + fromState.tva.id,
+//           };
+//           if (typeof variant.id === 'undefined') {
+//               return await axios.post('/api/variants', JSON.stringify(newVariant), tokenConfig())
+//                                 .then( (res) => {
+//                                     console.log("Création");
+//                                     registerStock(res.data.id, variant);
+//                                     return res;
+//                                 });
+//           } else {
+//               return await axios.put('/api/variants/' + variant.id, JSON.stringify(newVariant), tokenConfig())
+//                                 .then( (res) => {
+//                                     console.log("Mise à jour");
+//                                     registerStock(variant.id, res.data);
+//                                     return res;
+//                                 });
+//           }
+//       })
+// };
 
 export const registerStock = async (id, variant) => {
+  console.log(variant);
   let stock = {
       quantity: typeof variant.stock.quantity === "string" ? parseFloat(variant.stock.quantity.replace(',','.')) : variant.stock.quantity,
       product: '/api/variants/' + id
   }
   if (typeof variant.stock.id === 'undefined') {
-      axios.post('/api/stocks', JSON.stringify(stock), tokenConfig());
+      return await axios.post('/api/stocks', JSON.stringify(stock), tokenConfig());
   } else {
-      axios.put('/api/stocks/' + variant.stock.id, JSON.stringify(stock), tokenConfig());
+      return await axios.put('/api/stocks/' + variant.stock.id, JSON.stringify(stock), tokenConfig());
   }
 }
+
+export const registerVariants = async (fromState) => {
+  return await fromState.variants.map( async variant => {
+      let newVariant  = { 
+          name: variant.name, 
+          price: typeof variant.price === "string" ? parseFloat(variant.price.replace(',','.')) : variant.price,
+          tva: '/api/tvas/' + fromState.tva.id,
+      };
+      if (typeof variant.id === 'undefined') {
+          return await axios.post('/api/variants', JSON.stringify(newVariant), tokenConfig())
+                            .then( (res) => {
+                                console.log("Création");
+                                await registerStock(res.data.id, variant);
+                                return res;
+                            });
+      } else {
+          return await axios.put('/api/variants/' + variant.id, JSON.stringify(newVariant), tokenConfig())
+                            .then( (res) => {
+                                console.log("Mise à jour");
+                                await registerStock(variant.id, res.data);
+                                return res;
+                            })
+          ;
+      }
+  })
+};
 
 export const registerNutritionals = async (fromState) => {
     if (typeof fromState.initialProduct.nutritionals === 'undefined') {
@@ -235,6 +263,7 @@ export const registerNewValues = async (initialProduct, updatedProduct, fromStat
               case 'variants':
                   const variants = await registerVariants(fromState);
                   const registeredVariants = await Promise.all(variants);
+                  // const stock = await registerStock();
                   updatedProperties[property] = registeredVariants.map(variant => '/api/variants/' + variant.data.id);
                   break;
               case 'allergens':

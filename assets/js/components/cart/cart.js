@@ -21,13 +21,12 @@ class Cart extends React.Component
     onDeleteClick = item => {
         this.props.deleteItem(item);
       };
-
     displayItems = () => {
       let CartItem = (props) => {
         return (
           <li key={"cartitem-item-" + props.details.product.id} className="d-flex flex-row ml-auto">
               <a href="#" className="d-flex flex-row ml-auto">
-                  x{ props.details.quantity } { props.details.parent.name } { props.details.product.name } | { props.details.product.price * props.details.quantity }€
+                  x{ props.details.quantity } { props.details.parent.name } { props.details.product.name } | { Math.round(parseFloat(props.details.product.price) * parseInt(props.details.quantity) * 100) / 100 }€
               </a>
               <button className="btn btn-link" onClick={() => this.onDeleteClick(props.details)}><i className="fa fa-trash"></i></button> 
           </li>

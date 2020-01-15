@@ -55,7 +55,6 @@ class App extends React.Component
     componentDidMount = () => {
         const url = new URL('https:clikeat.re:3000/.well-known/mercure');
         url.searchParams.append('topic', 'pong/ping');
-
         const eventSource = new EventSource(url);
         eventSource.onmessage = event => {
             event.preventDefault();
@@ -64,7 +63,7 @@ class App extends React.Component
                 payload: {
                     variant: JSON.parse(event.data),
                 }
-              })
+            })
         }
     }
 

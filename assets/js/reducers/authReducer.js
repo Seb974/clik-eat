@@ -39,8 +39,6 @@ import {
       case LOGIN_SUCCESS:
       case REGISTER_SUCCESS:
         let user = userExtractor(action.payload.token);
-        console.log(action.payload.token);
-        console.log(user);
         localStorage.setItem('token', action.payload.token);
         localStorage.setItem('user', user);
         return {

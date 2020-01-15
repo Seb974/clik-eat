@@ -25,7 +25,7 @@ export const getItems = () => dispatch => {
 
 export const addItem = item => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
-  const body = JSON.stringify( { action: DECREASE_PRODUCT_STOCK, id: item.variant.id, quantity: item.quantity } )
+  const body = JSON.stringify( { action: DECREASE_PRODUCT_STOCK, id: item.variant.id, quantity: parseInt(item.quantity) } )
   axios.post('/app/ping', body, tokenConfig())
        .catch(err => {
         dispatch(
@@ -107,15 +107,3 @@ export const deleteCart = () => (dispatch, getState) => {
     payload: ''
   });
 }
-
-// axios
-  //   .delete(`/api/items/${id}`, tokenConfig())
-  //   .then(res =>
-  //     dispatch({
-  //       type: DELETE_ITEM,
-  //       payload: id
-  //     })
-  //   )
-  //   .catch(err =>
-  //     dispatch(returnErrors(err.response.data, err.response.status))
-  //   );

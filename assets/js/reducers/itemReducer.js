@@ -39,31 +39,30 @@ import {
           totalToPayHT: getTotalHT(reducedCart)
         };
       case ADD_ITEM:
-        state.items.forEach(element => {
-          if (element.product.name == action.payload.product.name && element.parent.name == action.payload.parent.name ) {
-            element.quantity += action.payload.quantity;
-            action.payload.quantity = 0;
-            return state;
-          }
-        })
-        const enlargedCart = action.payload.quantity !== 0 ? [action.payload, ...state.items] : state.items;
-        localStorage.setItem('cart', JSON.stringify(enlargedCart));
+        let itemIndex = state.items.findIndex( element => {
+            return element.product.name == action.payload.product.name && element.parent.name == action.payload.parent.name;
+        });
+        let newItems = itemIndex === -1 ? [action.payload, ...state.items] : 
+            state.items.map( (element, index) => {
+                return index !== itemIndex ? element : {...element, quantity: ( parseInt(element.quantity) + parseInt(action.payload.quantity) ) }
+            });
+        localStorage.setItem('cart', JSON.stringify(newItems));
         return {
-          ...state,
-          items: enlargedCart,
-          totalToPayTTC: getTotalTTC(enlargedCart),
-          totalTax: getTotalTax(enlargedCart),
-          totalToPayHT: getTotalHT(enlargedCart)
+            ...state,
+            items: newItems,
+            totalToPayTTC: getTotalTTC(newItems),
+            totalTax: getTotalTax(newItems),
+            totalToPayHT: getTotalHT(newItems)
         };
 
-      case UPDATE_ITEM:
-          localStorage.setItem('cart', JSON.stringify(state.items));
-          return {
-            ...state,
-            totalToPayTTC: getTotalTTC(state.items),
-            totalTax: getTotalTax(state.items),
-            totalToPayHT: getTotalHT(state.items)
-          };
+      // case UPDATE_ITEM:
+      //     localStorage.setItem('cart', JSON.stringify(state.items));
+      //     return {
+      //       ...state,
+      //       totalToPayTTC: getTotalTTC(state.items),
+      //       totalTax: getTotalTax(state.items),
+      //       totalToPayHT: getTotalHT(state.items)
+      //     };
       case DELETE_CART:
           localStorage.removeItem('cart');
           return {
