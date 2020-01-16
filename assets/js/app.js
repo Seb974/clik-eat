@@ -32,6 +32,7 @@ import SupplierDetails from './components/admin/supplier/supplierDetails';
 import SupplierForm from './components/admin/supplier/supplierForm';
 import ProductAdminList from './components/admin/product/productAdminList';
 import ProductForm from './components/admin/product/productForm';
+import StockList from './components/admin/stock/stockList';
 import store from './store';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
@@ -108,6 +109,7 @@ class App extends React.Component
                                     <Route path='/users-add-or-edit/:id?' component={UserForm} />
                                     <Route path='/products' component={ProductAdminList} />
                                     <Route path='/products-add-or-edit/:id?' component={ProductForm} />
+                                    <Route path='/stocks' component={StockList} />
                                     <Route path="*" render={() => (<Redirect to="/" />)} /> 
                                 </Switch>
                             </ScrollToTop>

@@ -57,8 +57,8 @@ class Navbar extends Component {
                         <div className="dropdown-divider"></div>
                         { typeof props.user === 'undefined' ? "" : (props.user.roles.indexOf('ROLE_SUPPLIER') === -1 && props.user.roles.indexOf('ROLE_ADMIN') === -1) ? "" : (
                             <span>
-                                <a className="dropdown-item" href="{{ path('stock_index') }}">
-                                    <i className="fas fa-box-open"></i>Stocks</a>
+                                <Link className="dropdown-item" to="/stocks">
+                                    <i className="fas fa-box-open"></i>Stocks</Link>
                                 <div className="dropdown-divider"></div>
                                 <a className="dropdown-item" href="{{ path('get_order') }}">
                                     <i className="fas fa-cash-register"></i>Orders</a>

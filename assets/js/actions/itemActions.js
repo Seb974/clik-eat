@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, DELETE_CART, ITEMS_LOADING, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK } from './types';
+import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, DELETE_CART, ITEMS_LOADING, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STOCK, UPDATE_PRODUCT_STOCK } from './types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import userExtractor from '../helpers/userExtractor';
@@ -93,7 +93,25 @@ export const updateItem = (item, qty) => (dispatch, getState) => {
     type: UPDATE_ITEM,
     payload: item
   });
-}
+};
+
+export const updateVariant = (item) => (dispatch, getState) => {
+  //REMPLACE POUR TEMPS REEL MERCURE PAR :
+  const body = JSON.stringify( { action: UPDATE_PRODUCT_STOCK, id: item.variant.id, quantity: item.quantity } )
+  axios.post('/app/ping', body, tokenConfig())
+         .catch(err => {
+          dispatch(
+            returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
+          )
+          });
+  // FIN SUPPLEMENT MERCURE
+  // dispatch({
+  //   type: UPDATE_PRODUCT_STOCK,
+  //   payload: {
+  //     variant: {...item.variant, product: {...item.product}, stock: {...item.variant.stock, quantity: item.quantity} },
+  //   }
+  // })
+};
 
 export const setItemsLoading = () => {
   return {
@@ -106,4 +124,4 @@ export const deleteCart = () => (dispatch, getState) => {
     type: DELETE_CART,
     payload: ''
   });
-}
+};

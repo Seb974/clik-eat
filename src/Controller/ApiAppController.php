@@ -28,12 +28,15 @@ class ApiAppController extends AbstractController
             $data = json_decode($request->getContent(), true);
             $request->request->replace(is_array($data) ? $data : array());
         }
+        dump($request->request);
         $article = $variantRepository->find($request->request->get("id"));
         if ($request->request->get("action") === 'DECREASE_PRODUCT_STOCK') {
             $newQty = $article->getStock()->getQuantity() - $request->request->get("quantity");
             $newQty > 0 ? $article->getStock()->setQuantity($newQty): $article->getStock()->setQuantity(0);
-        } else {
+        } elseif ($request->request->get("action") === 'INCREASE_PRODUCT_STOCK') {
             $article->getStock()->setQuantity( $article->getStock()->getQuantity() + $request->request->get("quantity") );
+        } else {
+            $article->getStock()->setQuantity( $request->request->get("quantity") );
         }
         $this->getDoctrine()->getManager()->flush();
         $response = $serializer->serializeEntity($article, 'variant');
