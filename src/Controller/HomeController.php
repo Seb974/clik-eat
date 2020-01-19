@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\Publisher;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Service\Mercure\MercureCookieGenerator;
 
 /**
  * This controller is about homepage
@@ -33,7 +34,7 @@ class HomeController extends AbstractController
 {
     /**
      * Page d'accueil du site donnant une vue globale de tous les produits et leur variantes.
-     * @Route("/", name="index")
+     * @Route("/bois", name="index")
      *
      * @param  App\Repository\ProductRepository $productRepository
      * @param  Symfony\Component\HttpFoundation\Request $request
@@ -63,26 +64,20 @@ class HomeController extends AbstractController
         ]);
     }
 
+    //* @Route("/api_index", name="index_api")
+    //public function indexApi( MercureCookieGenerator $cookieGenerator, SerializerService $serializer)
+
     /**
-     * @Route("/api_index", name="index_api")
+     * @Route("/", name="index_api")
      */
-    public function indexApi( ProductRepository $productRepository, Request $request , CartService $cartService, SerializerService $serializer)
+    public function __invoke( MercureCookieGenerator $cookieGenerator)
     {
-        // $user = $this->getUser();
-        // if ($user) {
-        //     if ($user->getCart() && empty($cartService->getCart())) {
-        //         $cartService->generateCartSession($user->getCart());
-        //     }
-        // }
+        $response = $this->render('base.html.twig');
+        $response->headers->setCookie($cookieGenerator->generate());
 
-		// $cart_items = $request->getSession()->get('cart', []);
-		// $cart_count = 0;
-		// foreach ( $cart_items as $id => $qty) {
-		// 	$cart_count += $qty;
-		// }
-
-        $products = $productRepository->findAll();
-        return JsonResponse::fromJsonString($serializer->serializeEntity($products, 'product'));
+        return $response;
+        // $products = $productRepository->findAll();
+        //return JsonResponse::fromJsonString($serializer->serializeEntity($products, 'product'));
     }
 
     

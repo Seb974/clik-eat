@@ -51,7 +51,7 @@ import { GET_PRODUCTS, GET_PRODUCT, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STO
               return index === pdtIndex ? {...element, variants: newVars} : element;
           });
           let newSelection = Object.keys(state.selected).length === 0 ? {} : 
-              state.selected.id !== pdtIndex ? state.selected : {...state.selected, variants: newVars};
+              state.selected.id !== newPdts[pdtIndex].id ? state.selected : {...state.selected, variants: newVars};
           
           localStorage.setItem('products', JSON.stringify(newPdts));
           return {
@@ -74,8 +74,8 @@ import { GET_PRODUCTS, GET_PRODUCT, INCREASE_PRODUCT_STOCK, DECREASE_PRODUCT_STO
               return index === productIndex ? {...element, variants: newVariants} : element;
           });
           let newSelected = Object.keys(state.selected).length === 0 ? {} : 
-              state.selected.id !== productIndex ? state.selected : {...state.selected, variants: newVariants};
-          
+              state.selected.id !== newProducts[productIndex].id ? state.selected : {...state.selected, variants: newVariants};
+
           localStorage.setItem('products', JSON.stringify(newProducts));
           return {
               ...state,

@@ -34,3 +34,11 @@ services:
         arguments: [ '@request_stack' ]
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+    
+    App\Mercure\JwtProvider:
+        arguments:
+            $secret: '%env(MERCURE_JWT_SECRET)%'
+    
+    App\Service\Mercure\MercureCookieGenerator:
+        arguments:
+            $secret: '%env(MERCURE_JWT_SECRET)%'

@@ -167,16 +167,6 @@ class ProductDetails extends React.Component
                         <div className="col-lg-4">
                             <div className="sidebar">
                                 { this.displayNutritionals(product) }
-
-                                {/* {% if is_granted('ROLE_ADMIN') %}
-                                <ul class="d-flex flex-row">
-                                    <button class="btn btn-secondary btn-sm">
-                                        <a href="{{ path('product_edit', {'id': product.id}) }}">edit</a>
-                                    </button>
-                                    {{ include('product/_delete_form.html.twig') }}
-                                </ul>
-                                {% endif %} */}
-
                             </div>
                         </div>
                     </div>

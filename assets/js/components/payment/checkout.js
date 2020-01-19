@@ -243,19 +243,45 @@ class Checkout extends Component {
 
     checkTotalToPay = (e) => {
         e.preventDefault();
-        this.setState({isWaiting: true});
         if (this.state.totalCost !== this.state.initialTotalCost) {
-            const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
-            axios.post('/pay', body, tokenConfig())
-             .then((res) => {
-                const url = JSON.parse(res.data);
-                this.setState({
-                    paymentLink: url,
-                    initialTotalCost: this.state.totalCost,
-                });
-                window.open(url, "_self");
-             });
+            const user = this.getUserInformations();
+            if (typeof user.d_city !== 'undefined' && user.d_city.isDeliverable === true) {
+                this.setState({isWaiting: true});
+                const body = JSON.stringify( { dataUser: user, dataItems: this.props.item } );
+                axios.post('/pay', body, tokenConfig())
+                 .then((res) => {
+                    const url = JSON.parse(res.data);
+                    this.setState({
+                        paymentLink: url,
+                        initialTotalCost: this.state.totalCost,
+                    });
+                    window.open(url, "_self");
+                 });
+            } else {
+                this.state.username === '' || this.state.email === '' || this.state.phone === '' || this.state.d_address === '' || this.state.d_zipCode === '' ?
+                    alert("Des informations nécessaires à la livraison de votre commande sont manquantes.") : 
+                    alert("Nous regrettons de ne pouvoir honorer votre commande, nous ne livrons malheureusement pas (encore...) votre ville.");
+            }
         }
+    }
+
+    getUserInformations = () => {
+        let user = {
+            id: this.props.user === null ? -1 :  parseInt(this.props.user.id),
+            username: this.state.username,
+            email: this.state.email,
+            phone: this.state.phone,
+            d_address: this.state.d_address,
+            d_address2: this.state.d_address2,
+            d_zipCode: this.state.d_zipCode,
+            d_gps: this.state.d_gps,
+            d_city: this.state.cities.find(city => parseInt(city.zipCode) === parseInt(this.state.d_zipCode)),
+            b_address: this.state.identicalBillingAddress === true || this.state.b_address === '' ? this.state.d_address : this.state.b_address,
+            b_address2: this.state.identicalBillingAddress === true || this.state.b_address2 === '' ? this.state.d_address2 : this.state.b_address2,
+            b_zipCode: this.state.identicalBillingAddress === true || this.state.b_zipCode === '' ? this.state.d_zipCode : this.state.b_zipCode,
+            b_city: this.state.identicalBillingAddress === true || this.state.b_zipCode === '' ? this.state.d_city : this.state.cities.find(city => parseInt(city.zipCode) === parseInt(this.state.b_zipCode)),
+        }
+        return user;
     }
 
     displayItems = () => {

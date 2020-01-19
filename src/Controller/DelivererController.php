@@ -13,7 +13,7 @@ namespace App\Controller;
 
 use App\Entity\Orders;
 
-use App\Repository\OrderRepository;
+use App\Repository\OrdersRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,14 +27,14 @@ class DelivererController extends AbstractController
      * index
      * @Route("/deliverer", name="deliverer")
      *
-     * @param  App\Repository\OrderRepository $orderRepository
+     * @param  App\Repository\OrdersRepository $ordersRepository
      * @param  App\Repository\UserRepository $userRepository
      *
      * @return Symfony\Component\HttpFoundation\Response
      */
-    public function index(OrderRepository $orderRepository, UserRepository $userRepository): Response
+    public function index(OrdersRepository $ordersRepository, UserRepository $userRepository): Response
     {
-		$del_order = $orderRepository->findAll();
+		$del_order = $ordersRepository->findAll();
 		dump($del_order);
 
         return $this->render('deliverer/index.html.twig', [

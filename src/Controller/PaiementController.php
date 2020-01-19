@@ -15,18 +15,29 @@ use App\Entity\CartItem as CartItem;
 use App\Entity\Metadata;
 use App\Entity\User;
 use App\Entity\City;
+use App\Entity\Item;
+use App\Entity\OrderEntity;
 use App\Entity\Orders;
+use App\Entity\Variant;
 use App\Service\Anonymize\AnonymizeService;
 use App\Service\Cart\CartService;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Payplug;
+use Symfony\Component\Mercure\Update;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Repository\UserRepository;
+use App\Repository\VariantRepository;
+use App\Service\Serializer\SerializerService;
+use App\Service\Mercure\MercureCookieGenerator;
 
 class PaiementController extends AbstractController
 {
@@ -115,12 +126,10 @@ class PaiementController extends AbstractController
 				}
 			}
 		};
-
 		$metas['billing1'    ]["field"  ] = "";
 		$metas['billing2'    ]["field"  ] = "";
 		$metas['billing_city']["zipCode"] = "";
 		$metas['billing_city']["name"   ] = "";
-
 		$billing_city = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_city'  ] );
 		if ( $billing_city ) {
 			$metas['billing1'      ] = $em->getRepository( Metadata::class )->findOneBy( [ 'user' => $user, 'type' => 'billing_line_1' ] );
@@ -151,7 +160,7 @@ class PaiementController extends AbstractController
      * checkout
      * @Route("/pay", name="pay", methods={"GET", "POST"})
      */
-    public function paymentProcess( Request $request )
+    public function paymentProcess(Request $request, SessionInterface $session)
     {
 		if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
             $data = json_decode($request->getContent(), true);
@@ -159,14 +168,6 @@ class PaiementController extends AbstractController
 		}
 		$dataUser = $request->request->get('dataUser');
 		$dataItems = $request->request->get('dataItems');
-		$d_city = array_values(array_filter($dataUser['cities'], function($value, $key) use ($dataUser) {
-			return $value['zipCode'] == $dataUser['d_zipCode'];
-		}, ARRAY_FILTER_USE_BOTH));
-		if ($dataUser['identicalBillingAddress']) {
-			$b_city = array_values(array_filter($dataUser['cities'], function($value, $key) use ($dataUser) {
-				return $value['zipCode'] == $dataUser['d_zipCode'];
-			}, ARRAY_FILTER_USE_BOTH));
-		}
 
 		Payplug\Payplug::setSecretKey( $_ENV['PAYPLUG_KEY'] );
 		$uniq_id = uniqid($request->request->get('email'));
@@ -202,12 +203,14 @@ class PaiementController extends AbstractController
 				'return_url' => $_ENV['SERVER_URL'] . "/payment/success?id=" . $uniq_id,
 				'cancel_url' => $_ENV['SERVER_URL'] . "/payment/fail?id=" . $uniq_id
 			),
-			// 'notification_url' => "{$_ENV['SERVER_URL']}/payment/notif?id={$uniq_id}"
 		));
 			$payment_url     = $payment->hosted_payment->payment_url;
 			$payment_id      = $payment->id;
 			$count           = 0;
 
+			$session->set('items', $dataItems);
+			$session->set('user', $dataUser);
+			$session->set('paymentId', $payment_id);
 			$response = json_encode($payment_url);
 			return new JsonResponse($response);
     }
@@ -215,15 +218,18 @@ class PaiementController extends AbstractController
 	/**
 	 * payement_success
      * @Route("/payment/success", name="payment_success")
-	 * @param  integer $id corresponding to the id of the current user
-	 * @param  Symfony\Component\HttpFoundation\Request $request
-	 * @param  App\Service\Cart\CartService $cartService
-	 * @param  App\Service\Anonymize\AnonymizeService $anonymizeService
-	 * @param  Doctrine\ORM\EntityManagerInterface $em
-	 * @return Symfony\Component\HttpFoundation\Response
      */
-	public function payement_success(): Response {
-		return $this->redirectToRoute('index', ['paymentStatus' => 'success']);
+	public function payement_success(SessionInterface $session, VariantRepository $variantRepository, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, MessageBusInterface $bus, SerializerService $serializerService): Response {
+		$dataItems = $session->get('items');
+		$dataUser = $session->get('user');
+		$paymentId = $session->get('paymentId');
+		$user = ($dataUser['id'] !== -1) ? $userRepository->find($dataUser['id']) : $this->createUser($dataUser, $paymentId, $passwordEncoder);
+		$order = $this->createOrder($user, $paymentId, $dataUser, $dataItems);
+		$this->createItems($order, $dataItems, $variantRepository);
+		$update = $this->createUpdate($userRepository, $serializerService, $order, 'order', 'order-add', 'order/add');
+        $bus->dispatch($update);
+
+		return $this->redirectToRoute('index_api', ['paymentStatus' => 'success']);
 	}
 
 	/**
@@ -234,7 +240,7 @@ class PaiementController extends AbstractController
 	 * @return Symfony\Component\HttpFoundation\Response
      */
 	public function payement_fail(): Response {
-		return $this->redirectToRoute('index', ['paymentStatus' => 'fail']);
+		return $this->redirectToRoute('index_api', ['paymentStatus' => 'fail']);
 	}
 
 	/**
@@ -247,5 +253,75 @@ class PaiementController extends AbstractController
 		return $this->render('paiement/notif.html.twig', [
 			'request' => $request
         ]);
+	}
+
+	private function createUser($dataUser, $paymentId, $passwordEncoder) {
+		$user = new User();
+		$user->setUsername($dataUser['username']);
+		$user->setEmail($dataUser['email']);
+		$user->setRoles(["ROLE_GUEST"]);
+		$user->setPassword($passwordEncoder->encodePassword($user, $paymentId));
+		$user->setIsBanned(false);
+		$entityManager = $this->getDoctrine()->getManager();
+		$entityManager->persist($user);
+		$entityManager->flush();
+
+		return $user;
+	}
+
+	private function createOrder(User $user, $paymentId, $dataUser, $dataItems) {
+		$now = new \DateTime();
+		$order = new OrderEntity();
+		$order->setUser($user);
+		$order->setPaymentId($paymentId);
+		$order->setPaymentDateTime($now);
+		$order->setTotalTTC($dataItems['totalToPayTTC']);
+		$order->setTotalHT($dataItems['totalTax']);
+		$order->setTotalTax($dataItems['totalToPayHT']);
+		$order->setStatus('ON PREPARATION');
+		$order->setDeliveryAddress($dataUser['d_address'] . ' ' . $dataUser['d_address2'] . ' ' . $dataUser['d_zipCode'] . ' ' . $dataUser['d_city']['name']);
+		$entityManager = $this->getDoctrine()->getManager();
+		$entityManager->persist($order);
+		$entityManager->flush();
+
+		return $order;
+	}
+
+	private function createItems(OrderEntity $order, $dataItems, VariantRepository $variantRepository) {
+		$entityManager = $this->getDoctrine()->getManager();
+		for ($i = 0; $i < count($dataItems['items']); ++$i) {
+			$item = new Item();
+			$variant = $variantRepository->find($dataItems['items'][$i]['product']['id']);
+			$quantity = $dataItems['items'][$i]['quantity'];
+			$item->setVariant($variant);
+			$item->setQuantity($quantity);
+			$entityManager->persist($item);
+			$order->addItem($item);
+		}
+		$entityManager->flush();
+	}
+
+	private function createUpdate(UserRepository $userRepository, $serializer, $entity, string $group, string $dataType, string $route) {
+		$target = $this->defineTarget($userRepository);
+		dump($target);
+		$jsonEntity = $serializer->serializeEntity($entity, $group);
+        $arrayEntity = json_decode($jsonEntity, true);
+        $arrayEntity['dataType'] = $dataType;
+		$response = json_encode($arrayEntity);
+		return new Update($route, $response, $target);
+		// return new Update($route, $response);
+
+	}
+
+	private function defineTarget(UserRepository $userRepository)
+	{
+		$target = [];
+		$agents = $userRepository->findAll();
+		foreach ($agents as $agent) {
+			if (in_array("ROLE_ADMIN", $agent->getRoles()) || in_array("ROLE_SUPPLIER", $agent->getRoles()) || in_array("ROLE_DELIVERER", $agent->getRoles())) {
+				$target[] = 'https://clikeat.re/api/users/'. $agent->getId();
+			}
+		}
+		return $target;
 	}
 }

@@ -20,15 +20,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ApiAppController extends AbstractController
 {
     /**
-     * @Route("/ping", name="test_ping", methods={"POST"})
+     * @Route("/stock/update", name="hub_stock_update", methods={"POST"})
      */
-    public function ping(Request $request, MessageBusInterface $bus, VariantRepository $variantRepository, SerializerService $serializer)      // 
+    public function updateStock(Request $request, MessageBusInterface $bus, VariantRepository $variantRepository, SerializerService $serializerService, SerializerInterface $serializer)      // 
     {
         if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
             $data = json_decode($request->getContent(), true);
             $request->request->replace(is_array($data) ? $data : array());
         }
-        dump($request->request);
         $article = $variantRepository->find($request->request->get("id"));
         if ($request->request->get("action") === 'DECREASE_PRODUCT_STOCK') {
             $newQty = $article->getStock()->getQuantity() - $request->request->get("quantity");
@@ -39,8 +38,11 @@ class ApiAppController extends AbstractController
             $article->getStock()->setQuantity( $request->request->get("quantity") );
         }
         $this->getDoctrine()->getManager()->flush();
-        $response = $serializer->serializeEntity($article, 'variant');
-        $update = new Update("pong/ping", $response);
+        $jsonArticle = $serializerService->serializeEntity($article, 'variant');
+        $arrayResponse = json_decode($jsonArticle, true);
+        $arrayResponse['dataType'] = "stock-update";
+        $response = json_encode($arrayResponse);
+        $update = new Update("stock/update", $response);
         $bus->dispatch($update);
 	    return JsonResponse::fromJsonString($response);
     }

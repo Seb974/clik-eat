@@ -26,7 +26,7 @@ export const getItems = () => dispatch => {
 export const addItem = item => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
   const body = JSON.stringify( { action: DECREASE_PRODUCT_STOCK, id: item.variant.id, quantity: parseInt(item.quantity) } )
-  axios.post('/app/ping', body, tokenConfig())
+  axios.post('/app/stock/update', body, tokenConfig())
        .catch(err => {
         dispatch(
           returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
@@ -56,7 +56,7 @@ export const addItem = item => (dispatch, getState) => {
 export const deleteItem = item => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
   const body = JSON.stringify( { action: INCREASE_PRODUCT_STOCK, id: item.product.id, quantity: item.quantity } )
-  axios.post('/app/ping', body, tokenConfig())
+  axios.post('/app/stock/update', body, tokenConfig())
          .catch(err => {
           dispatch(
             returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
@@ -82,10 +82,10 @@ export const updateItem = (item, qty) => (dispatch, getState) => {
   const action = (qty > 0) ? DECREASE_PRODUCT_STOCK : INCREASE_PRODUCT_STOCK;
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
   const body = JSON.stringify( { action: action, id: item.product.id, quantity: Math.abs(qty) } )
-  axios.post('/app/ping', body, tokenConfig())
+  axios.post('/app/stock/update', body, tokenConfig())
          .catch(err => {
           dispatch(
-            returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')       
+            returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
           )
           });
   // FIN SUPPLEMENT MERCURE
@@ -98,19 +98,13 @@ export const updateItem = (item, qty) => (dispatch, getState) => {
 export const updateVariant = (item) => (dispatch, getState) => {
   //REMPLACE POUR TEMPS REEL MERCURE PAR :
   const body = JSON.stringify( { action: UPDATE_PRODUCT_STOCK, id: item.variant.id, quantity: item.quantity } )
-  axios.post('/app/ping', body, tokenConfig())
+  axios.post('/app/stock/update', body, tokenConfig())
          .catch(err => {
           dispatch(
             returnErrors(err.response.data, err.response.status, 'UPDATE_STOCK_FAIL')
           )
           });
   // FIN SUPPLEMENT MERCURE
-  // dispatch({
-  //   type: UPDATE_PRODUCT_STOCK,
-  //   payload: {
-  //     variant: {...item.variant, product: {...item.product}, stock: {...item.variant.stock, quantity: item.quantity} },
-  //   }
-  // })
 };
 
 export const setItemsLoading = () => {

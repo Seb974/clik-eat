@@ -19,6 +19,10 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *          "api_products_variant_get_subresource"={
  *              "method"="GET",
  *              "normalization_context"={"groups"={"product"}}
+ *          },
+ *          "api_items_variant_get_subresource"={
+ *              "method"="GET",
+ *              "normalization_context"={"groups"={"order"}}
  *          }
  *      },
   *     collectionOperations={
@@ -39,25 +43,25 @@ class Variant
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"product", "variant"})
+     * @Groups({"product", "variant", "order"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60)
-     * @Groups({"product", "variant"})
+     * @Groups({"product", "variant", "order"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"product", "variant"})
+     * @Groups({"product", "variant", "order"})
      */
     private $price;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Stock", mappedBy="product", cascade={"persist", "remove"})
-     * @Groups({"product", "variant"})
+     * @Groups({"product", "variant", "order"})
      * @ApiSubresource
      */
     private $stock;
@@ -65,14 +69,14 @@ class Variant
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Product", inversedBy="variants", cascade={"persist"})
      * @ORM\JoinColumn(nullable=true)
-     * @Groups({"variant"})
+     * @Groups({"variant", "order"})
      * 
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Tva")
-     * @Groups({"product", "variant"})
+     * @Groups({"product", "variant", "order"})
      * @ApiSubresource
      */
     private $tva;

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { EventSourcePolyfill } from 'event-source-polyfill';
 import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
 import ScrollToTop from './helpers/scrollToTop';
 import { UPDATE_PRODUCT_STOCK } from './actions/types';
@@ -42,7 +43,6 @@ require('../css/app.css');
 
 class App extends React.Component 
 {
-
     state = {
         cart: this.props.cart || [],
     };
@@ -55,16 +55,24 @@ class App extends React.Component
 
     componentDidMount = () => {
         const url = new URL('https:clikeat.re:3000/.well-known/mercure');
-        url.searchParams.append('topic', 'pong/ping');
-        const eventSource = new EventSource(url);
+        url.searchParams.append('topic', 'stock/update');
+        url.searchParams.append('topic', 'order/add');
+        const eventSource = new EventSourcePolyfill(url, {
+            withCredentials: true,
+        });
         eventSource.onmessage = event => {
             event.preventDefault();
-            store.dispatch({
-                type: UPDATE_PRODUCT_STOCK,
-                payload: {
-                    variant: JSON.parse(event.data),
-                }
-            })
+            const data = JSON.parse(event.data);
+            if (data.dataType === 'stock-update') {
+                store.dispatch({
+                    type: UPDATE_PRODUCT_STOCK,
+                    payload: {
+                        variant: data,
+                    }
+                })
+            } else if (data.dataType === 'order-add') {
+                console.log(event);
+            }
         }
     }
 
