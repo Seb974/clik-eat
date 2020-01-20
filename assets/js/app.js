@@ -34,6 +34,7 @@ import SupplierForm from './components/admin/supplier/supplierForm';
 import ProductAdminList from './components/admin/product/productAdminList';
 import ProductForm from './components/admin/product/productForm';
 import StockList from './components/admin/stock/stockList';
+import OrderList from './components/admin/order/orderList';
 import store from './store';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
@@ -43,6 +44,11 @@ require('../css/app.css');
 
 class App extends React.Component 
 {
+    constructor(props) {
+        super(props);
+
+    }
+
     state = {
         cart: this.props.cart || [],
     };
@@ -54,7 +60,7 @@ class App extends React.Component
     };
 
     componentDidMount = () => {
-        const url = new URL('https:clikeat.re:3000/.well-known/mercure');
+        const url = new URL('https://clikeat.re:3000/.well-known/mercure');
         url.searchParams.append('topic', 'stock/update');
         url.searchParams.append('topic', 'order/add');
         const eventSource = new EventSourcePolyfill(url, {
@@ -71,7 +77,10 @@ class App extends React.Component
                     }
                 })
             } else if (data.dataType === 'order-add') {
-                console.log(event);
+                let user = store.getState().auth.user;
+                if (user !== null && typeof user !== 'undefined' && (user.roles.includes("ROLE_ADMIN") || user.roles.includes("ROLE_SUPPLIER") || user.roles.includes("ROLE_DELIVERER"))) {
+                    console.log(event);
+                }
             }
         }
     }
@@ -118,6 +127,7 @@ class App extends React.Component
                                     <Route path='/products' component={ProductAdminList} />
                                     <Route path='/products-add-or-edit/:id?' component={ProductForm} />
                                     <Route path='/stocks' component={StockList} />
+                                    <Route path='/orders' component={OrderList} />
                                     <Route path="*" render={() => (<Redirect to="/" />)} /> 
                                 </Switch>
                             </ScrollToTop>
@@ -134,6 +144,6 @@ const mapStateToProps = state => ({
     user: state.auth.user,
   });
   
-  export default connect( mapStateToProps)(App);
+  export default connect( mapStateToProps )(App);
 
   ReactDOM.render(<App/>, document.getElementById("root"));

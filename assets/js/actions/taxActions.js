@@ -2,8 +2,8 @@ import axios from 'axios';
 import { GET_TAXES, GET_TAX, ADD_TAX, DELETE_TAX, UPDATE_TAX } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
-import allergenReducer from '../reducers/productReducer';
-import { push } from 'react-router-redux'
+// import allergenReducer from '../reducers/productReducer';
+// import { push } from 'react-router-redux'
 
 export const getTaxes = () => dispatch => {
     axios.get('/api/tvas', tokenConfig())

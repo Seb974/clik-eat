@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import { tokenConfig } from '../../helpers/security';
 import { connect } from 'react-redux';
 import { getProducts } from '../../actions/productActions';
 import { addItem, deleteCart } from '../../actions/itemActions';
@@ -10,6 +12,7 @@ class ProductList extends React.Component
 {
 
     static propTypes = {
+        user: PropTypes.object,
         getProducts: PropTypes.func.isRequired,
         addItem: PropTypes.func.isRequired,
         deleteCart: PropTypes.func.isRequired,
@@ -127,6 +130,7 @@ class ProductList extends React.Component
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     product: state.product,
     isAuthenticated: state.auth.isAuthenticated,
     selectedCategory: state.category.selected,

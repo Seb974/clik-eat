@@ -60,8 +60,8 @@ class Navbar extends Component {
                                 <Link className="dropdown-item" to="/stocks">
                                     <i className="fas fa-box-open"></i>Stocks</Link>
                                 <div className="dropdown-divider"></div>
-                                <a className="dropdown-item" href="{{ path('get_order') }}">
-                                    <i className="fas fa-cash-register"></i>Orders</a>
+                                <Link className="dropdown-item" to="/orders">
+                                    <i className="fas fa-cash-register"></i>Commandes</Link>
                                 <div className="dropdown-divider"></div>
                             </span>
                             )

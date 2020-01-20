@@ -17,7 +17,7 @@ class JwtProvider
     public function __invoke() : string
     {
         return (new Builder())
-            ->set('mercure', ['publish' => ['*'], 'subscribe' => ['*']])
+            ->set('mercure', ['publish' => ['*']])
             ->sign(new Sha256(), $this->secret)
             ->getToken();
     }

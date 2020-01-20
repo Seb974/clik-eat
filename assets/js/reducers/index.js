@@ -8,6 +8,7 @@ import taxReducer from './taxReducer';
 import categoryReducer from './categoryReducer';
 import cityReducer from './cityReducer';
 import userReducer from './userReducer';
+import orderReducer from './orderReducer';
 import productAdminReducer from './productAdminReducer';
 import supplierReducer from './supplierReducer';
 
@@ -22,5 +23,6 @@ export default combineReducers({
   city: cityReducer,
   user: userReducer,
   productAdmin: productAdminReducer,
-  supplier: supplierReducer
+  supplier: supplierReducer,
+  order: orderReducer,
 });

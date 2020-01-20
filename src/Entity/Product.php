@@ -26,7 +26,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *     subresourceOperations={
  *          "api_variants_product_get_subresource"={
  *              "method"="GET",
- *              "normalization_context"={"groups"={"variant"}}
+ *              "normalization_context"={"groups"={"variant", "order"}}
  *          }
  *     },
   *     collectionOperations={
@@ -47,19 +47,19 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"product", "category", "allergen", "supplier", "variant"})
+     * @Groups({"product", "category", "allergen", "supplier", "variant", "order"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=150)
-     * @Groups({"product", "category", "allergen", "supplier", "variant"})
+     * @Groups({"product", "category", "allergen", "supplier", "variant", "order"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"product", "category", "allergen", "supplier", "variant"})
+     * @Groups({"product", "category", "allergen", "supplier", "variant", "order"})
      */
     private $description;
 
@@ -83,14 +83,14 @@ class Product
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Nutritionals", cascade={"persist", "remove"})
-     * @Groups({"product", "category", "allergen", "supplier", "variant"})
+     * @Groups({"product", "category", "allergen", "supplier", "variant", "order"})
      * @ApiSubresource
      */
     private $nutritionals;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="products")
-     * @Groups({"product", "allergen", "supplier", "variant"})
+     * @Groups({"product", "allergen", "supplier", "variant", "order"})
      * @ApiSubresource
      */
     private $category;
@@ -99,12 +99,12 @@ class Product
      * @ORM\ManyToOne(targetEntity="App\Entity\Tva")
      * @ApiSubresource
      */
-    // @Groups({"product", "category", "allergen", "supplier", "variant"})
+    // @Groups({"product", "category", "allergen", "supplier", "variant", "order"})
     private $tva;
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Allergen", inversedBy="products")
-     * @Groups({"product", "category", "supplier", "variant"})
+     * @Groups({"product", "category", "supplier", "variant", "order"})
      * @ApiSubresource
      */
     private $allergens;
@@ -118,7 +118,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Supplier", inversedBy="products")
-     * @Groups({"product", "category", "allergen", "variant"})
+     * @Groups({"product", "category", "allergen", "variant", "order"})
      * @ApiSubresource
      */
     private $supplier;

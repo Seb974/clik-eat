@@ -2,6 +2,7 @@
 
 namespace App\Service\Mercure;
 
+use App\Entity\User;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -20,6 +21,22 @@ class MercureCookieGenerator
     {
         $token = (new Builder())
             ->withClaim('mercure', ['subscribe' => ['*']])
+            ->getToken(new Sha256(), new Key($this->secret));
+
+        return Cookie::fromString("
+            mercureAuthorization = {$token}; 
+            path = /.well-known/mercure; 
+            domain = clikeat.re;
+            secure; 
+            httponly;
+        ");
+    }
+
+    public function generateCustom($id) : Cookie 
+    {
+        $token = (new Builder())
+            // ->withClaim('mercure', ['subscribe' => ["https://clikeat.re/api/users/" . $id] ])
+            ->withClaim('mercure', ['subscribe' => ['*'] ])
             ->getToken(new Sha256(), new Key($this->secret));
 
         return Cookie::fromString("

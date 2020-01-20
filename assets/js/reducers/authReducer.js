@@ -16,7 +16,7 @@ import {
     token: storedToken || "",
     isAuthenticated: storedToken !== "" ? true : false,
     isLoading: false,
-    user: storedToken !== "" ? userExtractor(storedToken) : null
+    user: storedToken !== "" ? userExtractor(storedToken) : null,
   };
   
   export default function(state = initialState, action) {
@@ -46,7 +46,7 @@ import {
           ...action.payload,
           isAuthenticated: true,
           isLoading: false,
-          user: user
+          user: user,
         };
       case LOGOUT_SUCCESS:
           localStorage.removeItem('token');
@@ -62,7 +62,7 @@ import {
           token: null,
           user: null,
           isAuthenticated: false,
-          isLoading: false
+          isLoading: false,
         };
       default:
         return state;

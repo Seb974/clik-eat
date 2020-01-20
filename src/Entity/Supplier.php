@@ -19,7 +19,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *    subresourceOperations={
  *          "api_products_supplier_get_subresource"={
  *              "method"="GET",
- *              "normalization_context"={"groups"={"product"}}
+ *              "normalization_context"={"groups"={"product", "order"}}
  *          }
  *     },
   *     collectionOperations={
@@ -40,13 +40,13 @@ class Supplier
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"product", "supplier", "user"})
+     * @Groups({"product", "supplier", "user", "order"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120)
-     * @Groups({"product", "supplier", "user"})
+     * @Groups({"product", "supplier", "user", "order"})
      */
     private $name;
 
@@ -71,7 +71,7 @@ class Supplier
 
     /**
      * @ORM\Column(type="time")
-     * @Groups({"product", "supplier"})
+     * @Groups({"product", "supplier", "order"})
      */
     private $preparationPeriod;
 

@@ -1,14 +1,4 @@
 <?php
-	/**
-     * HomePage Controller
-     *
-     * This controller manage all about Home page
-     *
-     * @package      Some Package
-     * @subpackage   Some Subpackage
-     * @category     Home Page
-     * @author       War Machines
-     */
 
 namespace App\Controller;
 
@@ -19,6 +9,8 @@ use App\Service\Cart\CartService;
 use App\Repository\VariantRepository;
 use App\Repository\ProductRepository;
 use App\Entity\Product;
+use App\Entity\User;
+use App\Mercure\JwtProvider;
 use App\Service\Serializer\SerializerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,23 +56,13 @@ class HomeController extends AbstractController
         ]);
     }
 
-    //* @Route("/api_index", name="index_api")
-    //public function indexApi( MercureCookieGenerator $cookieGenerator, SerializerService $serializer)
-
     /**
      * @Route("/", name="index_api")
      */
-    public function __invoke( MercureCookieGenerator $cookieGenerator)
+    public function __invoke(MercureCookieGenerator $cookieGenerator)
     {
         $response = $this->render('base.html.twig');
         $response->headers->setCookie($cookieGenerator->generate());
-
         return $response;
-        // $products = $productRepository->findAll();
-        //return JsonResponse::fromJsonString($serializer->serializeEntity($products, 'product'));
     }
-
-    
-
-
 }
