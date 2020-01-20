@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
 import ScrollToTop from './helpers/scrollToTop';
-import { UPDATE_PRODUCT_STOCK } from './actions/types';
+import { UPDATE_PRODUCT_STOCK, ADD_ORDER } from './actions/types';
 import { Provider } from 'react-redux';
 import Navbar from './components/layout/navbar';
 import ProductList from './components/product/productList';
@@ -36,6 +36,7 @@ import ProductForm from './components/admin/product/productForm';
 import StockList from './components/admin/stock/stockList';
 import OrderList from './components/admin/order/orderList';
 import store from './store';
+import { addOrder } from './actions/orderActions';
 import { loadUser } from './actions/authActions';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -57,6 +58,7 @@ class App extends React.Component
         isAuthenticated: PropTypes.bool,
         user: PropTypes.object,
         updateProductStock: PropTypes.func,
+        addOrder: PropTypes.func,
     };
 
     componentDidMount = () => {
@@ -75,11 +77,17 @@ class App extends React.Component
                     payload: {
                         variant: data,
                     }
-                })
+                });
             } else if (data.dataType === 'order-add') {
                 let user = store.getState().auth.user;
                 if (user !== null && typeof user !== 'undefined' && (user.roles.includes("ROLE_ADMIN") || user.roles.includes("ROLE_SUPPLIER") || user.roles.includes("ROLE_DELIVERER"))) {
                     console.log(event);
+                    store.dispatch({
+                        type: ADD_ORDER,
+                        payload: {
+                            order: data,
+                        }
+                    })
                 }
             }
         }
@@ -144,6 +152,6 @@ const mapStateToProps = state => ({
     user: state.auth.user,
   });
   
-  export default connect( mapStateToProps )(App);
+  export default connect( mapStateToProps, { addOrder } )(App);
 
   ReactDOM.render(<App/>, document.getElementById("root"));

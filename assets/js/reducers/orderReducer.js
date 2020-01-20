@@ -8,7 +8,6 @@ const initialState = {
 export default function(state = initialState, action) {
     switch (action.type) {
         case GET_ORDERS:
-            console.log(action.payload);
             return {
                 ...state,
                 orders: action.payload,
@@ -19,7 +18,7 @@ export default function(state = initialState, action) {
                 selected: action.payload
             };
         case ADD_ORDER:
-            const enlargedOrders = [action.payload, ...state.orders];
+            const enlargedOrders = [action.payload.order, ...state.orders].sort((a, b) => (a.id > b.id) ? 1 : -1);
             return {
                 ...state,
                 orders: enlargedOrders,

@@ -29,22 +29,23 @@ export const getOrder = (id, orders) => dispatch => {
 };
 
 export const addOrder = order => dispatch =>{
-    const body = JSON.stringify({ 
-        name: order.name, 
-        taux: order.taux
-    })
-    axios.post('/api/order_entities', body, tokenConfig())
-         .then((res) => {
-            dispatch({
-                type: ADD_ORDER,
-                payload: res.data
-            })
-         })
-         .catch(err => {
-            dispatch(
-                returnErrors(err.response.data, err.response.status, 'ORDER_CREATION_FAIL')
-            )
-         });
+    console.log(order);
+    // const body = JSON.stringify({ 
+    //     name: order.name, 
+    //     taux: order.taux
+    // })
+    // axios.post('/api/order_entities', body, tokenConfig())
+    //      .then((res) => {
+    //         dispatch({
+    //             type: ADD_ORDER,
+    //             payload: res.data
+    //         })
+    //      })
+    //      .catch(err => {
+    //         dispatch(
+    //             returnErrors(err.response.data, err.response.status, 'ORDER_CREATION_FAIL')
+    //         )
+    //      });
 };
 
 export const deleteOrder = id => dispatch => {

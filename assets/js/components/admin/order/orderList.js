@@ -32,11 +32,7 @@ class OrderList extends React.Component
                 <tr>
                     <td>{ props.details.id }</td>
                     <td>{ props.details.paymentDateTime }</td>
-                    <td>{ this.displayItems(props.details.items)
-                        // props.details.items.map( item => {
-                        //     return item.variant.product.name + " - " + item.variant.name + " : " + item.quantity + " U."
-                        // }) 
-                    }</td>
+                    <td>{ this.displayItems(props.details.items) }</td>
                     <td>{ props.details.status }</td>
                     <td>
                         <Link to={ "/orders-show/" + props.details.id }>Show</Link> - 
