@@ -265,7 +265,6 @@ class PaiementController extends AbstractController
 		$entityManager = $this->getDoctrine()->getManager();
 		$entityManager->persist($user);
 		$entityManager->flush();
-
 		return $user;
 	}
 
@@ -283,7 +282,6 @@ class PaiementController extends AbstractController
 		$entityManager = $this->getDoctrine()->getManager();
 		$entityManager->persist($order);
 		$entityManager->flush();
-
 		return $order;
 	}
 
@@ -303,14 +301,12 @@ class PaiementController extends AbstractController
 
 	private function createUpdate(UserRepository $userRepository, $serializer, $entity, string $group, string $dataType, string $route) {
 		$target = $this->defineTarget($userRepository);
-		dump($target);
 		$jsonEntity = $serializer->serializeEntity($entity, $group);
         $arrayEntity = json_decode($jsonEntity, true);
         $arrayEntity['dataType'] = $dataType;
 		$response = json_encode($arrayEntity);
 		return new Update($route, $response, $target);
 		// return new Update($route, $response);
-
 	}
 
 	private function defineTarget(UserRepository $userRepository)

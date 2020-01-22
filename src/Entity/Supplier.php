@@ -20,14 +20,18 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
  *          "api_products_supplier_get_subresource"={
  *              "method"="GET",
  *              "normalization_context"={"groups"={"product", "order"}}
+ *          },
+ *          "api_users_supplier_get_subresource"={
+ *              "method"="GET",
+ *              "normalization_context"={"groups"={"user"}}
  *          }
  *     },
   *     collectionOperations={
-  *         "get",
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER')"},
   *         "post"={"security"="is_granted('ROLE_ADMIN')"}
   *     },
   *     itemOperations={
-  *         "get"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or user in object.users"},
   *         "put"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
   *         "patch"={"security"="is_granted('ROLE_ADMIN') or user in object.users"},
   *         "delete"={"security"="is_granted('ROLE_ADMIN')"},
@@ -71,7 +75,7 @@ class Supplier
 
     /**
      * @ORM\Column(type="time")
-     * @Groups({"product", "supplier", "order"})
+     * @Groups({"product", "supplier", "order", "user"})
      */
     private $preparationPeriod;
 

@@ -15,13 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
  *          "normalization_context"={"groups"={"order"}}
  *      },
   *     collectionOperations={
-  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "post"
   *     },
   *     itemOperations={
-  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
-  *         "put"={"security"="is_granted('ROLE_ADMIN')"},
-  *         "patch"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
+  *         "put"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
+  *         "patch"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "delete"={"security"="is_granted('ROLE_ADMIN')"},
   *     }
  * )

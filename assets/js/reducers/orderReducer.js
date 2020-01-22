@@ -1,4 +1,4 @@
-import { GET_ORDERS, GET_ORDER, ADD_ORDER, DELETE_ORDER, UPDATE_ORDER } from '../actions/types';
+import { GET_ORDERS, GET_ORDER, ADD_ORDER, DELETE_ORDER, UPDATE_ORDER, SEND_TO_DELIVERY } from '../actions/types';
 
 const initialState = {
     orders: [],
@@ -18,7 +18,10 @@ export default function(state = initialState, action) {
                 selected: action.payload
             };
         case ADD_ORDER:
-            const enlargedOrders = [action.payload.order, ...state.orders].sort((a, b) => (a.id > b.id) ? 1 : -1);
+            console.log(action.payload.order);
+            let newOrder = action.payload.order;
+            newOrder.paymentDateTime = Date.now();
+            const enlargedOrders = [newOrder, ...state.orders].sort((a, b) => (a.id > b.id) ? 1 : -1);
             return {
                 ...state,
                 orders: enlargedOrders,
@@ -30,10 +33,11 @@ export default function(state = initialState, action) {
                 orders: reducedOrders,
             };
         case UPDATE_ORDER:
+        case SEND_TO_DELIVERY:
             const previousOrders = state.orders.filter(order => order.id !== action.payload.id);
             return {
                 ...state,
-                orders: [action.payload, ...previousOrders],
+                orders: [action.payload, ...previousOrders].sort((a, b) => (a.id > b.id) ? 1 : -1),
             }
 
         default:

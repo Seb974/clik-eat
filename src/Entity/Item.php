@@ -19,11 +19,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          }
  *     },
   *     collectionOperations={
-  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "post"
   *     },
   *     itemOperations={
-  *         "get"={"security"="is_granted('ROLE_ADMIN')"},
+  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "put"={"security"="is_granted('ROLE_ADMIN')"},
   *         "patch"={"security"="is_granted('ROLE_ADMIN')"},
   *         "delete"={"security"="is_granted('ROLE_ADMIN')"},

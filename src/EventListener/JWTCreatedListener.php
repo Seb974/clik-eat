@@ -44,7 +44,8 @@ class JWTCreatedListener
             'isBanned' => $user->getIsBanned(),
             'avatar' => $user->getAvatar(),
             'cart' => $user->getCart(),
-            'supplier' => $user->getSupplier(),
+            // 'supplier' => $user->getSupplier(),
+            'supplier' => $this->serializer->serializeEntity($user->getSupplier(), 'user'),
             'metadata' => $this->serializer->serializeEntity($metadata, 'metadata')
         ];
         $payload = $data;

@@ -70,14 +70,23 @@ export const addUser = (fromState) => dispatch =>{
 
 export const updateUser = (fromState) => dispatch => {
     const user = fromState.selection;
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Content-type': 'application/merge-patch+json'
+        }
+    }
+    if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token;
+    }
     const body = JSON.stringify({ 
         username: fromState.username, 
         email: fromState.email,
         roles: fromState.roles,
-        password: fromState.password,
+        // password: fromState.password,
         isBanned: fromState.isBanned,
     });
-    axios.put('/api/users/' + user.id, body, tokenConfig())
+    axios.patch('/api/users/' + user.id, body, config)
         .then((res) => {
             const updatedUserId = res.data.id;
             (async () => {
