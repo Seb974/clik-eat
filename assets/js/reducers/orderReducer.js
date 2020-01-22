@@ -1,4 +1,4 @@
-import { GET_ORDERS, GET_ORDER, ADD_ORDER, DELETE_ORDER, UPDATE_ORDER, SEND_TO_DELIVERY } from '../actions/types';
+import { GET_ORDERS, GET_ORDER, ADD_ORDER, DELETE_ORDER, UPDATE_ORDER, SEND_TO_DELIVERY, CLOSE_ORDER } from '../actions/types';
 
 const initialState = {
     orders: [],
@@ -34,6 +34,7 @@ export default function(state = initialState, action) {
             };
         case UPDATE_ORDER:
         case SEND_TO_DELIVERY:
+        case CLOSE_ORDER:
             const previousOrders = state.orders.filter(order => order.id !== action.payload.id);
             return {
                 ...state,

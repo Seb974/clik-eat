@@ -7,10 +7,6 @@ import { getOrders, transferToDelivery } from '../../../actions/orderActions';
 
 class OrderList extends React.Component 
 {
-    state = {
-        user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token)
-    };
-
     static propTypes = {
         getOrders: PropTypes.func.isRequired,
         transferToDelivery: PropTypes.func.isRequired,
@@ -93,7 +89,7 @@ class OrderList extends React.Component
     displayAdminView = () => {
         return (
             <div id="content-wrap">
-                <h1>Liste Admin des commandes à préparer</h1>
+                <h1>Commandes à préparer</h1>
                 <table class="table">
                     <thead>
                         <tr>
@@ -117,7 +113,7 @@ class OrderList extends React.Component
     displaySupplierView = () => {
         return (
             <div id="content-wrap">
-                <h1>Liste Fournisseur des commandes à préparer</h1>
+                <h1>Commandes à préparer</h1>
                 <table class="table">
                     <thead>
                         <tr>
@@ -139,7 +135,6 @@ class OrderList extends React.Component
     }
 
     render() {
-        // if( Object.entries(this.props.user).length !== 0 && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
             return this.props.user.roles.find(role => role === "ROLE_ADMIN") ? this.displayAdminView() : this.displaySupplierView();
         }

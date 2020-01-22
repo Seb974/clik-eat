@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_ORDERS, GET_ORDER, SEND_TO_DELIVERY, DELETE_ORDER, UPDATE_ORDER } from '../actions/types';
+import { GET_ORDERS, GET_ORDER, SEND_TO_DELIVERY, DELETE_ORDER, UPDATE_ORDER, CLOSE_ORDER } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
@@ -45,6 +45,28 @@ export const transferToDelivery = id => dispatch =>{
          .then( res => {
             dispatch({
                 type: SEND_TO_DELIVERY,
+                payload: res.data
+            })
+         });
+};
+
+export const closeOrder = id => dispatch =>{
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Content-type': 'application/merge-patch+json'
+        }
+    }
+    if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token;
+    }
+    const body = JSON.stringify({ 
+        status: "DELIVERED",
+    })
+    axios.patch('/api/order_entities/' + id, body, config)
+         .then( res => {
+            dispatch({
+                type: CLOSE_ORDER,
                 payload: res.data
             })
          });

@@ -68,8 +68,8 @@ class Navbar extends Component {
                         }
                         { typeof props.user === 'undefined' ? "" : (props.user.roles.indexOf('ROLE_DELIVERER') === -1 && props.user.roles.indexOf('ROLE_ADMIN') === -1) ? "" : (
                             <span>
-                                <a className="dropdown-item" href="{{ path('deliverer') }}">
-                                    <i className="fas fa-truck"></i>Livraisons</a>
+                                <Link className="dropdown-item" to="/deliveries">
+                                    <i className="fas fa-truck"></i>Livraisons</Link>
                                 <div className="dropdown-divider"></div>
                             </span>
                             )
