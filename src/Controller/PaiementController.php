@@ -38,6 +38,7 @@ use App\Repository\UserRepository;
 use App\Repository\VariantRepository;
 use App\Service\Serializer\SerializerService;
 use App\Service\Mercure\MercureCookieGenerator;
+use App\Service\Mercure\TargetAgents;
 
 class PaiementController extends AbstractController
 {
@@ -219,14 +220,14 @@ class PaiementController extends AbstractController
 	 * payement_success
      * @Route("/payment/success", name="payment_success")
      */
-	public function payement_success(SessionInterface $session, VariantRepository $variantRepository, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, MessageBusInterface $bus, SerializerService $serializerService): Response {
+	public function payement_success(SessionInterface $session, VariantRepository $variantRepository, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, MessageBusInterface $bus, SerializerService $serializerService, TargetAgents $targetService): Response {
 		$dataItems = $session->get('items');
 		$dataUser = $session->get('user');
 		$paymentId = $session->get('paymentId');
 		$user = ($dataUser['id'] !== -1) ? $userRepository->find($dataUser['id']) : $this->createUser($dataUser, $paymentId, $passwordEncoder);
 		$order = $this->createOrder($user, $paymentId, $dataUser, $dataItems);
 		$this->createItems($order, $dataItems, $variantRepository);
-		$update = $this->createUpdate($userRepository, $serializerService, $order, 'order', 'order-add', 'order/add');
+		$update = $this->createUpdate($userRepository, $serializerService, $order, 'order', 'order-add', 'order/add', $targetService);
         $bus->dispatch($update);
 
 		return $this->redirectToRoute('index_api', ['paymentStatus' => 'success']);
@@ -299,25 +300,13 @@ class PaiementController extends AbstractController
 		$entityManager->flush();
 	}
 
-	private function createUpdate(UserRepository $userRepository, $serializer, $entity, string $group, string $dataType, string $route) {
-		$target = $this->defineTarget($userRepository);
+	private function createUpdate(UserRepository $userRepository, $serializer, $entity, string $group, string $dataType, string $route, TargetAgents $targetService) {
+		$target = $targetService->defineTarget();
 		$jsonEntity = $serializer->serializeEntity($entity, $group);
         $arrayEntity = json_decode($jsonEntity, true);
         $arrayEntity['dataType'] = $dataType;
 		$response = json_encode($arrayEntity);
 		return new Update($route, $response, $target);
 		// return new Update($route, $response);
-	}
-
-	private function defineTarget(UserRepository $userRepository)
-	{
-		$target = [];
-		$agents = $userRepository->findAll();
-		foreach ($agents as $agent) {
-			if (in_array("ROLE_ADMIN", $agent->getRoles()) || in_array("ROLE_SUPPLIER", $agent->getRoles()) || in_array("ROLE_DELIVERER", $agent->getRoles())) {
-				$target[] = 'https://clikeat.re/api/users/'. $agent->getId();
-			}
-		}
-		return $target;
 	}
 }

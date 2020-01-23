@@ -42,19 +42,19 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"product", "user", "supplier", "variant"})
+     * @Groups({"product", "user", "supplier", "variant", "order"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"product", "user", "supplier", "variant"})
+     * @Groups({"product", "user", "supplier", "variant", "order"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"product", "user", "supplier", "variant"})
+     * @Groups({"product", "user", "supplier", "variant", "order"})
      */
     private $roles = [];
 
@@ -66,7 +66,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"product", "user", "supplier", "variant"})
+     * @Groups({"product", "user", "supplier", "variant", "order"})
      */
     private $username;
 

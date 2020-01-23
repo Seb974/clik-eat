@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
 import ScrollToTop from './helpers/scrollToTop';
-import { UPDATE_PRODUCT_STOCK, ADD_ORDER } from './actions/types';
+import { UPDATE_PRODUCT_STOCK, ADD_ORDER, UPDATE_ORDER } from './actions/types';
 import { Provider } from 'react-redux';
 import Navbar from './components/layout/navbar';
 import ProductList from './components/product/productList';
@@ -64,6 +64,7 @@ class App extends React.Component
         const url = new URL('https://clikeat.re:3000/.well-known/mercure');
         url.searchParams.append('topic', 'stock/update');
         url.searchParams.append('topic', 'order/add');
+        url.searchParams.append('topic', 'order/update');
         const eventSource = new EventSourcePolyfill(url, {
             withCredentials: true,
         });
@@ -77,15 +78,24 @@ class App extends React.Component
                         variant: data,
                     }
                 });
-            } else if (data.dataType === 'order-add') {
+            } else {
                 let user = store.getState().auth.user;
                 if (user !== null && typeof user !== 'undefined' && (user.roles.includes("ROLE_ADMIN") || user.roles.includes("ROLE_SUPPLIER") || user.roles.includes("ROLE_DELIVERER"))) {
-                    store.dispatch({
-                        type: ADD_ORDER,
-                        payload: {
-                            order: data,
-                        }
-                    })
+                    if (data.dataType === 'order-add') {
+                        store.dispatch({
+                            type: ADD_ORDER,
+                            payload: {
+                                order: data,
+                            }
+                        })
+                    } else if (data.dataType === 'order-set-deliverer' || data.dataType === 'order-on-delivery' || data.dataType === 'order-close') { 
+                        store.dispatch({
+                            type: UPDATE_ORDER,
+                            payload: {
+                                order: data,
+                            }
+                        })
+                    }
                 }
             }
         }

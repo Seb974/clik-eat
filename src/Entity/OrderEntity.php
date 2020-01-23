@@ -90,6 +90,12 @@ class OrderEntity
      */
     private $deliveryAddress;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Delivery", mappedBy="orderEntity", cascade={"persist", "remove"})
+     * @Groups({"order"})
+     */
+    private $delivery;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -221,6 +227,24 @@ class OrderEntity
     public function setDeliveryAddress(?string $deliveryAddress): self
     {
         $this->deliveryAddress = $deliveryAddress;
+
+        return $this;
+    }
+
+    public function getDelivery(): ?Delivery
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(?Delivery $delivery): self
+    {
+        $this->delivery = $delivery;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newOrderEntity = null === $delivery ? null : $this;
+        if ($delivery->getOrderEntity() !== $newOrderEntity) {
+            $delivery->setOrderEntity($newOrderEntity);
+        }
 
         return $this;
     }

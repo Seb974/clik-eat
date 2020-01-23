@@ -28,49 +28,57 @@ export const getOrder = (id, orders) => dispatch => {
     }
 };
 
-export const transferToDelivery = id => dispatch =>{
+export const transferToDelivery = id => dispatch => {
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-            'Content-type': 'application/merge-patch+json'
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer ' + token,
         }
-    }
-    if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token;
     }
     const body = JSON.stringify({ 
         status: "ON DELIVERY",
+        dataType: "order-on-delivery",
     })
-    axios.patch('/api/order_entities/' + id, body, config)
-         .then( res => {
-            dispatch({
-                type: SEND_TO_DELIVERY,
-                payload: res.data
-            })
-         });
+    axios.post('/app/order/' + id + '/update', body, config);
 };
 
-export const closeOrder = id => dispatch =>{
+export const closeOrder = id => dispatch => {
     const token = localStorage.getItem('token');
     const config = {
         headers: {
-            'Content-type': 'application/merge-patch+json'
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer ' + token,
         }
-    }
-    if (token) {
-        config.headers['Authorization'] = 'Bearer ' + token;
     }
     const body = JSON.stringify({ 
         status: "DELIVERED",
+        dataType: "order-close",
     })
-    axios.patch('/api/order_entities/' + id, body, config)
-         .then( res => {
+    axios.post('/app/order/' + id + '/update', body, config);
+};
+
+export const setDelivererToOrder = (order_id, deliverer_id) => dispatch =>{
+    const token = localStorage.getItem('token');
+    const config = {
+        headers: {
+            'Authorization': 'Bearer ' + token,
+        }
+    }
+    axios.get('/app/order/' + order_id + '/deliverer/' + deliverer_id, config)
+        .then((res) => {
             dispatch({
-                type: CLOSE_ORDER,
+                type: UPDATE_ORDER,
                 payload: res.data
             })
-         });
+        })
+        .catch(err => {
+            dispatch(
+                returnErrors(err.response.data, err.response.status, 'ORDER_DELETE_FAIL')
+            )
+        });
 };
+
 
 export const deleteOrder = id => dispatch => {
     axios.delete('/api/order_entities/' + id, tokenConfig())

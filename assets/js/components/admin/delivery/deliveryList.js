@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 import userExtractor from '../../../helpers/userExtractor';
-import { getOrders, closeOrder } from '../../../actions/orderActions';
+import { getOrders, closeOrder, setDelivererToOrder } from '../../../actions/orderActions';
 
 class DeliveryList extends React.Component 
 {
     static propTypes = {
         getOrders: PropTypes.func.isRequired,
         closeOrder: PropTypes.func.isRequired,
+        setDelivererToOrder: PropTypes.func.isRequired,
     };
     
     componentDidMount() {
@@ -23,7 +24,12 @@ class DeliveryList extends React.Component
 
     affectToSupplier = (e) => {
         e.preventDefault();
-        // this.props.closeOrder(parseInt(e.target.dataset['id']));
+        this.props.setDelivererToOrder(parseInt(e.target.dataset['id']), parseInt(this.props.user.id));
+    }
+
+    editBL = (e) => {
+        e.preventDefault();
+        alert("BL");
     }
 
     displayItems = (items) => {
@@ -46,7 +52,19 @@ class DeliveryList extends React.Component
                     <td>{ orderDateTime }</td>
                     <td>{ this.displayItems(props.details.items) }</td>
                     <td>{ props.details.deliveryAddress }</td>
-                    <td><a href="#" data-id={ props.details.id } onClick={ this.affectToSupplier } >Prendre</a> - <a href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a></td>
+                    <td>
+                        { (props.details.delivery !== null && typeof props.details.delivery !== 'undefined') ? 
+                            (props.details.delivery.deliverer.id !== this.props.user.id ? props.details.delivery.deliverer.username : 
+                                <span>
+                                    <a href="#" data-id={ props.details.id } onClick={ this.editBL } >BL</a> 
+                                    - 
+                                    <a href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a>
+                                </span> ) : 
+                                <span>
+                                    <a href="#" data-id={ props.details.id } onClick={ this.affectToSupplier } >Prendre</a> 
+                                </span> 
+                        }
+                    </td>
                 </tr>
             );
         }
@@ -92,4 +110,4 @@ const mapStateToProps = state => ({
     token: state.auth.token
   });
 
-export default connect(mapStateToProps, { getOrders, closeOrder })(DeliveryList);
+export default connect(mapStateToProps, { getOrders, closeOrder, setDelivererToOrder })(DeliveryList);
