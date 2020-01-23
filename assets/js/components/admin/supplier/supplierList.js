@@ -45,7 +45,7 @@ class SupplierList extends React.Component
         if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="content-wrap">
-                    <h1>Types de TVA</h1>
+                    <h1>Liste des fournisseurs</h1>
                     <table class="table">
                         <thead>
                             <tr>

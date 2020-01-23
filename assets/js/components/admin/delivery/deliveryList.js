@@ -37,9 +37,6 @@ class DeliveryList extends React.Component
             return <li>{props.details.variant.product.name + " - " + props.details.variant.name + " : " + props.details.quantity + " U"}</li>
         }
         return items.map( item =>  <ItemOrder details={item} /> );
-        // const itemList = items.map( item => {
-        //     return item.variant.product.name + " - " + item.variant.name + " : " + item.quantity + " U"
-        // });
     }
 
     displayOrdersToDeliver = () => {
@@ -50,40 +47,20 @@ class DeliveryList extends React.Component
             const orderDateTime = (dateTime.getDate() === now.getDate() && dateTime.getMonth() === now.getMonth() && dateTime.getFullYear() === now.getFullYear()) ?
                                   (dateTime.getHours() + ":" + dateTime.getMinutes()) : dateTime.toLocaleDateString(undefined, options);
             return (
-                // <tr>
-                //     <td>{ props.details.paymentId.substring(4) }</td>
-                //     <td>{ orderDateTime }</td>
-                //     <td>{ this.displayItems(props.details.items) }</td>
-                //     <td>{ props.details.deliveryAddress }</td>
-                //     <td>
-                //         { (props.details.delivery !== null && typeof props.details.delivery !== 'undefined') ? 
-                //             (props.details.delivery.deliverer.id !== this.props.user.id ? props.details.delivery.deliverer.username : 
-                //                 <span>
-                //                     <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.editBL } >BL</a> 
-                //                     - 
-                //                     <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a>
-                //                 </span> ) : 
-                //                 <span>
-                //                     <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.affectToSupplier } >Prendre</a> 
-                //                 </span> 
-                //         }
-                //     </td>
-                // </tr>
-                <div class="card">
-                    <h5 class="card-header">{ props.details.paymentId.substring(4) } - { orderDateTime }</h5>
-                    <div class="card-body">
-                        <h5 class="card-title">{ props.details.deliveryAddress }</h5>
-                        <p class="card-text">{ this.displayItems(props.details.items) }</p>
-                        {/* <a href="#" class="btn btn-primary">Go somewhere</a> */}
+                <div className="card">
+                    <h4 className="card-header">{ props.details.paymentId.substring(4) } - { orderDateTime }</h4>
+                    <div className="card-body">
+                        <h6 className="card-title">{ props.details.deliveryAddress }</h6>
+                        <p className="card-text">{ this.displayItems(props.details.items) }</p>
                         { (props.details.delivery !== null && typeof props.details.delivery !== 'undefined') ? 
-                            (props.details.delivery.deliverer.id !== this.props.user.id ? props.details.delivery.deliverer.username : 
+                            (props.details.delivery.deliverer.id !== this.props.user.id ? "Pris en charge par " + props.details.delivery.deliverer.username : 
                                 <span>
-                                    <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.editBL } >BL</a> 
-                                    - 
-                                    <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a>
+                                    <a role="button" className="btn btn-light" href="#" data-id={ props.details.id } onClick={ this.editBL } >BL</a>  
+                                       { "   "}
+                                    <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a>
                                 </span> ) : 
                                 <span>
-                                    <a role="button" class="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.affectToSupplier } >Prendre</a> 
+                                    <a role="button" className="btn btn-success" href="#" data-id={ props.details.id } onClick={ this.affectToSupplier } >Prendre</a> 
                                 </span> 
                         }
                     </div>
@@ -98,28 +75,11 @@ class DeliveryList extends React.Component
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_DELIVERER") !== undefined ) {
             return (
                 <div className="container" id="content-wrap">
-                    <h1>Commandes à préparer</h1>
+                    <h1>Commandes à livrer</h1>
                     {
                         (typeof this.props.orders !== 'undefined' && this.props.orders.filter(order => order.status === "ON DELIVERY").length > 0) ? 
-                        this.displayOrdersToDeliver() : <p>no records found</p>
+                        this.displayOrdersToDeliver() : <p>Aucune commande en attente</p>
                     }
-                    {/* <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Id.</th>
-                                <th>Heure</th>
-                                <th>Commande</th>
-                                <th>Adresse</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                (typeof this.props.orders !== 'undefined' && this.props.orders.filter(order => order.status === "ON DELIVERY").length > 0) ? 
-                                this.displayOrdersToDeliver() : <tr> <td colspan="3">no records found</td> </tr>
-                            }
-                        </tbody>
-                    </table> */}
                 </div>
             );
         }

@@ -11,6 +11,12 @@ table.dataTable thead .sorting_desc_disabled:before {
 	bottom: .5em;
 }
 
+div#page-container {
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
 .selected-Category {
 	color: #74be6b;
     background-color: #e1f7de;

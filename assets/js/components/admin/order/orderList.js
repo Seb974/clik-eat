@@ -22,19 +22,18 @@ class OrderList extends React.Component
     }
 
     displayAdminItems = (items) => {
-        const itemList = items.map( item => {
-            return item.variant.product.name + " - " + item.variant.name + " : " + item.quantity + " U"
-        });
-        return itemList.join("\n");
+        let AdminItemOrder = (props) => {
+            return <li>{props.details.variant.product.name + " - " + props.details.variant.name + " : " + props.details.quantity + " U"}</li>
+        }
+        return items.map( item =>  <AdminItemOrder details={item} /> );
     }
 
     displaySupplierItems = (items, supplierId) => {
-        const itemList = items.map( item => {
-            if (item.variant.product.supplier.id === supplierId) {
-                return item.variant.product.name + " - " + item.variant.name + " : " + item.quantity + " U"
-            }
-        });
-        return itemList.join(" -- ");
+        let SupplierItemOrder = (props) => {
+            return <li>{props.details.variant.product.name + " - " + props.details.variant.name + " : " + props.details.quantity + " U"}</li>
+        }
+        const itemList = items.filter( item => item.variant.product.supplier.id === supplierId);
+        return itemList.map( item =>  <SupplierItemOrder details={item} /> );
     }
 
     displayAdminOrders = () => {
@@ -45,12 +44,13 @@ class OrderList extends React.Component
             const orderDateTime = (dateTime.getDate() === now.getDate() && dateTime.getMonth() === now.getMonth() && dateTime.getFullYear() === now.getFullYear()) ?
                                   (dateTime.getHours() + ":" + dateTime.getMinutes()) : dateTime.toLocaleDateString(undefined, options);
             return (
-                <tr>
-                    <td>{ props.details.paymentId.substring(4) }</td>
-                    <td>{ orderDateTime }</td>
-                    <td>{ this.displayAdminItems(props.details.items) }</td>
-                    <td><a href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a></td>
-                </tr>
+                <div className="card">
+                    <h4 className="card-header">{ props.details.paymentId.substring(4) } - { orderDateTime }</h4>
+                    <div className="card-body">
+                        <p className="card-text">{ this.displayAdminItems(props.details.items) }</p>
+                        <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a>
+                    </div>
+                </div>
             );
         }
         let ordersToPrepare = this.props.orders.filter(order => order.status === "ON PREPARATION");
@@ -66,15 +66,15 @@ class OrderList extends React.Component
             const orderDateTime = (dateTime.getDate() === now.getDate() && dateTime.getMonth() === now.getMonth() && dateTime.getFullYear() === now.getFullYear()) ?
                                   (dateTime.getHours() + ":" + dateTime.getMinutes()) : dateTime.toLocaleDateString(undefined, options);
             return (
-                <tr>
-                    <td>{ props.details.paymentId.substring(4) }</td>
-                    <td>{ orderDateTime }</td>
-                    <td>{ this.displaySupplierItems(props.details.items, currentSupplier.id) }</td>
-                    <td><a href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a></td>
-                </tr>
+                <div className="card">
+                    <h4 className="card-header">{ props.details.paymentId.substring(4) } - { orderDateTime }</h4>
+                    <div className="card-body">
+                        <p className="card-text">{ this.displaySupplierItems(props.details.items, currentSupplier.id) }</p>
+                        <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a>
+                    </div>
+                </div>
             );
         }
-        // let ordersToPrepare = this.props.orders.filter(order => order.status === "ON PREPARATION");
         let supplierOrdersToPrepare = this.props.orders.filter(order => {
             let supplierProducts = order.items.find(item => {
                 return item.variant.product.supplier.id === currentSupplier.id
@@ -86,57 +86,20 @@ class OrderList extends React.Component
         return supplierOrdersToPrepare.map( order => <SupplierOrder details={order} /> );
     }
 
-    displayAdminView = () => {
-        return (
-            <div id="content-wrap">
-                <h1>Commandes à préparer</h1>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Id.</th>
-                            <th>Heure</th>
-                            <th>Commande</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            (typeof this.props.orders !== 'undefined' && this.props.orders.length > 0) ? 
-                            this.displayAdminOrders() : <tr> <td colspan="3">no records found</td> </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-
-    displaySupplierView = () => {
-        return (
-            <div id="content-wrap">
-                <h1>Commandes à préparer</h1>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Id.</th>
-                            <th>Heure</th>
-                            <th>Commande</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            (typeof this.props.orders !== 'undefined' && this.props.orders.length > 0) ? 
-                            this.displaySupplierOrders() : <tr> <td colspan="3">no records found</td> </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-
     render() {
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
-            return this.props.user.roles.find(role => role === "ROLE_ADMIN") ? this.displayAdminView() : this.displaySupplierView();
+            return (
+                <div className="container" id="content-wrap">
+                    <h1>Commandes à préparer</h1>
+                    { 
+                        typeof this.props.orders !== 'undefined' && this.props.orders.length > 0 ?
+                            ( this.props.user.roles.find(role => role === "ROLE_ADMIN" ) ? 
+                                this.displayAdminOrders() : 
+                                this.displaySupplierOrders() ) :
+                            <p>Aucune commande en attente</p>
+                    }
+                </div>
+            );
         }
         else {
             return <Redirect to='/'/>

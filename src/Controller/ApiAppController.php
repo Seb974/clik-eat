@@ -103,7 +103,7 @@ class ApiAppController extends AbstractController
      */
     public function errorAction(): RedirectResponse
     {
-        return $this->redirectToRoute('index');
+        return $this->redirectToRoute('index_api');
     }
 
 }
