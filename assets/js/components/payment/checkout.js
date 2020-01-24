@@ -229,7 +229,6 @@ class Checkout extends Component {
             b_city: this.state.identicalBillingAddress === false ? this.state.b_city : this.state.d_city,
             cities: [],
         };
-        // this.props.updateUser(userDetails);
     }
 
     onInformationsReady = async () => {

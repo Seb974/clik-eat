@@ -282,7 +282,7 @@ class Profile extends React.Component
 
                                         <div className="col-md-2 mt-3">
                                             <small>
-                                                <label htmlFor="gps">GPS</label>
+                                                {/* <label htmlFor="gps">GPS</label> */}
                                                 <input type="hidden" name="d_gps" className="form-control" id="gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
                                             </small>
                                         </div>

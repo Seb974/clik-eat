@@ -12,7 +12,8 @@ class Login extends React.Component
     state = {
         email: '',
         password: '',
-        msg: null
+        msg: null,
+        isWaiting: false,
       };
     
     static propTypes = {
@@ -29,11 +30,13 @@ class Login extends React.Component
     
     handleLogin = e => {
         e.preventDefault();
+        // this.setState({isWaiting: true});
         const { email, password } = this.state;
         const user = { email, password};
         this.setState({email: '', password: ''});
         this.props.login(user);
-      };
+        // this.setState({isWaiting: false});
+    };
 
     render() {
         if (!this.props.isAuthenticated) {
@@ -73,8 +76,10 @@ class Login extends React.Component
                                         </div>
     
     
-                                        <button className="btn btn-primary btn-block m-t-10" >SE CONNECTER
-                                            <i className="fa fa-sign-in"></i>
+                                        <button type="submit" className="btn btn-primary btn-block m-t-10">
+                                            {/* SE CONNECTER<i className="fa fa-sign-in"></i> */}
+                                            <span className="spinner-border spinner-border-sm" role="status" hidden={ !this.props.isWaiting }></span> 
+                                            <span hidden={ this.props.isWaiting }>SE CONNECTER <i className="fa fa-sign-in"></i></span>
                                         </button>
     
                                         <div className="divider">
@@ -98,7 +103,8 @@ class Login extends React.Component
 const mapStateToProps = state => ({
     isAuthenticated: state.auth.isAuthenticated,
     user: state.auth.user,
-    error: state.error
+    error: state.error,
+    isWaiting: state.auth.isLoading,
   });
   
   export default connect( mapStateToProps, { login, clearErrors })(Login);

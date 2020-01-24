@@ -59,7 +59,10 @@ export const register = ({ username, email, password }) => dispatch => {
 export const login = ({ email, password }) => dispatch => {
   // const config = { headers: { 'Content-Type': 'application/json' } };
   const body = JSON.stringify({ username: email, password: password });
-
+  dispatch({
+    type: USER_LOADING,
+    payload: '',
+  });
   axios.post('/api/login_check', body, tokenConfig())
        .then((res) => {
           dispatch({
@@ -68,6 +71,7 @@ export const login = ({ email, password }) => dispatch => {
           });
        })
        .catch(err => {
+          alert("Paramètres de connexion incorrects");
           dispatch(
             returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL')
           
