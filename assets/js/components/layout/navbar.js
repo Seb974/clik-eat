@@ -6,6 +6,7 @@ import { logout } from '../../actions/authActions';
 import { getCategories } from '../../actions/categoryActions';
 import { getCategory } from '../../actions/categoryActions';
 import PropTypes from 'prop-types';
+import { withRouter } from "react-router-dom";
 
 class Navbar extends Component {
 
@@ -29,6 +30,7 @@ class Navbar extends Component {
     handleLogout = (e) => {
         e.preventDefault();
         this.props.logout();
+        this.props.history.push('/');
     }
 
     onChange = e => {
@@ -208,5 +210,6 @@ const mapStateToProps = state => ({
     categories: state.category.categories,
     selectedCategory: state.category.selected,
   });
-  
-  export default connect( mapStateToProps, { logout, getCategories, getCategory })(Navbar);
+
+const NavbarWithRouter = withRouter(Navbar);
+export default connect( mapStateToProps, { logout, getCategories, getCategory })(NavbarWithRouter);

@@ -59,7 +59,6 @@ class StockList extends React.Component
         //                 <td>{ props.details.id }</td>
         //                 <td>{ props.product.name }</td>
         //                 <td>{ props.details.name }</td>
-        //                 {/* <td><input type="number" name={ props.details.id } value={ this.state[props.details.id] || '' } onChange={ this.onChange } /></td> */}
         //                 <td><input type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity || '' } /></td>
         //                 <td>
         //                     <a href="#" data-variant={ props.details.id } data-product={ props.product.id } onClick={ this.onSubmitNewQty }>Enregistrer</a>
@@ -72,98 +71,76 @@ class StockList extends React.Component
         // });
 
         let Variant = (props) => {
-            return (
-                     <li key={"variant-item-" + props.details.id} className="d-flex flex-row-reverse variant-list">
-                        {/* {props.details.stock.quantity <= 0 ? <span class="react-stock">Rupture de stock !</span> :  */}
-                        {props.details.name}
-                            (<span>
-                                <span class="stock-info">
-                                    <i className="fas fa-dolly"></i> 
-                                    {/* {" "} {props.details.stock.quantity} {" "} */}
-                                    <input type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity || '' } />
-                                </span>
-                                <a role="button" className="btn btn-primary btn-sm"  data-variant={ props.details.id } data-product={ props.product.id } onClick={ this.onSubmitNewQty }>
-                                    {/* <i className="fas fa-shopping-cart"></i>
-                                    {props.details.name}  à {props.details.price}€ */}
-                                    Enregistrer
-                                </a>
-                            </span>)
-                        {/* } */}
-                    </li>
-              );
-            }
+            return ( 
+                <li>
+                    <span className="stocklist-variant-name">{ props.details.name }</span>
+                    <input className="stocklist-variant-qty" type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity } />   {/*  || '' */}
+                    <a role="button" href="#" className="btn btn-danger btn-sm stocklist-variant-validation" data-variant={ props.details.id } data-product={ props.product.id } onClick={ this.onSubmitNewQty }>Enregistrer</a>
+                </li>
+            );
+        }
         return product.variants.map(variant => {
-            return (
-                <span key={"variant-span-" + variant.id}>
-                    <hr/>
-                    <Variant details={variant} product={product}/>
-                </span>
-            )
+            return <Variant details={variant} product={product} />;
         });
     }
 
     displayProducts = () => {
+        // let currentSupplier = JSON.parse(this.props.user.supplier);
+        // let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
+        //                   this.props.products : 
+        //                   this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
+        // return productList.map( product => this.displayVariants(product) );
+
         let currentSupplier = JSON.parse(this.props.user.supplier);
         let Product = (props) => {
             return (
-              <div className="col-12 col-sm-6 col-lg-4 react-product">
-                  <div className="card card-lg home-card">
-                      <div className="card-text">
-                          <ul>
-                              <li key={"product-item-" + props.details.id}>
-                                  <Link to={ "/show/" + props.details.id }>{ props.details.name }</Link>
-                              </li>
-                          </ul>
-                      </div>
-                      <div className="card-block">
-                          <ul className="d-flex flex-column">
-                              { this.displayVariants(props.details) }
-                          </ul>
-                      </div>
-                  </div>
-              </div>
+                <div className="card">
+                    <h4 className="card-header">{ props.details.name }</h4>
+                    <div className="card-body">
+                        <p className="card-text">
+                            <ul className="stocklist-variant-list">{ this.displayVariants(props.details) }</ul>
+                        </p>
+                        {/* <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a> */}
+                    </div>
+                </div>
             );
         }
         let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
                           this.props.products : 
                           this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
-        return productList.map( product => <Product key={"product-" + product.id} details={product} /> );
-        
-        //   return productsToDisplay.map(product => {
-        //       return <Product key={"product-" + product.id} details={product} />
-        //   });
-
-
-        // let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
-        //                   this.props.products : 
-        //                   this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
-        // return productList.map( product => this.displayVariants(product) );
+        return productList.map( product => <Product details={product} /> );
     }
 
     render() {
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
+            // return (
+            //     <div id="content-wrap">
+            //         <table class="table">
+            //             <thead>
+            //                 <tr>
+            //                     <th>Id</th>
+            //                     <th>Nom</th>
+            //                     <th>Variante</th>
+            //                     <th>Quantité</th>
+            //                     <th>actions</th>
+            //                 </tr>
+            //             </thead>
+            //             <tbody>
+
+            //         {
+            //             (typeof this.props.products !== 'undefined' && this.props.products.length > 0) ? 
+            //                 this.displayProducts() :
+            //                 <p>Aucun produit référencé</p>
+            //         }
+            //             </tbody>
+            //         </table>
+            //         <Link to={ "/products-add-or-edit" }>Create new</Link>
+            //     </div>
+            // );
             return (
-                <div id="content-wrap">
-                    <h1>Liste des stocks</h1>
-                    {/* <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Nom</th>
-                                <th>Variante</th>
-                                <th>Quantité</th>
-                                <th>actions</th>
-                            </tr>
-                        </thead>
-                        <tbody> */}
-                    {
-                        (typeof this.props.products !== 'undefined' && this.props.products.length > 0) ? 
-                            this.displayProducts() :
-                            <p>Aucun produit référencé</p>
-                    }
-                        {/* </tbody>
-                    </table> */}
-                    {/* <Link to={ "/products-add-or-edit" }>Create new</Link> */}
+                <div className="container" id="content-wrap">
+                    <h1>Etat des stocks</h1>
+                    { typeof this.props.products !== 'undefined' && this.props.products.length > 0 ? this.displayProducts() : <p>Aucun produit référencé</p> }
                 </div>
             );
         }
@@ -185,4 +162,3 @@ const mapStateToProps = state => ({
   });
 
 export default connect(mapStateToProps, { updateVariant })(StockList);
-// export default connect(mapStateToProps, { getProducts, deleteProduct, getSuppliers, getCategories, getAllergens, getTaxes })(StockList);
