@@ -53,23 +53,6 @@ class StockList extends React.Component
     }
 
     displayVariants = (product) => {
-        // let Variant = (props) => {
-        //     return (
-        //             <tr>
-        //                 <td>{ props.details.id }</td>
-        //                 <td>{ props.product.name }</td>
-        //                 <td>{ props.details.name }</td>
-        //                 <td><input type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity || '' } /></td>
-        //                 <td>
-        //                     <a href="#" data-variant={ props.details.id } data-product={ props.product.id } onClick={ this.onSubmitNewQty }>Enregistrer</a>
-        //                 </td>
-        //             </tr>
-        //       );
-        //     }
-        // return product.variants.map(variant => {
-        //     return <Variant details={variant} product={product} />;
-        // });
-
         let Variant = (props) => {
             return ( 
                 <li>
@@ -85,12 +68,6 @@ class StockList extends React.Component
     }
 
     displayProducts = () => {
-        // let currentSupplier = JSON.parse(this.props.user.supplier);
-        // let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
-        //                   this.props.products : 
-        //                   this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
-        // return productList.map( product => this.displayVariants(product) );
-
         let currentSupplier = JSON.parse(this.props.user.supplier);
         let Product = (props) => {
             return (
@@ -100,7 +77,6 @@ class StockList extends React.Component
                         <p className="card-text">
                             <ul className="stocklist-variant-list">{ this.displayVariants(props.details) }</ul>
                         </p>
-                        {/* <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.transferToDelivery } >Terminer</a> */}
                     </div>
                 </div>
             );
@@ -113,30 +89,6 @@ class StockList extends React.Component
 
     render() {
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
-            // return (
-            //     <div id="content-wrap">
-            //         <table class="table">
-            //             <thead>
-            //                 <tr>
-            //                     <th>Id</th>
-            //                     <th>Nom</th>
-            //                     <th>Variante</th>
-            //                     <th>Quantité</th>
-            //                     <th>actions</th>
-            //                 </tr>
-            //             </thead>
-            //             <tbody>
-
-            //         {
-            //             (typeof this.props.products !== 'undefined' && this.props.products.length > 0) ? 
-            //                 this.displayProducts() :
-            //                 <p>Aucun produit référencé</p>
-            //         }
-            //             </tbody>
-            //         </table>
-            //         <Link to={ "/products-add-or-edit" }>Create new</Link>
-            //     </div>
-            // );
             return (
                 <div className="container" id="content-wrap">
                     <h1>Etat des stocks</h1>

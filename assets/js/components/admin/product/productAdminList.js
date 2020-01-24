@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from "react-router-dom";
 import { getProducts, deleteProduct } from '../../../actions/productActions';
 import { getSuppliers } from '../../../actions/supplierActions';
 import { getCategories } from '../../../actions/categoryActions';
@@ -38,36 +39,39 @@ class ProductAdminList extends React.Component
     };
 
     displayProducts = () => {
+        let currentSupplier = JSON.parse(this.props.user.supplier);
         let Product = (props) => {
             const id = props.details.id;
             return (
                 <tr>
-                    <td>{ id }</td>
+                    {/* <td>{ id }</td> */}
                     <td>{ props.details.name }</td>
-                    <td>{ props.details.description }</td>
-                    <td>
-                        {/* <Link to={ "/users-show/" + props.details.id }>Show</Link> -  */}
-                        <Link to={ "/products-add-or-edit/" + id }>Edit</Link>
-                        <Link to={ "/products" } onClick={(e) => this.handleDelete(id, e)}>Delete</Link>
+                    <td className="action-column">
+                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/products-add-or-edit/" + id }>Modifier</Link>
+                        { "   "}
+                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/products" } onClick={(e) => this.handleDelete(id, e)}>Supprimer</Link>
                     </td>
                 </tr>
             );
         }
-        return this.props.products.map( product => <Product details={product} /> );
+        let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
+                          this.props.products : 
+                          this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
+        return productList.map( product => <Product details={product} /> );
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
             return (
                 <div id="content-wrap">
                     <h1>Liste des produits</h1>
+                    <Link role="button" className="btn btn-success" to={ "/products-add-or-edit" }>Créer un produit</Link>
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Id</th>
+                                {/* <th>Id</th> */}
                                 <th>Nom</th>
-                                <th>Description</th>
-                                <th>actions</th>
+                                <th className="action-column">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,7 +81,6 @@ class ProductAdminList extends React.Component
                             }
                         </tbody>
                     </table>
-                    <Link to={ "/products-add-or-edit" }>Create new</Link>
                 </div>
             );
         }

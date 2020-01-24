@@ -116,6 +116,20 @@ input.stocklist-variant-qty {
 	text-align: center;
 }
 
+div#productform-container {
+	padding-bottom: 12%;
+}
+
+a.product-button {
+	margin-top:2%;
+	margin-bottom: 2%;
+	margin-right: 2%;
+}
+
+.action-column {
+	text-align: center;
+}
+
 @media (max-width: 767px) {
 	.home-card {
 		height: 580px!important;
@@ -137,7 +151,7 @@ input.stocklist-variant-qty {
 	}
 	.category-section {
 		top: 62px!important;
-	  }
+	}
   }
 
   @media (min-width: 1024px) {

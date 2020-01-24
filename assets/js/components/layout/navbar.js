@@ -65,6 +65,9 @@ class Navbar extends Component {
                                 <Link className="dropdown-item" to="/orders">
                                     <i className="fas fa-cash-register"></i>Commandes</Link>
                                 <div className="dropdown-divider"></div>
+                                <Link className="dropdown-item" to="/products">
+                                    <i class="fas fa-utensils"></i>Produits</Link>
+                                <div className="dropdown-divider"></div>
                             </span>
                             )
                         }
@@ -86,9 +89,6 @@ class Navbar extends Component {
                                 <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/cities">
                                     <i className="fas fa-city"></i>Villes</Link>
-                                <div className="dropdown-divider"></div>
-                                <Link className="dropdown-item" to="/products">
-                                    <i class="fas fa-utensils"></i>Produits</Link>
                                 <div className="dropdown-divider"></div>
                                 <Link className="dropdown-item" to="/categories">
                                     <i className="fas fa-columns"></i>Catégories</Link>

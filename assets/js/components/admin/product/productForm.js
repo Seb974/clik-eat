@@ -18,12 +18,10 @@ class ProductForm extends React.Component
         isNew: typeof this.id === 'undefined' ? true : false,
         newIndex: 100,
         selection: typeof this.id === 'undefined' ? {} : this.selectedProduct, 
-        title: typeof this.id === 'undefined' ? 'Créer un nouvau produit' : 'Modifier le produit ' + this.selectedProduct.name,
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
         name: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.name === 'undefined' ? '' : this.selectedProduct.name),
         description: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.description === 'undefined' ? '' : this.selectedProduct.description),
         nutritionals: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals),
-        supplier: typeof this.id === 'undefined' ? this.props.suppliers[0] : (typeof this.selectedProduct.supplier === 'undefined' ? this.props.suppliers[0] : this.selectedProduct.supplier),
         category: typeof this.id === 'undefined' ? this.props.categories[0] : (typeof this.selectedProduct.category === 'undefined' ? this.props.categories[0] : this.selectedProduct.category),
         tax: typeof this.id === 'undefined' ? this.props.taxes[0] : (typeof this.selectedProduct.tva === 'undefined' ? this.props.taxes[0] : this.selectedProduct.tva),
         allergens: typeof this.id === 'undefined' ? [] : (typeof this.selectedProduct.allergens === 'undefined' ? [] : this.selectedProduct.allergens),
@@ -35,6 +33,7 @@ class ProductForm extends React.Component
         saturated: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.transAG),
         sodium: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.nutritionals === 'undefined' ? [] : this.selectedProduct.nutritionals.salt),
         picture: typeof this.id === 'undefined' ? '' : (typeof this.selectedProduct.picture === 'undefined' ? '' : this.selectedProduct.picture),
+        supplier: typeof this.id === 'undefined' ? this.props.suppliers[0] : (typeof this.selectedProduct.supplier === 'undefined' ? this.props.suppliers[0] : this.selectedProduct.supplier),
     };
 
     static propTypes = {
@@ -43,6 +42,8 @@ class ProductForm extends React.Component
     };
     
     componentDidMount() {
+        let currentSupplier = this.props.user.roles.find(role => role === "ROLE_SUPPLIER") !== undefined ? JSON.parse(this.props.user.supplier) : null;
+        this.setState({ currentSupplier });
     }
 
     onChange = e => {
@@ -140,18 +141,21 @@ class ProductForm extends React.Component
     }
 
     displaySuppliers = (suppliers) => {
-        return (
-        <select id="supplier" name="supplier" onChange={ (e) => this.onSelectChange(suppliers, e) }>
-            {suppliers.map(supplier => {
-                    if (this.state.supplier.id === supplier.id) {
-                        return <option value={supplier.id} selected>{ supplier.name }</option>
-                    } else {
-                        return <option value={supplier.id}>{ supplier.name }</option>
-                    }
-                })
-            }
-        </select>
-        );
+        return this.state.currentSupplier !== null && this.state.currentSupplier !== undefined ?
+            <select id="supplier" name="supplier" disabled="true">
+                <option value={this.state.currentSupplier.id}>{ this.state.currentSupplier.name }</option>
+            </select> : 
+            <select id="supplier" name="supplier" onChange={ (e) => this.onSelectChange(suppliers, e) }>
+                {suppliers.map(supplier => {
+                        if (this.state.supplier.id === supplier.id) {
+                            return <option value={supplier.id} selected>{ supplier.name }</option>
+                        } else {
+                            return <option value={supplier.id}>{ supplier.name }</option>
+                        }
+                    })
+                }
+            </select>
+        ;
     }
 
     displayCategories = (categories) => {
@@ -224,11 +228,10 @@ class ProductForm extends React.Component
     }
 
     render = () => {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
-
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
             return (
-                <div className="container mt-3">
-                    <h1>{ this.state.title }</h1>
+                <div id="productform-container" className="container">
+                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le produit "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le produit "' + this.state.name +'"' : 'Créer un nouvau produit') }</h1>
                     <form name="product" method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
 
