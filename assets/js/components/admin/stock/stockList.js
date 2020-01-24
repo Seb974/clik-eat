@@ -74,7 +74,7 @@ class StockList extends React.Component
                 <div className="card">
                     <h4 className="card-header">{ props.details.name }</h4>
                     <div className="card-body">
-                        <p className="card-text">
+                        <p className="card-text stock-items-container">
                             <ul className="stocklist-variant-list">{ this.displayVariants(props.details) }</ul>
                         </p>
                     </div>

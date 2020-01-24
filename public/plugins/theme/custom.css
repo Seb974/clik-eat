@@ -155,7 +155,33 @@ div.with-padding-top {
 	margin: auto;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 359px) {
+	a.stocklist-variant-validation {
+		width: 82px;
+	}
+	input.stocklist-variant-qty {
+		width: 40px;
+	}
+	span.stocklist-variant-name {
+		display: inline-block;
+		width: 90px;
+	}
+}
+
+@media (min-width: 360px) and (max-width: 767px) {
+	a.stocklist-variant-validation {
+		width: 90px;
+	}
+	input.stocklist-variant-qty {
+		width: 50px;
+	}
+	span.stocklist-variant-name {
+		display: inline-block;
+		width: 110px;
+	}
+  }
+
+  @media (max-width: 767px) {
 	.home-card {
 		height: 580px!important;
 	}
@@ -164,6 +190,12 @@ div.with-padding-top {
 	}
 	.category-section {
 		top: 50px!important;
+	}
+	.with-phone-padding-top {
+		padding-top: 15px;
+	}
+	.stock-items-container {
+		padding: 0;
 	}
   }
 
