@@ -130,6 +130,31 @@ a.product-button {
 	text-align: center;
 }
 
+.spinner-container {
+	width: 100%;
+	text-align: center;
+}
+
+div.with-padding-top {
+	padding-top: 15px;
+}
+
+.cityname-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+#d_city, #b_city {
+	display: inline-block;
+	height: auto;
+	padding-bottom: 10px;
+}
+
+#adresses-panel {
+	margin: auto;
+}
+
 @media (max-width: 767px) {
 	.home-card {
 		height: 580px!important;

@@ -1,9 +1,13 @@
 import axios from 'axios';
-import { GET_USERS, GET_USER, ADD_USER, DELETE_USER, UPDATE_USER } from '../actions/types';
+import { GET_USERS, GET_USER, ADD_USER, DELETE_USER, UPDATE_USER, USERS_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getUsers = () => dispatch => {
+    dispatch({
+        type: USERS_LOADING,
+        payload: ''
+    })
     axios.get('/api/users', tokenConfig())
          .then((res) => {
             dispatch({

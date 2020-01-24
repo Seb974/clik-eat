@@ -19,14 +19,16 @@ class UserList extends React.Component
     };
     
     componentDidMount() {
-        this.props.getUsers();
+        if (this.props.users.length === 0) {
+            this.props.getUsers();
+        }
         this.props.getCities();
     }
 
     handleDelete = (id, e) => {
         e.preventDefault();
         this.props.deleteUser(id);
-        // this.props.history.push(`/users`);
+        this.props.history.push(`/users`);
     };
 
     displayUsers = () => {
@@ -58,29 +60,40 @@ class UserList extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="content-wrap">
                     <h1>Liste des inscrits</h1>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Nom</th>
-                                <th>Email</th>
-                                <th>Rôle</th>
-                                <th>Etat</th>
-                                <th>actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                (typeof this.props.users !== 'undefined' && this.props.users.length > 0) ? 
-                                this.displayUsers() : <tr> <td colspan="3">no records found</td> </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <Link to={ "/users-add-or-edit" }>Create new</Link>
+                        {
+                            this.props.isWaiting === false ?
+                            <span>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Id</th>
+                                                <th>Nom</th>
+                                                <th>Email</th>
+                                                <th>Rôle</th>
+                                                <th>Etat</th>
+                                                <th>actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            { 
+                                                (typeof this.props.users !== 'undefined' && this.props.users.length > 0) ?
+                                                this.displayUsers()  : <tr> <td colspan="3">no records found</td> </tr> 
+                                            }
+                                        </tbody>
+                                    </table>
+                                    <Link to={ "/users-add-or-edit" } >Create new</Link> 
+                                </span>  
+                            : 
+                                <div className="spinner-container">
+                                    <div class="spinner-border text-danger text-center" role="status"> 
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                        }
                 </div>
             );
         }
@@ -95,7 +108,8 @@ const mapStateToProps = state => ({
     cities: state.city.cities,
     isAuthenticated: state.auth.isAuthenticated,
     token: state.auth.token,
-    user: state.auth.user
+    user: state.auth.user,
+    isWaiting: state.user.isLoading
   });
 
 export default connect(mapStateToProps, { getUsers, getCities, deleteUser })(UserList);

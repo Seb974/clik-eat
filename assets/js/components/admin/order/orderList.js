@@ -13,7 +13,9 @@ class OrderList extends React.Component
     };
     
     componentDidMount() {
-        this.props.getOrders();
+        if (this.props.orders.length === 0) {
+            this.props.getOrders();
+        }
     }
 
     transferToDelivery = (e) => {
@@ -90,17 +92,25 @@ class OrderList extends React.Component
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
             return (
                 <div className="container" id="content-wrap">
-                    <h1>Commandes à préparer</h1>
-                    { 
-                        typeof this.props.orders !== 'undefined' && this.props.orders.length > 0 ?
-                            ( this.props.user.roles.find(role => role === "ROLE_ADMIN" ) ? 
-                                this.displayAdminOrders() : 
-                                this.displaySupplierOrders() ) :
-                            <p>Aucune commande en attente</p>
-                    }
+                        <h1>Commandes à préparer</h1>
+                        {
+                            this.props.isWaiting === false ?
+                                ( typeof this.props.orders !== 'undefined' && this.props.orders.length > 0 ?
+                                    ( this.props.user.roles.find(role => role === "ROLE_ADMIN" ) ? 
+                                        this.displayAdminOrders() : 
+                                        this.displaySupplierOrders() ) :
+                                    <p>Aucune commande en attente</p> ) :
+                                    <div className="spinner-container">
+                                        <div class="spinner-border text-danger text-center" role="status"> 
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
+                        }
                 </div>
             );
         }
+        // spinner-border text-danger
+        // spinner-grow text-danger
         else {
             return <Redirect to='/'/>
         }
@@ -111,7 +121,8 @@ const mapStateToProps = state => ({
     user: state.auth.user,
     orders: state.order.orders,
     isAuthenticated: state.auth.isAuthenticated,
-    token: state.auth.token
+    token: state.auth.token,
+    isWaiting: state.order.isLoading
   });
 
 export default connect(mapStateToProps, { getOrders, transferToDelivery })(OrderList);

@@ -26,11 +26,21 @@ class ProductAdminList extends React.Component
     };
     
     componentDidMount() {
-        this.props.getProducts();
-        this.props.getSuppliers();
-        this.props.getCategories();
-        this.props.getAllergens();
-        this.props.getTaxes();
+        if (this.props.products.length === 0) {
+            this.props.getProducts();
+        }
+        if (this.props.suppliers.length === 0) {
+            this.props.getSuppliers();
+        }
+        if (this.props.categories.length === 0) {
+            this.props.getCategories();
+        }
+        if (this.props.allergens.length === 0) {
+            this.props.getAllergens();
+        }
+        if (this.props.taxes.length === 0) {
+            this.props.getTaxes();
+        }
     }
 
     handleDelete = (id, e) => {
@@ -96,9 +106,9 @@ const mapStateToProps = state => ({
     token: state.auth.token,
     user: state.auth.user,
     suppliers: state.supplier.suppliers,
-    category: state.category.getCategories,
-    allergen: state.allergen.allergens,
-    tax: state.tax.taxes
+    categories: state.category.categories,
+    allergens: state.allergen.allergens,
+    taxes: state.tax.taxes
   });
 
 export default connect(mapStateToProps, { getProducts, deleteProduct, getSuppliers, getCategories, getAllergens, getTaxes })(ProductAdminList);

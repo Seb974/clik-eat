@@ -1,9 +1,13 @@
 import axios from 'axios';
-import { GET_ORDERS, GET_ORDER, SEND_TO_DELIVERY, DELETE_ORDER, UPDATE_ORDER, CLOSE_ORDER } from '../actions/types';
+import { GET_ORDERS, GET_ORDER, SEND_TO_DELIVERY, DELETE_ORDER, UPDATE_ORDER, CLOSE_ORDER, ORDER_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getOrders = () => dispatch => {
+    dispatch({
+        type: ORDER_LOADING,
+        payload: ''
+    })
     axios.get('/api/order_entities', tokenConfig())
          .then((res) => {
             dispatch({

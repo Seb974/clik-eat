@@ -14,7 +14,9 @@ class DeliveryList extends React.Component
     };
     
     componentDidMount() {
-        this.props.getOrders();
+        if (this.props.orders.length === 0) {
+            this.props.getOrders();
+        }
     }
 
     closeDelivery = (e) => {
@@ -77,8 +79,14 @@ class DeliveryList extends React.Component
                 <div className="container" id="content-wrap">
                     <h1>Commandes à livrer</h1>
                     {
-                        (typeof this.props.orders !== 'undefined' && this.props.orders.filter(order => order.status === "ON DELIVERY").length > 0) ? 
-                        this.displayOrdersToDeliver() : <p>Aucune commande en attente</p>
+                        this.props.isWaiting === false ?
+                            (typeof this.props.orders !== 'undefined' && this.props.orders.filter(order => order.status === "ON DELIVERY").length > 0) ? 
+                            this.displayOrdersToDeliver() : <p>Aucune commande en attente</p> : 
+                            <div className="spinner-container">
+                                <div class="spinner-border text-danger text-center" role="status"> 
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
                     }
                 </div>
             );
@@ -93,7 +101,8 @@ const mapStateToProps = state => ({
     user: state.auth.user,
     orders: state.order.orders,
     isAuthenticated: state.auth.isAuthenticated,
-    token: state.auth.token
+    token: state.auth.token,
+    isWaiting: state.order.isLoading
   });
 
 export default connect(mapStateToProps, { getOrders, closeOrder, setDelivererToOrder })(DeliveryList);
