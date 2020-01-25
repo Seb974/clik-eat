@@ -84,7 +84,7 @@ class CartList extends React.Component
                     <div className="col-lg-8">
                         <div className="post">
                             <div className="post-header">
-                                <h2 className="post-title"><i className="fas fa-shopping-cart"></i> Panier</h2>
+                                <h2 className="post-title"><i className="fas fa-shopping-cart"></i> Panier de yoplait</h2>
                                 {/* 
                                 UTILISABLE POUR DISPLAY UN TEMPS APPROXIMATIF DE LIVRAISON
                                 <div className="post-meta">
