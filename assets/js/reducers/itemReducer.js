@@ -5,6 +5,7 @@ import {
     ADD_ITEM,
     DELETE_ITEM,
     UPDATE_ITEM,
+    DECREASE_ITEM,
     DELETE_CART,
     ITEMS_LOADING
   } from '../actions/types';
@@ -54,7 +55,30 @@ import {
             totalTax: getTotalTax(newItems),
             totalToPayHT: getTotalHT(newItems)
         };
-
+        case DECREASE_ITEM:
+          let item = state.items.find(item => parseInt(item.product.id) === parseInt(action.payload.variant.id));
+          let newCard = state.items.filter(element => element !== item);
+          if (action.payload.quantity >= item.quantity) {
+              localStorage.setItem('cart', JSON.stringify(newCard));
+              return {
+                  ...state,
+                  items: newCard,
+                  totalToPayTTC: getTotalTTC(newCard),
+                  totalTax: getTotalTax(newCard),
+                  totalToPayHT: getTotalHT(newCard)
+              };
+          } else {
+              item.quantity -= action.payload.quantity;
+              let newItemQty = [...newCard, item].sort((a, b) => (a.id > b.id) ? 1 : -1);
+              localStorage.setItem('cart', JSON.stringify(newItemQty));
+              return {
+                ...state,
+                items: newItemQty,
+                totalToPayTTC: getTotalTTC(newItemQty),
+                totalTax: getTotalTax(newItemQty),
+                totalToPayHT: getTotalHT(newItemQty)
+            };
+          }
       // case UPDATE_ITEM:
       //     localStorage.setItem('cart', JSON.stringify(state.items));
       //     return {

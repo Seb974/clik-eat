@@ -1,12 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getItems, addItem, deleteItem, updateItem } from '../../actions/itemActions';
+import { getItems, addItem, deleteItem, updateItem, decreaseItemQuantity } from '../../actions/itemActions';
 import { getProduct } from '../../actions/productActions';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 class CartList extends React.Component 
 {
+    input = [];
+
+    constructor(props) {
+        super(props);
+        this.props.item.items.forEach(item => {
+            this.input[item.product.id] = React.createRef();
+        });
+    }
+
+
     state = {
       quantities: '',
     };
@@ -17,23 +27,32 @@ class CartList extends React.Component
         addItem: PropTypes.func.isRequired,
         deleteItem: PropTypes.func.isRequired,
         updateItem: PropTypes.func.isRequired,
+        decreaseItemQuantity: PropTypes.func.isRequired,
         item: PropTypes.object.isRequired,
         isAuthenticated: PropTypes.bool
       };
     
     componentDidMount() {
         this.props.getItems();
+        console.log(this.props.item.items);
       }
     
     onDeleteClick = item => {
         this.props.deleteItem(item);
     };
 
-    handleUpdateQty = (itemUpdated, event) => {
-        let qty = parseInt(event.currentTarget.value) - itemUpdated.quantity;
-        if (qty !== 0) {
-          itemUpdated.quantity += qty;
-          this.props.updateItem(itemUpdated, qty);
+    handleUpdateQty = (event) => {
+        event.preventDefault();
+        let selectedItem = parseInt(event.target.dataset.item);
+        let itemUpdated = this.props.item.items.find(item => item.product.id === selectedItem);
+        let qty = parseInt(this.input[selectedItem].current.value) - itemUpdated.quantity;
+        if (qty > 0) {
+            let newItem = { product: itemUpdated.parent, variant: itemUpdated.product, quantity: Math.abs(qty) };
+            this.props.addItem(newItem);
+        }
+        if (qty < 0) {
+            let newItem = { product: itemUpdated.parent, variant: itemUpdated.product, quantity: Math.abs(qty) };
+            this.props.decreaseItemQuantity(newItem);
         }
     }
 
@@ -43,7 +62,7 @@ class CartList extends React.Component
               <span>
                   <hr/>
                   <ul className="d-flex flex-row-reverse">
-                   <li key={"cartitem-item-" + props.details.product.id} className={"cartitem-item"}>    {/* className="d-flex flex-row ml-auto" */}
+                   <li key={"cartitem-item-" + props.details.product.id} className={"cartitem-item"}>
                    { props.variantInState.stock.quantity > 5 ? "" : 
                               props.variantInState.stock.quantity === 0 ?
                               (<p className="badge badge-cart-void">
@@ -53,11 +72,9 @@ class CartList extends React.Component
                                   { "Plus que " + props.variantInState.stock.quantity + " en stock !"}
                               </p>)
                     }
-                    <span>{ props.details.parent.name } { props.details.product.name + "  "} </span>
-                      {/* <a href="#">
-                          x{ props.details.quantity } { props.details.parent.name } { props.details.product.name } | { props.details.product.price * props.details.quantity }€
-                      </a> */}
-                      <input type="number" value={props.details.quantity} onChange={(event) => this.handleUpdateQty(props.details, event)} min="1" max={props.details.product.stock.quantity} />
+                    <span>{ props.details.parent.name + " - " + props.details.product.name + "  "} </span>
+                      <input type="number" ref={ this.input[props.details.product.id] } defaultValue={props.details.quantity} min="1" max={props.details.product.stock.quantity} step="1" data-item={ props.details.product.id } onChange={ this.handleUpdateQty }/>
+                      {/* <a role="button" href="#" className="btn btn-success btn-sm stocklist-variant-validation" data-item={ props.details.product.id } onClick={ this.handleUpdateQty }>Valider</a> */}
                       <button className="btn btn-link" onClick={() => this.onDeleteClick(props.details)}><i className="fa fa-trash"></i></button> 
                       </li>
                   </ul>
@@ -84,7 +101,7 @@ class CartList extends React.Component
                     <div className="col-lg-8">
                         <div className="post">
                             <div className="post-header">
-                                <h2 className="post-title"><i className="fas fa-shopping-cart"></i> Panier de yoplait</h2>
+                                <h2 className="post-title"><i className="fas fa-shopping-cart"></i> Mon panier</h2>
                                 {/* 
                                 UTILISABLE POUR DISPLAY UN TEMPS APPROXIMATIF DE LIVRAISON
                                 <div className="post-meta">
@@ -148,5 +165,5 @@ const mapStateToProps = state => ({
   
   export default connect(
     mapStateToProps,
-    { getItems, addItem, deleteItem, updateItem, getProduct }
+    { getItems, addItem, deleteItem, updateItem, getProduct, decreaseItemQuantity }
   )(CartList);
