@@ -325,7 +325,7 @@ class ProductForm extends React.Component
                         </div>
                         <hr/>
                         <a href="#" id="add_variant" className="btn btn-default" onClick={ this.onVariantAdd } >Ajouter une variante</a>
-                        <button className="btn" onClick={ this.onSubmit }>Enregistrer</button>
+                        <button className="btn btn-success" onClick={ this.onSubmit }>Enregistrer</button>
                     </form>
                 </div>
             )
