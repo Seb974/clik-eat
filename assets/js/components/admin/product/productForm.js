@@ -142,10 +142,10 @@ class ProductForm extends React.Component
 
     displaySuppliers = (suppliers) => {
         return this.state.currentSupplier !== null && this.state.currentSupplier !== undefined ?
-            <select id="supplier" name="supplier" disabled="true">
+            <select id="supplier" className="form-control form-control-lg" name="supplier" disabled="true">
                 <option value={this.state.currentSupplier.id}>{ this.state.currentSupplier.name }</option>
             </select> : 
-            <select id="supplier" name="supplier" onChange={ (e) => this.onSelectChange(suppliers, e) }>
+            <select id="supplier" name="supplier" className="form-control form-control-lg" onChange={ (e) => this.onSelectChange(suppliers, e) }>
                 {suppliers.map(supplier => {
                         if (this.state.supplier.id === supplier.id) {
                             return <option value={supplier.id} selected>{ supplier.name }</option>
@@ -160,7 +160,7 @@ class ProductForm extends React.Component
 
     displayCategories = (categories) => {
         return (
-        <select id="category" name="category" onChange={ (e) => this.onSelectChange(categories, e) }>
+        <select id="category" name="category" className="form-control form-control-lg" onChange={ (e) => this.onSelectChange(categories, e) }>
             {categories.map(category => {
                     if (this.state.category.id === category.id) {
                         return <option value={category.id} selected>{ category.name }</option>
@@ -175,7 +175,7 @@ class ProductForm extends React.Component
 
     displayAllergens = (allergens) => {
         return (
-        <select id="allergens" name="allergens" multiple="multiple" onChange={ this.onAllergensChange }>
+        <select id="allergens" className="form-control" name="allergens" multiple="multiple" onChange={ this.onAllergensChange }>
             {allergens.map(allergen => {
                     if (this.state.allergens.filter(elt => elt.id === allergen.id).length > 0) {
                         return <option value={allergen.id} selected>{ allergen.name }</option>
@@ -190,7 +190,7 @@ class ProductForm extends React.Component
 
     displayTaxes = (taxes) => {
         return (
-        <select id="tax" name="tax" onChange={ (e) => this.onSelectChange(taxes, e) }>
+        <select className="form-control form-control-lg" id="tax" name="tax" onChange={ (e) => this.onSelectChange(taxes, e) }>
             {taxes.map(tax => {
                     if (this.state.tax.id === tax.id) {
                         return <option value={tax.id} selected>{ tax.name }</option>
@@ -209,19 +209,19 @@ class ProductForm extends React.Component
                 <div key={index}>
                     <hr/>
                     <label>{ "Variante N°" + (index + 1) }</label>
-                    <div>
+                    <div className="form-group">
                         <label>Nom</label>
-                        <input type="text" data-id={index} placeholder="name" name="name" value={variant.name ||''} onChange={(e) => this.onVariantChange(e, index) } />
+                        <input type="text" className="form-control" data-id={index} placeholder="name" name="name" value={variant.name ||''} onChange={(e) => this.onVariantChange(e, index) } />
                     </div>
-                    <div>
+                    <div className="form-group">
                         <label>Prix</label>
-                        <input type="text" data-id={index} placeholder="price" name="price" value={variant.price ||''} onChange={(e) => this.onVariantChange(e, index) } />
+                        <input type="text" className="form-control" data-id={index} placeholder="price" name="price" value={variant.price ||''} onChange={(e) => this.onVariantChange(e, index) } />
                     </div>
-                    <div>
+                    <div className="form-group">
                         <label>Quantité en stock</label>
-                        <input type="text" data-id={index} placeholder="quantity" name="stock" value={variant.stock.quantity || 0} onChange={(e) => this.onVariantChange(e, index) } />
+                        <input type="text" className="form-control" data-id={index} placeholder="quantity" name="stock" value={variant.stock.quantity || 0} onChange={(e) => this.onVariantChange(e, index) } />
                     </div>
-                    <a href="#" class="btn btn-danger" onClick={ (e) => this.onVariantDelete(e, index) }>Supprimer</a>
+                    <a href="#" className="btn btn-danger" onClick={ (e) => this.onVariantDelete(e, index) }>Supprimer</a>
                 </div>
             );
         });
@@ -235,81 +235,97 @@ class ProductForm extends React.Component
                     <form name="product" method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
 
-                            <div>
-                                <label for="product_supplier" class="required">Fournisseur</label>
+                        <div className="form-row">
+                            <div className="col">
+                            {/* <div className="form-group"> */}
+                                <label for="product_supplier" className="required">Fournisseur</label>
                                 { this.displaySuppliers(this.props.suppliers) }
                             </div>
 
-                            <div>
-                                <label for="product_category" class="required">Category</label>
+                            <div className="col">
+                            {/* <div className="form-group"> */}
+                                <label for="product_category" className="required">Categorie</label>
                                 { this.displayCategories(this.props.categories) }
                             </div>
+                        </div>
 
-                            <div>
-                                <label for="product_name" class="required">Name</label>
-                                <input type="text" id="name" name="name" required="required" maxlength="150" value={ this.state.name } onChange={ this.onChange }/>
+                            <div className="form-group">
+                                <label for="product_name" className="required">Nom</label>
+                                <input type="text" className="form-control" id="name" name="name" required="required" maxlength="150" value={ this.state.name } onChange={ this.onChange }/>
                             </div>
 
-                            <div>
-                                <label for="product_illustration" class="picture-label">Image</label>
-                                <input type="file" id="picture" name="picture" onChange={ this.onImageChange }/>
+                            <div className="form-group">
+                                <label for="product_illustration" className="picture-label">Image</label>
+                                <input type="file" className="form-control-file" id="picture" name="picture" onChange={ this.onImageChange }/>
                             </div>
 
-                            <div>
+                            <div className="form-group">
                                 <label for="product_description">Description</label>
-                                <textarea id="description" name="description" onChange={ this.onChange }>{ this.state.description }</textarea>
+                                <textarea className="form-control" rows="5" id="description" name="description" onChange={ this.onChange }>{ this.state.description }</textarea>
                             </div>
 
-                            <div>
-                                <label for="product_allergens">Allergens</label>
+                            <div className="form-group">
+                                <label for="product_allergens">Allergènes</label>
                                 { this.displayAllergens(this.props.allergens) }
                             </div>
 
-                            <div>
-                                <label for="product_proteins">Proteins</label>
-                                <input type="text" id="protein" name="protein" value={ this.state.protein } onChange={ this.onChange }/>
+                            <div className="form-row">
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_carbohydrates">Glucides</label>
+                                    <input type="text" className="form-control" id="carbohydrates" name="carbohydrates" value={ this.state.carbohydrates } onChange={ this.onChange } />
+                                </div>
+
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_sugar">Sucres</label>
+                                    <input type="text" className="form-control" id="sugar" name="sugar" value={ this.state.sugar } onChange={ this.onChange }/>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="product_carbohydrates">Carbohydrates</label>
-                                <input type="text" id="carbohydrates" name="carbohydrates" value={ this.state.carbohydrates } onChange={ this.onChange } />
+                            <div className="form-row">
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_fat">Lipides</label>
+                                    <input type="text" className="form-control" id="fat" name="fat" value={ this.state.fat } onChange={ this.onChange }/>
+                                </div>
+
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_saturated">Acides gras saturés</label>
+                                    <input type="text" className="form-control" id="saturated" name="saturated" value={ this.state.saturated } onChange={ this.onChange }/>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="product_sugar">Sugar</label>
-                                <input type="text" id="sugar" name="sugar" value={ this.state.sugar } onChange={ this.onChange }/>
+                            <div className="form-row">
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_proteins">Protéines</label>
+                                    <input type="text" className="form-control" id="protein" name="protein" value={ this.state.protein } onChange={ this.onChange }/>
+                                </div>
+
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label for="product_sodium">Sel</label>
+                                    <input type="text" className="form-control" id="sodium" name="sodium" value={ this.state.sodium } onChange={ this.onChange }/>
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="product_fat">Fat</label>
-                                <input type="text" id="fat" name="fat" value={ this.state.fat } onChange={ this.onChange }/>
-                            </div>
-
-                            <div>
-                                <label for="product_saturated">Saturated</label>
-                                <input type="text" id="saturated" name="saturated" value={ this.state.saturated } onChange={ this.onChange }/>
-                            </div>
-
-                            <div>
-                                <label for="product_sodium">Sodium</label>
-                                <input type="text" id="sodium" name="sodium" value={ this.state.sodium } onChange={ this.onChange }/>
-                            </div>
-
-                            <div>
-                                <label for="product_tva" class="required">Tva</label>
+                            <div className="form-group">
+                                <label for="product_tva" className="required">Tva</label>
                                 { this.displayTaxes(this.props.taxes) }
                             </div>
                             <br/>
                             <div>
-                                <label class="required">Variants</label>
+                                <label className="required">Variantes</label>
                                 <div id="product_variants">
                                     { this.displayVariants(this.state.variants) }
                                 </div>
                             </div>
                         </div>
                         <hr/>
-                        <a href="#" id="add_variant" class="btn btn-default" onClick={ this.onVariantAdd } >Add a variant</a>
-                        <button class="btn" onClick={ this.onSubmit }>Save</button>
+                        <a href="#" id="add_variant" className="btn btn-default" onClick={ this.onVariantAdd } >Ajouter une variante</a>
+                        <button className="btn" onClick={ this.onSubmit }>Enregistrer</button>
                     </form>
                 </div>
             )
