@@ -155,6 +155,10 @@ div.with-padding-top {
 	margin: auto;
 }
 
+#productform-save-button {
+	margin-left: 15px;
+}
+
 @media (max-width: 359px) {
 	a.stocklist-variant-validation {
 		width: 82px;

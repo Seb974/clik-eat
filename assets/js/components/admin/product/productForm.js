@@ -231,7 +231,7 @@ class ProductForm extends React.Component
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN" || role === "ROLE_SUPPLIER") !== undefined ) {
             return (
                 <div id="productform-container" className="container">
-                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le produit "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le produit "' + this.state.name +'"' : 'Créer un nouvau produit') }</h1>
+                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le produit "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le produit "' + this.state.name +'"' : 'Créer un produit') }</h1>
                     <form name="product" method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
 
@@ -249,7 +249,7 @@ class ProductForm extends React.Component
                             </div>
                         </div>
 
-                            <div className="form-group">
+                            <div className="form-group with-padding-top">
                                 <label for="product_name" className="required">Nom</label>
                                 <input type="text" className="form-control" id="name" name="name" required="required" maxlength="150" value={ this.state.name } onChange={ this.onChange }/>
                             </div>
@@ -283,7 +283,7 @@ class ProductForm extends React.Component
                                 </div>
                             </div>
 
-                            <div className="form-row">
+                            <div className="form-row with-padding-top">
                                 <div className="col">
                                 {/* <div className="form-group"> */}
                                     <label for="product_fat">Lipides</label>
@@ -297,7 +297,7 @@ class ProductForm extends React.Component
                                 </div>
                             </div>
 
-                            <div className="form-row">
+                            <div className="form-row with-padding-top">
                                 <div className="col">
                                 {/* <div className="form-group"> */}
                                     <label for="product_proteins">Protéines</label>
@@ -311,7 +311,7 @@ class ProductForm extends React.Component
                                 </div>
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group with-padding-top">
                                 <label for="product_tva" className="required">Tva</label>
                                 { this.displayTaxes(this.props.taxes) }
                             </div>
@@ -325,7 +325,7 @@ class ProductForm extends React.Component
                         </div>
                         <hr/>
                         <a href="#" id="add_variant" className="btn btn-default" onClick={ this.onVariantAdd } >Ajouter une variante</a>
-                        <button className="btn btn-success" onClick={ this.onSubmit }>Enregistrer</button>
+                        <button id="productform-save-button" className="btn btn-success" onClick={ this.onSubmit }>Enregistrer</button>
                     </form>
                 </div>
             )
