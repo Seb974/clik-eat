@@ -209,7 +209,6 @@ class Profile extends React.Component
 
     render() {
         return (
-            // <div className="container mt-3">
             <div className="container mt-3">
                 {/* <div className="row"> */}
                     {/* Addresses panel */}

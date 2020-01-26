@@ -57,7 +57,7 @@ class StockList extends React.Component
             return ( 
                 <li>
                     <span className="stocklist-variant-name">{ props.details.name }</span>
-                    <input className="stocklist-variant-qty" type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity } />   {/*  || '' */}
+                    <input className="stocklist-variant-qty" type="number" ref={ this.input[props.details.id] } defaultValue={ props.details.stock.quantity } />         {/*  data-variant={ props.details.id } data-product={ props.product.id } onChange={ this.onSubmitNewQty } */}
                     <a role="button" href="#" className="btn btn-danger btn-sm stocklist-variant-validation" data-variant={ props.details.id } data-product={ props.product.id } onClick={ this.onSubmitNewQty }>Enregistrer</a>
                 </li>
             );

@@ -304,6 +304,12 @@ class Checkout extends Component {
         });
     }
 
+    getNumberOfArticles = items => {
+        return items.reduce((cumul, current) => {
+            return current.quantity == null ? cumul : cumul + current.quantity;
+        }, 0);
+    }
+
     render() {
         const { item } = this.props;
         return (
@@ -314,9 +320,11 @@ class Checkout extends Component {
                         <h4 className="d-flex justify-content-between align-items-center mb-3">
                             <span className="text-muted">Votre panier</span>
                             <span className="badge badge-secondary badge-pill">
-                                { item.items.reduce((cumul, current) => {
-                                    return current.quantity == null ? cumul : cumul + current.quantity;
-                                    }, 0) + " articles"
+                                { this.getNumberOfArticles(this.props.item.items) === 0 ? "panier vide" : 
+                                    (this.getNumberOfArticles(this.props.item.items) === 1 ? 
+                                        this.getNumberOfArticles(this.props.item.items) + " article" :
+                                        this.getNumberOfArticles(this.props.item.items) + " articles"
+                                    )
                                 }
                             </span>
                         </h4>
@@ -336,10 +344,6 @@ class Checkout extends Component {
                                 <span>Total (TTC)</span>
                                 <strong>{ Math.round(item.totalToPayTTC * 100) / 100 }€</strong>
                             </li>
-
-                           {/* <a href={ this.state.paymentLink }>
-                                <button className="btn btn-primary btn-lg btn-block">PAYER</button>
-                           </a> */}
                            <Link to={ this.state.paymentLink } ref={ this.paymentButton } className="btn btn-primary btn-lg btn-block" hidden={ this.props.item.totalToPayTTC <= 0 ? true : false}  onClick={ this.checkTotalToPay } >
                                 <span className="spinner-border spinner-border-sm" role="status" hidden={ !this.state.isWaiting }></span> 
                                 <span hidden={ this.state.isWaiting }>PAYER</span>
@@ -350,85 +354,79 @@ class Checkout extends Component {
                     {/* Addresses panel */}
                     <div className="col-md-8 order-md-1" id="adresses-panel">
                         <form className="needs-validation" onSubmit={ this.onMetadataSubmit }>
+                            {/* User info */}
                             <div className="row">
-                                <div className="row">
-                                    {/* <div className="col-md-4 mb-3"></div> */}
-                                    
-                                        {/* User info */}
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="firstName">Nom</label>
-                                            <input type="text" className="form-control" id="firstName" name="username" value={ this.state.username } onChange={ this.onChange } required/>     {/* style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" /> */}
-                                            <div className="invalid-feedback">
-                                                Un prénom est nécessaire pour la livraison.
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="email">Email</label>
-                                            <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange } onBlur={ this.handleUpdateEmail } required/>
-                                            <div className="invalid-feedback">
-                                                Merci de renseigner un email afin d'être informé de étapes de votre commande.
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="phone">Tel</label>
-                                            <input type="text" className="form-control" id="phone" name="phone" value={ this.state.phone } onChange={ this.onChange } required/>
-                                            <div className="invalid-feedback">
-                                                Merci de renseigner un tel afin d'être informé de étapes de votre commande.
-                                            </div>
-                                        </div>
+                                <div className="col-md-4 mb-3 user-infos">
+                                    <label htmlFor="firstName">Nom</label>
+                                    <input type="text" className="form-control" id="firstName" name="username" value={ this.state.username } onChange={ this.onChange } required/>     {/* style="background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABHklEQVQ4EaVTO26DQBD1ohQWaS2lg9JybZ+AK7hNwx2oIoVf4UPQ0Lj1FdKktevIpel8AKNUkDcWMxpgSaIEaTVv3sx7uztiTdu2s/98DywOw3Dued4Who/M2aIx5lZV1aEsy0+qiwHELyi+Ytl0PQ69SxAxkWIA4RMRTdNsKE59juMcuZd6xIAFeZ6fGCdJ8kY4y7KAuTRNGd7jyEBXsdOPE3a0QGPsniOnnYMO67LgSQN9T41F2QGrQRRFCwyzoIF2qyBuKKbcOgPXdVeY9rMWgNsjf9ccYesJhk3f5dYT1HX9gR0LLQR30TnjkUEcx2uIuS4RnI+aj6sJR0AM8AaumPaM/rRehyWhXqbFAA9kh3/8/NvHxAYGAsZ/il8IalkCLBfNVAAAAABJRU5ErkJggg==&quot;); background-repeat: no-repeat; background-attachment: scroll; background-size: 16px 18px; background-position: 98% 50%;" /> */}
+                                    <div className="invalid-feedback">
+                                        Un prénom est nécessaire pour la livraison.
                                     </div>
                                 </div>
+                                <div className="col-md-4 mb-3 user-infos">
+                                    <label htmlFor="email">Email</label>
+                                    <input type="email" className="form-control" id="email" name="email" value={ this.state.email } onChange={ this.onChange } onBlur={ this.handleUpdateEmail } required/>
+                                    <div className="invalid-feedback">
+                                        Merci de renseigner un email afin d'être informé de étapes de votre commande.
+                                    </div>
+                                </div>
+                                <div className="col-md-4 mb-3 user-infos">
+                                    <label htmlFor="phone">Tel</label>
+                                    <input type="text" className="form-control" id="phone" name="phone" value={ this.state.phone } onChange={ this.onChange } required/>
+                                    <div className="invalid-feedback">
+                                        Merci de renseigner un tel afin d'être informé de étapes de votre commande.
+                                    </div>
+                                </div>
+                            </div>
                             {/* Delivery address panel */}
                             <hr className="mb-4"/>
                             <div className="row">
                                 <div className="col-md-4 mb-3">
                                     <h4 className="mb-3">Adresse de livraison</h4>
                                 </div>
-
-                                <div className="row">
-                                        <div className="col-md-12">
-                                            <div id="map-example-container">
-                                                {/* <Map/> */}
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="input-map">Adresse</label>
-                                            <input type="text" className="form-control" id="input-map" name="d_address" value={ this.state.d_address } onChange={ this.onChange } required />
-                                            <div className="invalid-feedback">
-                                                Merci de saisir une adresse de livraison.
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="complément">Complement d'adresse</label>
-                                            <input type="textarea" className="form-control" id="complément" name="d_address2" value={ this.state.d_address2 } placeholder="Appt, Immeuble, Digicode, etc" onChange={ this.onChange } />
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <label htmlFor="zip">CP</label>
-                                            <input type="text" className="form-control" id="d_zip" name="d_zipCode"  value={ this.state.d_zipCode } onChange={ this.onZipCodeChange } required/>
-                                            <div className="invalid-feedback">
-                                                Code Postal nécessaire.
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 mb-3">
-                                            <span id="d_city">{ this.state. d_city.name }</span>
-                                            {/* { this.state. d_city.name } */}
-                                        </div>
-                                        <div className="col-md-2 mt-3">
-                                            <small>
-                                                {/* <label htmlFor="complément">GPS</label> */}
-                                                <input type="hidden" className="form-control" id="gps" name="d_gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
-                                            </small>
-                                        </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div id="map-example-container">
+                                        {/* <Map/> */}
+                                    </div>
                                 </div>
                             </div>
+                            <div className="row with-padding-top">
+                                <div className="col-md-12">
+                                    <label htmlFor="input-map">Adresse</label>
+                                    <input type="text" className="form-control" id="input-map" name="d_address" value={ this.state.d_address } onChange={ this.onChange } required />
+                                    <div className="invalid-feedback">
+                                        Merci de saisir une adresse de livraison.
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row with-padding-top">
+                                <div className="col-md-4 mb-3 user-infos with-phone-padding-top">
+                                    <label htmlFor="complément">Complement d'adresse</label>
+                                    <input type="textarea" className="form-control" id="complément" name="d_address2" value={ this.state.d_address2 } placeholder="Appt, Immeuble, Digicode, etc" onChange={ this.onChange } />
+                                </div>
+                                <div className="col-md-4 mb-3 user-infos">
+                                    <label htmlFor="zip">Code postal</label>
+                                    <input type="text" className="form-control" id="d_zip" name="d_zipCode"  value={ this.state.d_zipCode } onChange={ this.onZipCodeChange } required/>
+                                    <div className="invalid-feedback">
+                                        Code Postal nécessaire.
+                                    </div>
+                                </div>
+                                <div className="col-md-4 mb-3 user-infos cityname-container">
+                                    <span id="d_city">{ this.state. d_city.name }</span>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <input type="hidden" className="form-control" id="gps" name="d_gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
+                            </div>
 
-
+                            {/* Billing address */}
                             <hr className="mb-4"/>
                             <div className="row">
                                 <div className="col-md-4 mb-3">
                                     <h4 className="mb-3">Adresse de facturation</h4>
                                 </div>
-
                                 <div className="col-md-4 mb-3">
                                     <label className="custom-control custom-checkbox custom-checkbox-primary">
                                         <input id="billingAddress-checkbox" type="checkbox" className="custom-control-input" checked={this.state.identicalBillingAddress} onChange={ this.handleBillingAddress } />
@@ -436,36 +434,35 @@ class Checkout extends Component {
                                         <span className="custom-control-description">Identique à adresse de livraison</span>
                                     </label>
                                 </div>
-
-                                { this.state.identicalBillingAddress === true ? <p></p> : 
-                                    (<span>
-                                        <div className="row">
-                                            <div className="col-md-4 mb-3">
-                                                <label htmlFor="address">Adresse</label>
-                                                <input type="text" className="form-control" id="address" name="b_address" value={ this.state.identicalBillingAddress === false ? this.state.b_address : this.state.d_address } onChange={ this.onChange } />
-                                                <div className="invalid-feedback">
-                                                    Merci de saisir une adresse de livraison.
-                                                </div>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <label htmlFor="complément">Complement d'adresse</label>
-                                                <input type="textarea" className="form-control" id="complément" name="b_address2" value={ this.state.identicalBillingAddress === false ? this.state.b_address2 : this.state.d_address2 } onChange={ this.onChange } placeholder="Appt, Immeuble, etc" />
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <label htmlFor="zip">CP</label>
-                                                <input type="text" className="form-control" id="b_zip" name="b_zipCode" value={ this.state.identicalBillingAddress === false ? this.state.b_zipCode : this.state.d_zipCode } onChange={ this.onZipCodeChange } />
-                                                <div className="invalid-feedback">
-                                                    Code Postal nécessaire.
-                                                </div>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <span id="b_city">{ this.state.b_city.name }</span>
-                                                {/* { this.state. d_city.name } */}
+                            </div>
+                            { this.state.identicalBillingAddress === true ? <p></p> : 
+                                (<span>
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <label htmlFor="address">Adresse</label>
+                                            <input type="text" className="form-control" id="address" name="b_address" value={ this.state.identicalBillingAddress === false ? this.state.b_address : this.state.d_address } onChange={ this.onChange } />
+                                            <div className="invalid-feedback">
+                                                Merci de saisir une adresse de livraison.
                                             </div>
                                         </div>
-                                    </span>)
-                                }
-                            </div>
+                                    </div>
+                                    <div className="row with-padding-top">
+                                        <div className="col-md-4 mb-3 user-infos with-phone-padding-top">
+                                            <label htmlFor="complément">Complement d'adresse</label>
+                                            <input type="textarea" className="form-control" id="complément" name="b_address2" value={ this.state.identicalBillingAddress === false ? this.state.b_address2 : this.state.d_address2 } onChange={ this.onChange } placeholder="Appt, Immeuble, etc" />
+                                        </div>
+                                        <div className="col-md-4 mb-3 user-infos">
+                                            <label htmlFor="zip">Code postal</label>
+                                            <input type="text" className="form-control" id="b_zip" name="b_zipCode" value={ this.state.identicalBillingAddress === false ? this.state.b_zipCode : this.state.d_zipCode } onChange={ this.onZipCodeChange } />
+                                            <div className="invalid-feedback">
+                                                Code Postal nécessaire.
+                                            </div>
+                                        </div>
+                                        <div className="col-md-4 mb-3 user-infos cityname-container">
+                                            <span id="b_city">{ this.state.b_city.name }</span>
+                                        </div>
+                                    </div>
+                                </span>) }
                         </form>
                     </div>
                 </div>
