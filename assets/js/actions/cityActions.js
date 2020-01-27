@@ -1,15 +1,19 @@
 import axios from 'axios';
-import { GET_CITIES, GET_CITY, ADD_CITY, DELETE_CITY, UPDATE_CITY } from '../actions/types';
+import { GET_CITIES, GET_CITY, ADD_CITY, DELETE_CITY, UPDATE_CITY, CITIES_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getCities = () => dispatch => {
+    dispatch({
+        type: CITIES_LOADING,
+        payload: ''
+    });
     axios.get('/api/cities', tokenConfig())
          .then((res) => {
             dispatch({
                 type: GET_CITIES,
                 payload: res.data['hydra:member']
-            })
+            });
          })
          .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))

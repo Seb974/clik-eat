@@ -23,9 +23,7 @@ class SupplierForm extends React.Component
         gps: typeof this.id === 'undefined' ? '-21.329519,55.471617' : (typeof this.gps !== 'undefined' ? this.selectedSupplier.gps : '-21.329519,55.471617'),
         users: typeof this.id === 'undefined' ? [] : (typeof this.selectedSupplier!== 'undefined' ? this.selectedSupplier.users : []),
         preparationPeriod: typeof this.id === 'undefined' ? '' : (typeof this.selectedSupplier!== 'undefined' ? this.selectedSupplier.preparationPeriod : ''),
-        timeString: '00:00',
         selection: {}, 
-        title: 'Créer un nouveau fournisseur',
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
         origin: new Date(2020, 0, 1, 0, 0, 0),
         time: new Date(2020, 0, 1, 0, 0, 0),
@@ -53,8 +51,6 @@ class SupplierForm extends React.Component
                         address: typeof selectedSupplier.address === 'undefined' ? '' : selectedSupplier.address,
                         users: typeof selectedSupplier.users === 'undefined' ? [] : selectedSupplier.users,
                         selection: selectedSupplier,
-                        title: 'Modifier le fournisseur ' + typeof selectedSupplier.name === 'undefined' ? '' : selectedSupplier.name,
-                        timeString: new Date(this.state.preparationPeriod).toLocaleTimeString(),
                         time: new Date(2020, 0, 1, 0, preparationTime.getMinutes(), 0),
                     });
                     break;
@@ -252,7 +248,7 @@ class SupplierForm extends React.Component
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="productform-container" className="container">
-                    <h1>{ this.state.title }</h1>
+                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le fournisseur "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le fournisseur "' + this.state.name +'"' : 'Créer un fournisseur') }</h1>
                     <form onSubmit={ this.handleSubmit } method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
                             <div className="row">
@@ -274,7 +270,6 @@ class SupplierForm extends React.Component
                                         value={this.state.time}
                                         onChange={this.onTimeChange}
                                         className="form-control"
-                                        // onChange={date => { this.setState({time: date}); }} 
                                         options={  {enableTime: true,
                                                     noCalendar: true,
                                                     dateFormat: "H:i",
@@ -285,7 +280,6 @@ class SupplierForm extends React.Component
                                                     }
                                                 }
                                     />
-                                    {/* <TimePicker className="form-control" onChange={this.onTimeChange} value={this.state.timeString} /> */}
                                 </div>
                             </div>
 

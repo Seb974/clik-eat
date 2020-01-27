@@ -49,6 +49,7 @@ export const GET_CITY = 'GET_CITY';
 export const ADD_CITY = 'ADD_CITY';
 export const DELETE_CITY = 'DELETE_CITY';
 export const UPDATE_CITY = 'UPDATE_CITY';
+export const CITIES_LOADING = 'CITIES_LOADING';
 export const GET_USERS = 'GET_USERS';
 export const GET_USER = 'GET_USER';
 export const ADD_USER = 'ADD_USER';

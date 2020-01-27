@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getSuppliers, deleteSupplier } from '../../../actions/supplierActions';
 import { getUsers } from '../../../actions/userActions';
-import {  Redirect, Link } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
 

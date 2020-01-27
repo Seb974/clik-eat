@@ -14,7 +14,6 @@ class CityForm extends React.Component
         zipCode: '',
         isDeliverable: false,
         selection: {}, 
-        title: 'Créer une nouvelle ville',
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token)
     };
 
@@ -36,7 +35,6 @@ class CityForm extends React.Component
                         zipCode: selectedCity.zipCode,
                         isDeliverable: selectedCity.isDeliverable,
                         selection: selectedCity,
-                        title: 'Modifier la ville ' + selectedCity.name,
                     });
                     break;
                 }
@@ -73,40 +71,44 @@ class CityForm extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
-                <div className="container">
-                    <div className="row">
-                        <div className="col-12 col-sm-8 col-md-4 mx-auto">
-                            <div className="card m-b-0">
-                                <div className="card-header">
-                                    <h4 class="card-title"><i class="fa fa-user-plus"></i>{ this.state.title }</h4>
-                                </div>
-                                <div className="card-block">
-                                    <form onSubmit={ this.handleSubmit }>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Nom de la ville</label>
-                                            <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom de la catégorie" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
-                                        </div>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Code postal</label>
-                                            <input type="text" name="zipCode" id="inputZipCode" className="form-control" placeholder="Code postal" required value={ this.state.zipCode } onChange={ this.onChange }/>
-                                        </div>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Code postal</label>
-                                            <input type="checkbox" name="isDeliverable" id="inputIsDeliverable" className="form-control" placeholder="Livrable" checked={ this.state.isDeliverable } onChange={ this.onCheckboxChange }/>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
-                                    </form>
-                                </div>
+                <div id="productform-container" className="container-md-10">
+                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier la ville "' + this.state.name + '"': (this.state.name !== '' ? 'Créer la ville "' + this.state.name +'"' : 'Créer une ville') }</h1>
+                    <form onSubmit={ this.handleSubmit }>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <label htmlFor="name">Nom de la ville</label>
+                                <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom de la catégorie" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
                             </div>
                         </div>
-                    </div>
-                    {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/cities" } onClick={ this.handleDelete }>Delete</Link>}
-                    <Link to={ "/cities" }>back to list</Link>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <label htmlFor="zipCode">Code postal</label>
+                                <input type="text" name="zipCode" id="inputZipCode" className="form-control" placeholder="Code postal" required value={ this.state.zipCode } onChange={ this.onChange }/>
+                            </div>
+                        </div>
+                        <div className="row">
+                            {/* <div className="col-md-6">
+                                <label htmlFor="isDeliverable">Code postal</label>
+                                <input type="checkbox" name="isDeliverable" id="inputIsDeliverable" className="form-control" placeholder="Livrable" checked={ this.state.isDeliverable } onChange={ this.onCheckboxChange }/>
+                            </div> */}
+
+                            <div className="col-md-6">
+                                <label htmlFor="role">Livraison</label>
+                                <label className="custom-control custom-checkbox custom-checkbox-primary">
+                                    <input type="checkbox" id="inputIsDeliverable" name="isDeliverable" className="custom-control-input" checked={ this.state.isDeliverable } onChange={ this.onCheckboxChange } />
+                                    <span className="custom-control-indicator"></span>
+                                    <span className="custom-control-description">{ this.state.isDeliverable === true ? 'Opérée' : 'Non opérée' }</span>
+                                </label>
+                            </div>
+                        </div>
+                                
+                        <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
+                    </form>
+
+                    {/* {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/cities" } onClick={ this.handleDelete }>Delete</Link>} */}
+                    <Link  role="button" className="btn btn-light btn-sm product-button with-padding-top"  to={ "/cities" }>Retourner à la liste</Link>
                 </div>
             );
         }
@@ -117,6 +119,7 @@ class CityForm extends React.Component
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     cities: state.city.cities,
     isAuthenticated: state.auth.isAuthenticated,
     token: state.auth.token,
