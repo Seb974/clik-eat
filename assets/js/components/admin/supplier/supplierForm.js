@@ -1,3 +1,5 @@
+import 'flatpickr/dist/themes/material_green.css'
+
 import React from 'react';
 import { connect } from 'react-redux';
 import { addSupplier, updateSupplier, deleteSupplier } from '../../../actions/supplierActions';
@@ -7,6 +9,7 @@ import {Redirect} from "react-router-dom";
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
 import TimePicker from 'react-time-picker';
+import Flatpickr from 'react-flatpickr'
 
 class SupplierForm extends React.Component 
 {
@@ -24,6 +27,9 @@ class SupplierForm extends React.Component
         selection: {}, 
         title: 'Créer un nouveau fournisseur',
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
+        origin: new Date(2020, 0, 1, 0, 0, 0),
+        time: new Date(2020, 0, 1, 0, 0, 0),
+
     };
 
     static propTypes = {
@@ -39,6 +45,7 @@ class SupplierForm extends React.Component
         if (typeof id !== 'undefined') {
             for (let i = 0; i < this.props.suppliers.length; i++) {
                 if (parseInt(this.props.suppliers[i].id) === parseInt(id)) {
+                    const preparationTime = new Date(this.state.preparationPeriod);
                     const selectedSupplier = this.props.suppliers[i];
                     this.setState({
                         isNew: false,
@@ -48,6 +55,7 @@ class SupplierForm extends React.Component
                         selection: selectedSupplier,
                         title: 'Modifier le fournisseur ' + typeof selectedSupplier.name === 'undefined' ? '' : selectedSupplier.name,
                         timeString: new Date(this.state.preparationPeriod).toLocaleTimeString(),
+                        time: new Date(2020, 0, 1, 0, preparationTime.getMinutes(), 0),
                     });
                     break;
                 }
@@ -61,7 +69,7 @@ class SupplierForm extends React.Component
         let placesAutocomplete = places( {
             appId     : process.env.ALGOLIA_APPID,
             apiKey    : process.env.ALGOLIA_APIKEY,
-            container : document.querySelector( '#input-map' ),
+            container : document.getElementById('input-supplier-map'),
         } ).configure( {
             countries         : ['fr'],
             useDeviceLocation : false
@@ -162,12 +170,30 @@ class SupplierForm extends React.Component
     };
 
     onTimeChange = time => {
-        var timeString = time + ':00';
-        const datetime = new Date('1970-01-01T' + timeString + 'Z');
+        const period = new Date(2020, 0, 1, 0, time[0].getMinutes());
         this.setState({ 
-            timeString: time,
-            preparationPeriod: datetime
+            time: period,
+            preparationPeriod: this.dateDiff(period)
         });
+    }
+
+    dateDiff = (selectedPeriod) => {
+        let diff = {};
+        let tmp = selectedPeriod - this.state.origin;
+
+            tmp = Math.floor(tmp/1000);
+            diff.sec = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.sec)/60);
+            diff.min = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.min)/60);
+            diff.hour = tmp % 24;
+             
+            tmp = Math.floor((tmp-diff.hour)/24); 
+            diff.day = tmp;
+
+        return new Date(1970, 0, 1, diff.hour, diff.min, 0);
     };
 
     onUsersChange = e => {
@@ -206,18 +232,12 @@ class SupplierForm extends React.Component
         this.props.history.push(`/suppliers`);
     }
 
-    handleDelete = e => {
-        e.preventDefault();
-        this.props.deleteSupplier(this.props.match.params.id);
-        this.props.history.push(`/suppliers`);
-    }
-
     displayUsers = (users) => {
         return (
-        <select id="supplier_users" name="users" multiple="multiple" onChange={ this.onUsersChange }>
-            {users.map(user => {
-                    // if (this.selectedSupplier.users.filter(elt => elt.id === user.id).length > 0) {
-                        if (this.state.users.filter(elt => elt.id === user.id).length > 0) {
+        <select id="supplier_users" className="form-control" name="users" multiple="multiple" onChange={ this.onUsersChange }>
+            {
+                users.map(user => {
+                    if (this.state.users.filter(elt => elt.id === user.id).length > 0) {
                         return <option value={user.id} selected>{ user.email }</option>
                     } else {
                         return <option value={user.id}>{ user.email }</option>
@@ -229,79 +249,86 @@ class SupplierForm extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
-                <div className="container">
-                    <div className="row">
-                        {/* <div className="col-12 col-sm-8 col-md-4 mx-auto"> */}
-                            <div className="card m-b-0">
-                                <div className="card-header">
-                                    <h4 class="card-title"><i class="fa fa-user-plus"></i>{ this.state.title }</h4>
-                                </div>
-                                <div className="card-block">
-                                    <form onSubmit={ this.handleSubmit }>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Nom du fournisseur</label>
-                                            <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom du fournisseur" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
-                                        </div>
-
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <label className="sr-only">Utilisateurs associés</label>
-                                            { typeof this.props.users === 'undefined' ? '' : this.displayUsers(this.props.users) }
-                                        </div>
-
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <label className="sr-only">Temps de préparation</label>
-                                            <TimePicker onChange={this.onTimeChange} value={this.state.timeString} />
-                                        </div>
-
-                                        {/* Delivery address panel */}
-                                        <hr className="mb-4"/>
-                                        <div className="row">
-                                        <div className="form-group input-icon-left m-b-10">
-                                                <h4 className="mb-3">Adresse</h4>
-                                            </div>
-            
-                                            <div className="row">
-                                                    <div className="col-md-12">
-                                                        <div id="map-example-container">
-                                                            {/* <Map/> */}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-12">
-                                                        <label htmlFor="address">Adresse</label>
-                                                        <input type="text" className="form-control" id="input-map" name="address" value={ this.state.address } onChange={ this.onChange }/>
-                                                        <div className="invalid-feedback">
-                                                            Merci de saisir une adresse.
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-2 mt-3">
-                                                        <small>
-                                                            <input type="hidden" name="gps" className="form-control" id="gps" value={ this.state.gps } placeholder="" onChange={ this.onChange } />
-                                                        </small>
-                                                    </div>
-            
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
-                                    </form>
+                <div id="productform-container" className="container">
+                    <h1>{ this.state.title }</h1>
+                    <form onSubmit={ this.handleSubmit } method="post" enctype="multipart/form-data">
+                        <div id="product" className="container">
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <label htmlFor="name">Nom du fournisseur</label>
+                                    <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom du fournisseur" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
                                 </div>
                             </div>
-                        {/* </div> */}
-                    </div>
-                    {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/suppliers" } onClick={ this.handleDelete }>Delete</Link>}
-                    <Link to={ "/suppliers" }>back to list</Link>
+                            <div className="row with-padding-top">
+                                <div className="col-md-12">
+                                    <label htmlFor="users">Utilisateurs associés</label>
+                                    { typeof this.props.users === 'undefined' ? '' : this.displayUsers(this.props.users) }
+                                </div>
+                            </div>
+                            <div className="row with-padding-top">
+                                <div className="col-md-12">
+                                    <label htmlFor="users">Temps de préparation</label>
+                                    <Flatpickr data-enable-time
+                                        value={this.state.time}
+                                        onChange={this.onTimeChange}
+                                        className="form-control"
+                                        // onChange={date => { this.setState({time: date}); }} 
+                                        options={  {enableTime: true,
+                                                    noCalendar: true,
+                                                    dateFormat: "H:i",
+                                                    time_24hr: true, 
+                                                    minTime: "00:05",
+                                                    maxTime: "00:59",
+                                                    minuteIncrement: 1
+                                                    }
+                                                }
+                                    />
+                                    {/* <TimePicker className="form-control" onChange={this.onTimeChange} value={this.state.timeString} /> */}
+                                </div>
+                            </div>
+
+                            {/* Delivery address panel */}
+                            <hr className="mb-4"/>
+                            <div className="row">
+                                <div className="col-md-4 mb-3">
+                                    <h4 className="mb-3">Adresse</h4>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div id="map-example-container">
+                                        {/* <Map/> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row with-padding-top">
+                                <div className="col-md-12">
+                                    <label htmlFor="address">Adresse</label>
+                                    <input type="text" id="input-supplier-map" className="form-control" name="address" value={ this.state.address } onChange={ this.onChange }/>
+                                    <div className="invalid-feedback">
+                                        Merci de saisir une adresse de livraison.
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row with-padding-top">
+                                <input type="hidden" name="gps" className="form-control" id="gps" value={ this.state.gps } placeholder="" onChange={ this.onChange } />
+                            </div>
+                            <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
+                        </div>
+                    </form>
+                    <Link to={ "/suppliers" }>Retourner à la liste</Link>
                 </div>
             );
-        }
-        else {
+        } else {
             return <Redirect to='/'/>
         }
     }
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     users: state.user.users,
     suppliers: state.supplier.suppliers,
     isAuthenticated: state.auth.isAuthenticated,

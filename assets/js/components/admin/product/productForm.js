@@ -235,50 +235,50 @@ class ProductForm extends React.Component
                     <form name="product" method="post" enctype="multipart/form-data">
                         <div id="product" className="container">
 
-                        <div className="form-row">
-                            <div className="col">
-                            {/* <div className="form-group"> */}
-                                <label for="product_supplier" className="required">Fournisseur</label>
-                                { this.displaySuppliers(this.props.suppliers) }
-                            </div>
+                            <div className="form-row">
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label htmlFor="product_supplier" className="required">Fournisseur</label>
+                                    { this.displaySuppliers(this.props.suppliers) }
+                                </div>
 
-                            <div className="col">
-                            {/* <div className="form-group"> */}
-                                <label for="product_category" className="required">Categorie</label>
-                                { this.displayCategories(this.props.categories) }
+                                <div className="col">
+                                {/* <div className="form-group"> */}
+                                    <label htmlFor="product_category" className="required">Categorie</label>
+                                    { this.displayCategories(this.props.categories) }
+                                </div>
                             </div>
-                        </div>
 
                             <div className="form-group with-padding-top">
-                                <label for="product_name" className="required">Nom</label>
+                                <label htmlFor="product_name" className="required">Nom</label>
                                 <input type="text" className="form-control" id="name" name="name" required="required" maxlength="150" value={ this.state.name } onChange={ this.onChange }/>
                             </div>
 
                             <div className="form-group">
-                                <label for="product_illustration" className="picture-label">Image</label>
+                                <label htmlFor="product_illustration" className="picture-label">Image</label>
                                 <input type="file" className="form-control-file" id="picture" name="picture" onChange={ this.onImageChange }/>
                             </div>
 
                             <div className="form-group">
-                                <label for="product_description">Description</label>
+                                <label htmlFor="product_description">Description</label>
                                 <textarea className="form-control" rows="5" id="description" name="description" onChange={ this.onChange }>{ this.state.description }</textarea>
                             </div>
 
                             <div className="form-group">
-                                <label for="product_allergens">Allergènes</label>
+                                <label htmlFor="product_allergens">Allergènes</label>
                                 { this.displayAllergens(this.props.allergens) }
                             </div>
 
                             <div className="form-row">
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_carbohydrates">Glucides</label>
+                                    <label htmlFor="product_carbohydrates">Glucides</label>
                                     <input type="text" className="form-control" id="carbohydrates" name="carbohydrates" value={ this.state.carbohydrates } onChange={ this.onChange } />
                                 </div>
 
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_sugar">Sucres</label>
+                                    <label htmlFor="product_sugar">Sucres</label>
                                     <input type="text" className="form-control" id="sugar" name="sugar" value={ this.state.sugar } onChange={ this.onChange }/>
                                 </div>
                             </div>
@@ -286,13 +286,13 @@ class ProductForm extends React.Component
                             <div className="form-row with-padding-top">
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_fat">Lipides</label>
+                                    <label htmlFor="product_fat">Lipides</label>
                                     <input type="text" className="form-control" id="fat" name="fat" value={ this.state.fat } onChange={ this.onChange }/>
                                 </div>
 
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_saturated">Acides gras saturés</label>
+                                    <label htmlFor="product_saturated">Acides gras saturés</label>
                                     <input type="text" className="form-control" id="saturated" name="saturated" value={ this.state.saturated } onChange={ this.onChange }/>
                                 </div>
                             </div>
@@ -300,19 +300,19 @@ class ProductForm extends React.Component
                             <div className="form-row with-padding-top">
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_proteins">Protéines</label>
+                                    <label htmlFor="product_proteins">Protéines</label>
                                     <input type="text" className="form-control" id="protein" name="protein" value={ this.state.protein } onChange={ this.onChange }/>
                                 </div>
 
                                 <div className="col">
                                 {/* <div className="form-group"> */}
-                                    <label for="product_sodium">Sel</label>
+                                    <label htmlFor="product_sodium">Sel</label>
                                     <input type="text" className="form-control" id="sodium" name="sodium" value={ this.state.sodium } onChange={ this.onChange }/>
                                 </div>
                             </div>
 
                             <div className="form-group with-padding-top">
-                                <label for="product_tva" className="required">Tva</label>
+                                <label htmlFor="product_tva" className="required">Tva</label>
                                 { this.displayTaxes(this.props.taxes) }
                             </div>
                             <br/>

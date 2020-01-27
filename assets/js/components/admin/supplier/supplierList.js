@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getSuppliers } from '../../../actions/supplierActions';
+import { getSuppliers, deleteSupplier } from '../../../actions/supplierActions';
 import { getUsers } from '../../../actions/userActions';
 import {  Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -14,7 +14,8 @@ class SupplierList extends React.Component
 
     static propTypes = {
         getSuppliers: PropTypes.func.isRequired,
-        getUsers: PropTypes.func.isRequired
+        getUsers: PropTypes.func.isRequired,
+        deleteSupplier: PropTypes.func.isRequired,
     };
     
     componentDidMount() {
@@ -24,6 +25,12 @@ class SupplierList extends React.Component
         this.props.getUsers();
     }
 
+    handleDelete = (id, e) => {
+        e.preventDefault();
+        this.props.deleteSupplier(id);
+        this.props.history.push(`/suppliers`);
+    };
+
     displaySuppliers = () => {
         let Supplier = (props) => {
             return (
@@ -32,8 +39,9 @@ class SupplierList extends React.Component
                     <td>{ props.details.name }</td>
                     {/* <td>{ props.details.address }</td> */}
                     <td className="action-column">
-                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/suppliers-show/" + props.details.id }>Voir</Link>
-                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/suppliers-add-or-edit/" + props.details.id }>Modifier</Link>
+                        {/* <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/suppliers-show/" + props.details.id }>Voir</Link> */}
+                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/suppliers-add-or-edit/" + props.details.id }>Editer</Link>
+                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/suppliers" } onClick={(e) => this.handleDelete(id, e)}>Supprimer</Link>
                     </td>
                 </tr>
             );
@@ -92,4 +100,4 @@ const mapStateToProps = state => ({
     isWaiting: state.supplier.isLoading
   });
 
-export default connect(mapStateToProps, { getSuppliers, getUsers })(SupplierList);
+export default connect(mapStateToProps, { getSuppliers, getUsers, deleteSupplier })(SupplierList);
