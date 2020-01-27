@@ -1,17 +1,19 @@
 import axios from 'axios';
-import { GET_TAXES, GET_TAX, ADD_TAX, DELETE_TAX, UPDATE_TAX } from '../actions/types';
+import { GET_TAXES, GET_TAX, ADD_TAX, DELETE_TAX, UPDATE_TAX, TAXES_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
-// import allergenReducer from '../reducers/productReducer';
-// import { push } from 'react-router-redux'
 
 export const getTaxes = () => dispatch => {
+    dispatch({
+        type: TAXES_LOADING,
+        payload: ''
+    });
     axios.get('/api/tvas', tokenConfig())
          .then((res) => {
             dispatch({
                 type: GET_TAXES,
                 payload: res.data['hydra:member']
-            })
+            });
          })
          .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))

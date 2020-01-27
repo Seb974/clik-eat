@@ -33,6 +33,7 @@ export const GET_TAX = 'GET_TAX';
 export const ADD_TAX = 'ADD_TAX';
 export const DELETE_TAX = 'DELETE_TAX';
 export const UPDATE_TAX = 'UPDATE_TAX';
+export const TAXES_LOADING = 'TAXES_LOADING';
 export const GET_SUPPLIERS = 'GET_SUPPLIERS';
 export const GET_SUPPLIER = 'GET_SUPPLIER';
 export const ADD_SUPPLIER = 'ADD_SUPPLIER';

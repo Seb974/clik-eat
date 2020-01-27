@@ -13,7 +13,6 @@ class TaxForm extends React.Component
         name: '',
         taux: 0,
         selection: {}, 
-        title: 'Créer une nouvelle taxe',
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token)
     };
 
@@ -34,7 +33,6 @@ class TaxForm extends React.Component
                         name: selectedTax.name,
                         taux: selectedTax.taux,
                         selection: selectedTax,
-                        title: 'Modifier la taxe ' + selectedTax.name,
                     });
                     break;
                 }
@@ -66,35 +64,28 @@ class TaxForm extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
-                <div className="container">
-                    <div className="row">
-                        <div className="col-12 col-sm-8 col-md-4 mx-auto">
-                            <div className="card m-b-0">
-                                <div className="card-header">
-                                    <h4 class="card-title"><i class="fa fa-user-plus"></i>{ this.state.title }</h4>
-                                </div>
-                                <div className="card-block">
-                                    <form onSubmit={ this.handleSubmit }>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Nom de la taxe</label>
-                                            <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom de la taxe" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
-                                        </div>
-                                        <div className="form-group input-icon-left m-b-10">
-                                            <i className="fa fa-user"></i>
-                                            <label className="sr-only">Taux</label>
-                                            <input type="text" name="taux" id="inputTaux" className="form-control" placeholder="Taux" required value={ this.state.taux } onChange={ this.onChange }/>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
-                                    </form>
+                <div id="productform-container" className="container">
+                    <div className="col-md-10 order-md-1" id="adresses-panel">
+                        <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier la taxe "' + this.state.name + '"': (this.state.name !== '' ? 'Créer la taxe "' + this.state.name +'"' : 'Créer une taxe') }</h1>
+                        <form onSubmit={ this.handleSubmit }>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <label htmlFor="name">Nom de la taxe</label>
+                                    <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom de la taxe" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
                                 </div>
                             </div>
-                        </div>
+                            <div className="row with-padding-top">
+                                <div className="col-md-12">
+                                    <label htmlFor="taux">Taux</label>
+                                    <input type="text" name="taux" id="inputTaux" className="form-control" placeholder="Taux" required value={ this.state.taux } onChange={ this.onChange }/>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
+                        </form>
+                        <Link role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/taxes" }>Retourner à la liste</Link>
                     </div>
-                    {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/taxes" } onClick={ this.handleDelete }>Delete</Link>}
-                    <Link to={ "/taxes" }>back to list</Link>
                 </div>
             );
         }
@@ -105,6 +96,7 @@ class TaxForm extends React.Component
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     taxes: state.tax.taxes,
     isAuthenticated: state.auth.isAuthenticated,
     token: state.auth.token,

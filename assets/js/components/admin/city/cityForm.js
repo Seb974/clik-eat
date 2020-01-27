@@ -102,7 +102,7 @@ class CityForm extends React.Component
                                     
                             <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
                         </form>
-                        <Link  role="button" className="btn btn-light btn-sm product-button with-padding-top"  to={ "/cities" }>Retourner à la liste</Link>
+                        <Link role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/cities" }>Retourner à la liste</Link>
                     </div>
                 </div>
             );
