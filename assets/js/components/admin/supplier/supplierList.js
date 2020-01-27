@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getSuppliers } from '../../../actions/supplierActions';
 import { getUsers } from '../../../actions/userActions';
-import { Link } from 'react-router-dom';
+import {  Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
 
@@ -28,12 +28,12 @@ class SupplierList extends React.Component
         let Supplier = (props) => {
             return (
                 <tr>
-                    <td>{ props.details.id }</td>
+                    {/* <td>{ props.details.id }</td> */}
                     <td>{ props.details.name }</td>
-                    <td>{ props.details.address }</td>
-                    <td>
-                        <Link to={ "/suppliers-show/" + props.details.id }>Show</Link> - 
-                        <Link to={ "/suppliers-add-or-edit/" + props.details.id }>Edit</Link>
+                    {/* <td>{ props.details.address }</td> */}
+                    <td className="action-column">
+                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/suppliers-show/" + props.details.id }>Voir</Link>
+                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/suppliers-add-or-edit/" + props.details.id }>Modifier</Link>
                     </td>
                 </tr>
             );
@@ -42,27 +42,38 @@ class SupplierList extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="content-wrap">
                     <h1>Liste des fournisseurs</h1>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Nom</th>
-                                <th>Adresse</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                (typeof this.props.suppliers !== 'undefined' && this.props.suppliers.length > 0) ? 
-                                this.displaySuppliers() : <tr> <td colspan="3">no records found</td> </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <Link to={ "/suppliers-add-or-edit" }>Create new</Link>
+                    { 
+                        this.props.isWaiting === false ?
+                            <span>
+                                <Link role="button" className="btn btn-success" to={ "/suppliers-add-or-edit" }>Créer un fournisseur</Link>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            {/* <th>Id</th> */}
+                                            <th>Nom</th>
+                                            {/* <th>Adresse</th> */}
+                                            <th className="action-column">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            (typeof this.props.suppliers !== 'undefined' && this.props.suppliers.length > 0) ? 
+                                            this.displaySuppliers() : <tr> <td colspan="3">no records found</td> </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </span> 
+                        :
+                            <div className="spinner-container">
+                                <div class="spinner-border text-danger text-center" role="status"> 
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                    }
                 </div>
             );
         }
@@ -73,10 +84,12 @@ class SupplierList extends React.Component
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     users: state.user.users,
     suppliers: state.supplier.suppliers,
     isAuthenticated: state.auth.isAuthenticated,
-    token: state.auth.token
+    token: state.auth.token,
+    isWaiting: state.supplier.isLoading
   });
 
 export default connect(mapStateToProps, { getSuppliers, getUsers })(SupplierList);

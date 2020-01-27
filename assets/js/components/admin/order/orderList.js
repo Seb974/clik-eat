@@ -109,8 +109,6 @@ class OrderList extends React.Component
                 </div>
             );
         }
-        // spinner-border text-danger
-        // spinner-grow text-danger
         else {
             return <Redirect to='/'/>
         }

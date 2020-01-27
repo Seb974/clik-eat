@@ -7,7 +7,7 @@ export const getOrders = () => dispatch => {
     dispatch({
         type: ORDER_LOADING,
         payload: ''
-    })
+    });
     axios.get('/api/order_entities', tokenConfig())
          .then((res) => {
             dispatch({

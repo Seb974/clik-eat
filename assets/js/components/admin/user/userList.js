@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getUsers, deleteUser } from '../../../actions/userActions';
 import { getCities } from '../../../actions/cityActions';
-import { Link } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
 
@@ -22,7 +22,9 @@ class UserList extends React.Component
         if (this.props.users.length === 0) {
             this.props.getUsers();
         }
-        this.props.getCities();
+        if (this.props.cities.length === 0) {
+            this.props.getCities();
+        }
     }
 
     handleDelete = (id, e) => {
@@ -36,22 +38,20 @@ class UserList extends React.Component
             const id = props.details.id;
             return (
                 <tr>
-                    {/* <td>{ props.details.id }</td> */}
-                    <td>{ id }</td>
-                    <td>{ props.details.username }</td>
+                    {/* <td>{ id }</td> */}
+                    {/* <td>{ props.details.username }</td> */}
                     <td>{ props.details.email }</td>
-                    <td>
+                    {/* <td>
                         { 
                              props.details.roles.includes("ROLE_ADMIN") ? "ADMIN" : 
                             (props.details.roles.includes("ROLE_SUPPLIER") ? "FOURNISSEUR" : 
                             (props.details.roles.includes("ROLE_DELIVERER") ? "LIVREUR" : "CLIENT")) 
                         }
-                    </td>
-                    <td>{ props.details.isBanned == true ? "BANNI" : "-" }</td>
-                    <td>
-                        {/* <Link to={ "/users-show/" + props.details.id }>Show</Link> -  */}
-                        <Link to={ "/users-add-or-edit/" + id }>Edit</Link>
-                        <Link to={ "/users" } onClick={(e) => this.handleDelete(id, e)}>Delete</Link>
+                    </td> */}
+                    {/* <td>{ props.details.isBanned == true ? "BANNI" : "-" }</td> */}
+                    <td className="action-column">
+                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/users-add-or-edit/" + id }>Editer</Link>
+                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/users" } onClick={(e) => this.handleDelete(id, e)}>Supprimer</Link>
                     </td>
                 </tr>
             );
@@ -67,32 +67,32 @@ class UserList extends React.Component
                         {
                             this.props.isWaiting === false ?
                             <span>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Id</th>
-                                                <th>Nom</th>
-                                                <th>Email</th>
-                                                <th>Rôle</th>
-                                                <th>Etat</th>
-                                                <th>actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            { 
-                                                (typeof this.props.users !== 'undefined' && this.props.users.length > 0) ?
-                                                this.displayUsers()  : <tr> <td colspan="3">no records found</td> </tr> 
-                                            }
-                                        </tbody>
-                                    </table>
-                                    <Link to={ "/users-add-or-edit" } >Create new</Link> 
-                                </span>  
+                                <Link role="button" className="btn btn-success" to={ "/users-add-or-edit" } >Créer un utilisateur</Link> 
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            {/* <th>Id</th> */}
+                                            {/* <th>Nom</th> */}
+                                            <th>Email</th>
+                                            {/* <th>Rôle</th> */}
+                                            {/* <th>Etat</th> */}
+                                            <th className="action-column">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        { 
+                                            (typeof this.props.users !== 'undefined' && this.props.users.length > 0) ?
+                                            this.displayUsers()  : <tr> <td colspan="3">Aucun untilisateur trouvé</td> </tr> 
+                                        }
+                                    </tbody>
+                                </table>
+                            </span>  
                             : 
-                                <div className="spinner-container">
-                                    <div class="spinner-border text-danger text-center" role="status"> 
-                                        <span class="sr-only">Loading...</span>
-                                    </div>
+                            <div className="spinner-container">
+                                <div class="spinner-border text-danger text-center" role="status"> 
+                                    <span class="sr-only">Loading...</span>
                                 </div>
+                            </div>
                         }
                 </div>
             );

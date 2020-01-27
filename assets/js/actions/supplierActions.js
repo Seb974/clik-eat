@@ -1,10 +1,14 @@
 import axios from 'axios';
-import { GET_SUPPLIERS, GET_SUPPLIER, ADD_SUPPLIER, DELETE_SUPPLIER, UPDATE_SUPPLIER } from '../actions/types';
+import { GET_SUPPLIERS, GET_SUPPLIER, ADD_SUPPLIER, DELETE_SUPPLIER, UPDATE_SUPPLIER, SUPPLIER_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import { push } from 'react-router-redux'
 
 export const getSuppliers = () => dispatch => {
+    dispatch({
+        type: SUPPLIER_LOADING,
+        payload: ''
+    });
     axios.get('/api/suppliers', tokenConfig())
          .then((res) => {
             dispatch({
