@@ -248,71 +248,73 @@ class SupplierForm extends React.Component
         if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="productform-container" className="container">
-                    <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le fournisseur "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le fournisseur "' + this.state.name +'"' : 'Créer un fournisseur') }</h1>
-                    <form onSubmit={ this.handleSubmit } method="post" enctype="multipart/form-data">
-                        <div id="product" className="container">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <label htmlFor="name">Nom du fournisseur</label>
-                                    <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom du fournisseur" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
+                    <div className="col-md-10 order-md-1" id="adresses-panel">
+                        <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier le fournisseur "' + this.state.name + '"': (this.state.name !== '' ? 'Créer le fournisseur "' + this.state.name +'"' : 'Créer un fournisseur') }</h1>
+                        <form onSubmit={ this.handleSubmit } method="post" enctype="multipart/form-data">
+                            <div id="product" className="container">
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <label htmlFor="name">Nom du fournisseur</label>
+                                        <input type="text" name="name" id="inputName" className="form-control" placeholder="Nom du fournisseur" required autoFocus value={ this.state.name } onChange={ this.onChange }/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="row with-padding-top">
-                                <div className="col-md-12">
-                                    <label htmlFor="users">Utilisateurs associés</label>
-                                    { typeof this.props.users === 'undefined' ? '' : this.displayUsers(this.props.users) }
+                                <div className="row with-padding-top">
+                                    <div className="col-md-12">
+                                        <label htmlFor="users">Utilisateurs associés</label>
+                                        { typeof this.props.users === 'undefined' ? '' : this.displayUsers(this.props.users) }
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="row with-padding-top">
-                                <div className="col-md-12">
-                                    <label htmlFor="users">Temps de préparation</label>
-                                    <Flatpickr data-enable-time
-                                        value={this.state.time}
-                                        onChange={this.onTimeChange}
-                                        className="form-control"
-                                        options={  {enableTime: true,
-                                                    noCalendar: true,
-                                                    dateFormat: "H:i",
-                                                    time_24hr: true, 
-                                                    minTime: "00:05",
-                                                    maxTime: "00:59",
-                                                    minuteIncrement: 1
+                                <div className="row with-padding-top">
+                                    <div className="col-md-12">
+                                        <label htmlFor="users">Temps de préparation</label>
+                                        <Flatpickr data-enable-time
+                                            value={this.state.time}
+                                            onChange={this.onTimeChange}
+                                            className="form-control"
+                                            options={  {enableTime: true,
+                                                        noCalendar: true,
+                                                        dateFormat: "H:i",
+                                                        time_24hr: true, 
+                                                        minTime: "00:05",
+                                                        maxTime: "00:59",
+                                                        minuteIncrement: 1
+                                                        }
                                                     }
-                                                }
-                                    />
+                                        />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Delivery address panel */}
-                            <hr className="mb-4"/>
-                            <div className="row">
-                                <div className="col-md-4 mb-3">
-                                    <h4 className="mb-3">Adresse</h4>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div id="map-example-container">
-                                        {/* <Map/> */}
+                                {/* Delivery address panel */}
+                                <hr className="mb-4"/>
+                                <div className="row">
+                                    <div className="col-md-4 mb-3">
+                                        <h4 className="mb-3">Adresse</h4>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="row with-padding-top">
-                                <div className="col-md-12">
-                                    <label htmlFor="address">Adresse</label>
-                                    <input type="text" id="input-supplier-map" className="form-control" name="address" value={ this.state.address } onChange={ this.onChange }/>
-                                    <div className="invalid-feedback">
-                                        Merci de saisir une adresse de livraison.
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <div id="map-example-container">
+                                            {/* <Map/> */}
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="row with-padding-top">
+                                    <div className="col-md-12">
+                                        <label htmlFor="address">Adresse</label>
+                                        <input type="text" id="input-supplier-map" className="form-control" name="address" value={ this.state.address } onChange={ this.onChange }/>
+                                        <div className="invalid-feedback">
+                                            Merci de saisir une adresse de livraison.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row with-padding-top">
+                                    <input type="hidden" name="gps" className="form-control" id="gps" value={ this.state.gps } placeholder="" onChange={ this.onChange } />
+                                </div>
+                                <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
                             </div>
-                            <div className="row with-padding-top">
-                                <input type="hidden" name="gps" className="form-control" id="gps" value={ this.state.gps } placeholder="" onChange={ this.onChange } />
-                            </div>
-                            <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
-                        </div>
-                    </form>
-                    <Link to={ "/suppliers" }>Retourner à la liste</Link>
+                        </form>
+                        <Link  role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/suppliers" }>Retourner à la liste</Link>
+                    </div>
                 </div>
             );
         } else {

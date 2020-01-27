@@ -44,6 +44,7 @@ export const GET_CATEGORY = 'GET_CATEGORY';
 export const ADD_CATEGORY = 'ADD_CATEGORY';
 export const DELETE_CATEGORY = 'DELETE_CATEGORY';
 export const UPDATE_CATEGORY = 'UPDATE_CATEGORY';
+export const CATEGORIES_LOADING = 'CATEGORIES_LOADING';
 export const GET_CITIES = 'GET_CITIES';
 export const GET_CITY = 'GET_CITY';
 export const ADD_CITY = 'ADD_CITY';

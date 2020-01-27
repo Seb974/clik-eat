@@ -1,15 +1,19 @@
 import axios from 'axios';
-import { GET_CATEGORIES, GET_CATEGORY, ADD_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY } from '../actions/types';
+import { GET_CATEGORIES, GET_CATEGORY, ADD_CATEGORY, DELETE_CATEGORY, UPDATE_CATEGORY, CATEGORIES_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 
 export const getCategories = () => dispatch => {
+    dispatch({
+        type: CATEGORIES_LOADING,
+        payload: ''
+    })
     axios.get('/api/categories', tokenConfig())
          .then((res) => {
             dispatch({
                 type: GET_CATEGORIES,
                 payload: res.data['hydra:member']
-            })
+            });
          })
          .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))

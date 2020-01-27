@@ -64,7 +64,7 @@ class CityList extends React.Component
                                 <tbody>
                                     {
                                         (typeof this.props.cities !== 'undefined' && this.props.cities.length > 0) ? 
-                                        this.displayCities() : <tr> <td colspan="3">no records found</td> </tr>
+                                        this.displayCities() : <tr> <td colspan="3">Aucune ville trouvée</td> </tr>
                                     }
                                 </tbody>
                             </table>
