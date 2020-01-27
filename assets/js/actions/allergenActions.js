@@ -1,18 +1,22 @@
 import axios from 'axios';
-import { GET_ALLERGENS, GET_ALLERGEN, ADD_ALLERGEN, DELETE_ALLERGEN, UPDATE_ALLERGEN } from '../actions/types';
+import { GET_ALLERGENS, GET_ALLERGEN, ADD_ALLERGEN, DELETE_ALLERGEN, UPDATE_ALLERGEN, ALLERGENS_LOADING } from '../actions/types';
 import { tokenConfig } from '../helpers/security';
 import { returnErrors } from './errorActions';
 import allergenReducer from '../reducers/productReducer';
 import { push } from 'react-router-redux'
 
 export const getAllergens = () => dispatch => {
+    dispatch({
+        type: ALLERGENS_LOADING,
+        payload: ''
+    });
     axios
         .get('/api/allergens', tokenConfig())
         .then((res) => {
             dispatch({
                 type: GET_ALLERGENS,
                 payload: res.data['hydra:member']
-            })
+            });
         })
         .catch(err => {
             dispatch(returnErrors(err.response.data, err.response.status))

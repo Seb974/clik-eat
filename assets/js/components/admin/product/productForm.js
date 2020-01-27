@@ -327,6 +327,7 @@ class ProductForm extends React.Component
                         <a href="#" id="add_variant" className="btn btn-default" onClick={ this.onVariantAdd } >Ajouter une variante</a>
                         <button id="productform-save-button" className="btn btn-success" onClick={ this.onSubmit }>Enregistrer</button>
                     </form>
+                    <Link role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/products" }>Retourner à la liste</Link>
                 </div>
             )
         } else {

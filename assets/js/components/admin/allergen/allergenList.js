@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getAllergens } from '../../../actions/allergenActions';
-import { Link } from 'react-router-dom';
+import { getAllergens, deleteAllergen } from '../../../actions/allergenActions';
+import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
 
@@ -12,22 +12,30 @@ class AllergenList extends React.Component
     };
 
     static propTypes = {
-        getAllergens: PropTypes.func.isRequired
+        getAllergens: PropTypes.func.isRequired,
+        deleteAllergen: PropTypes.func.isRequired,
     };
     
     componentDidMount() {
-        this.props.getAllergens();
+        if (this.props.allergens.length === 0) {
+            this.props.getAllergens();
+        }
     }
+
+    handleDelete = (id, e) => {
+        e.preventDefault();
+        this.props.deleteAllergen(id);
+        this.props.history.push(`/allergens`);
+    };
 
     displayAllergens = () => {
         let Allergen = (props) => {
             return (
                 <tr>
-                    <td>{ props.details.id }</td>
                     <td>{ props.details.name }</td>
-                    <td>
-                        <Link to={ "/allergens-show/" + props.details.id }>Show</Link> - 
-                        <Link to={ "/allergens-add-or-edit/" + props.details.id }>Edit</Link>
+                    <td className="action-column">
+                        <Link role="button" className="btn btn-warning btn-sm product-button" to={ "/allergens-add-or-edit/" + props.details.id }>Editer</Link>
+                        <Link role="button" className="btn btn-danger btn-sm product-button" to={ "/allergens" } onClick={(e) => this.handleDelete(id, e)}>Supprimer</Link>
                     </td>
                 </tr>
             );
@@ -36,26 +44,37 @@ class AllergenList extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             return (
                 <div id="content-wrap">
                     <h1>Liste des allergènes</h1>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Name</th>
-                                <th>actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                (typeof this.props.allergens !== 'undefined' && this.props.allergens.length > 0) ? 
-                                this.displayAllergens() : <tr> <td colspan="3">no records found</td> </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <Link to={ "/allergens-add-or-edit" }>Create new</Link>
+                    { 
+                        this.props.isWaiting === false ?
+                            <span>
+                                <Link role="button" className="btn btn-success" to={ "/allergens-add-or-edit" }>Créer un allergène</Link>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            {/* <th>Id</th> */}
+                                            <th>Nom</th>
+                                            <th className="action-column">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            (typeof this.props.allergens !== 'undefined' && this.props.allergens.length > 0) ? 
+                                            this.displayAllergens() : <tr> <td colspan="3">AUcun allergène trouvé</td> </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </span>
+                        :
+                            <div className="spinner-container">
+                                <div class="spinner-border text-danger text-center" role="status"> 
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                    }
                 </div>
             );
         }
@@ -66,9 +85,11 @@ class AllergenList extends React.Component
 }
 
 const mapStateToProps = state => ({
+    user: state.auth.user,
     allergens: state.allergen.allergens,
     isAuthenticated: state.auth.isAuthenticated,
-    token: state.auth.token
+    token: state.auth.token,
+    isWaiting: state.allergen.isLoading,
   });
 
-export default connect(mapStateToProps, { getAllergens })(AllergenList);
+export default connect(mapStateToProps, { getAllergens, deleteAllergen })(AllergenList);

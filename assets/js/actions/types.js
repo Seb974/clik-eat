@@ -28,6 +28,7 @@ export const GET_ALLERGEN = 'GET_ALLERGEN';
 export const ADD_ALLERGEN = 'ADD_ALLERGEN';
 export const DELETE_ALLERGEN = 'DELETE_ALLERGEN';
 export const UPDATE_ALLERGEN = 'UPDATE_ALLERGEN';
+export const ALLERGENS_LOADING = 'ALLERGENS_LOADING';
 export const GET_TAXES = 'GET_TAXES';
 export const GET_TAX = 'GET_TAX';
 export const ADD_TAX = 'ADD_TAX';

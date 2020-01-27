@@ -419,9 +419,10 @@ class UserForm extends React.Component
                                         </div>
                                     </span>) }
                                 <button className="btn btn-primary btn-lg btn-block" type="submit">{ typeof this.id === 'undefined' ? "Enregistrer" : "Mettre à jour" }</button>
-                                {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/users" } onClick={ this.handleDelete }>Delete</Link>}
-                                  <Link to={ "/users" }>back to list</Link>
+                                {/* {(typeof this.props.match.params.id === 'undefined') ? '' : <Link to={ "/users" } onClick={ this.handleDelete }>Delete</Link>}
+                                  <Link to={ "/users" }>back to list</Link> */}
                             </form>
+                            <Link role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/users" }>Retourner à la liste</Link>
                         </div>
                     </div>
             );
