@@ -264,8 +264,9 @@ class UserForm extends React.Component
                 <div className="container mt-3">
                         {/* Addresses panel */}
                         <div className="col-md-10 order-md-1" id="adresses-panel">
+                        <h1>{ (typeof this.id !== 'undefined' && this.id !== null) ? 'Modifier l\'utilisateur "' + this.state.username + '"': (this.state.username !== '' ? 'Créer l\'utilisateur "' + this.state.username +'"' : 'Créer un utilisateur') }</h1>
                             <form className="needs-validation" onSubmit={ this.onSubmit }>
-                                <div className="row">
+                                <div className="row with-padding-top">
                                     {/* User info */}
                                     <div className="col-md-4 mb-3 user-infos">
                                         <label htmlFor="firstName">Nom</label>

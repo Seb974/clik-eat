@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use App\Entity\User;
 use App\Entity\OrderEntity;
 use App\Entity\Delivery;
@@ -106,4 +108,26 @@ class ApiAppController extends AbstractController
         return $this->redirectToRoute('index_api');
     }
 
+    /**
+     * @Route("/order/{id}/deliverynote", name="delivery-note-edition")
+     */
+    public function createBL(OrderEntity $order, Request $request)
+    {
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        
+        $dompdf = new Dompdf($pdfOptions);
+        $html = $this->renderView('deliveryNote/deliveryNote.html.twig', [
+                    'order' => $order
+                ]);
+        
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Output the generated PDF to Browser (inline view)
+        return $dompdf->stream("Bon de livraison ". substr($order->getPaymentId(), 4) .".pdf", [
+            "Attachment" => false
+        ]);
+    }
 }

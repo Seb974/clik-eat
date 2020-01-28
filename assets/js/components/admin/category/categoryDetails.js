@@ -20,7 +20,7 @@ class CategoryDetails extends React.Component
     }
 
     render() {
-        if( Object.entries(this.state.user).length !== 0 && this.state.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
+        if( (this.props.user !== null && this.props.user !== undefined) && this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ) {
             const selection = this.props.selectedCategory;
             return (
                 <span>

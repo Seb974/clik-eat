@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Bon de livraison</title>
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+		<header>
+			<div class="container" id="clikeat-side">
+				<div class="row justify-content-center">
+					<div class="col align-self-center">
+						<img src="/var/www/clikeat.re/clik-eat/public/uploads/logos/ClikEat-logo-with-name.png" alt="ClikEat" height="100px"/>
+					</div>
+				</div>
+				{# <div class="row justify-content-end">
+					<div class="col align-self-end">
+						<div id="clikeat-address">19 chemin Raphaël - 97410 SAINT PIERRE</div>
+					</div>
+				</div> #}
+			</div>
+			<div class="container" id="client-side">
+				<div class="row justify-content-start">
+					<div class="col align-self-end">
+						<div id="client-name">{{ order.user.username }} - {{order.user.email }}</div>
+					</div>
+				</div>
+				<div class="row justify-content-start">
+					<div class="col align-self-end">
+						<div id="client-address">{{ order.deliveryAddress }}</div>
+					</div>
+				</div>
+			</div>
+
+		</header>
+
+		<section>
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col align-self-center">
+						<h4>Commande N° {{ order.paymentId[4:] }}</h4>
+					</div>
+				</div>
+				<div class="row justify-content-start">
+					<div class="col align-self-start">
+						<div id="order-date">Le {{ order.paymentDateTime|date("m/d/Y") }}</div>
+					</div>
+				</div>
+			</div>
+			<div class="container" id="order-items">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Produit</th>
+							<th>Version</th>
+							<th>Quantité</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in order.items %}
+							<tr>
+								<td>{{ item.variant.product.name }}</td>
+								<td>{{ item.variant.name }}</td>
+								<td>{{ item.quantity }} U</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="3">Aucune donnée trouvée</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="2">Total HT</td>
+							<td>{{ order.totalTax }} €</td>
+						</tr>
+						<tr>
+							<td colspan="2">TVA</td>
+							<td>{{ order.totalHt }} €</td>
+						</tr>
+						<tr>
+							<td colspan="2">Total TTC</td>
+							<td>{{ order.totalTTC }} €</td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</section>
+		<footer>
+		</footer>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        	integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    	</script>
+    </body>
+</html>

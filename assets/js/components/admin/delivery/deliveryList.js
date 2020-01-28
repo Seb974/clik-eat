@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import userExtractor from '../../../helpers/userExtractor';
 import { getOrders, closeOrder, setDelivererToOrder } from '../../../actions/orderActions';
 
 class DeliveryList extends React.Component 
@@ -29,11 +28,6 @@ class DeliveryList extends React.Component
         this.props.setDelivererToOrder(parseInt(e.target.dataset['id']), parseInt(this.props.user.id));
     }
 
-    editBL = (e) => {
-        e.preventDefault();
-        alert("BL");
-    }
-
     displayItems = (items) => {
         let ItemOrder = (props) => {
             return <li>{props.details.variant.product.name + " - " + props.details.variant.name + " : " + props.details.quantity + " U"}</li>
@@ -57,7 +51,7 @@ class DeliveryList extends React.Component
                         { (props.details.delivery !== null && typeof props.details.delivery !== 'undefined') ? 
                             (props.details.delivery.deliverer.id !== this.props.user.id ? "Pris en charge par " + props.details.delivery.deliverer.username : 
                                 <span>
-                                    <a role="button" className="btn btn-light" href="#" data-id={ props.details.id } onClick={ this.editBL } >BL</a>  
+                                    <a role="button" className="btn btn-light" href={ '/app/order/' +  props.details.id + '/deliverynote'} target="_blank">Editer le BL</a>
                                        { "   "}
                                     <a role="button" className="btn btn-primary" href="#" data-id={ props.details.id } onClick={ this.closeDelivery } >Terminer</a>
                                 </span> ) : 

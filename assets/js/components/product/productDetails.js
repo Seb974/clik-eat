@@ -47,29 +47,26 @@ class ProductDetails extends React.Component
     displayVariants = (product) => {
         let Variant = (props) => {
             return (
-                <span>
-                    <hr/>
-                    <ul className="d-flex flex-row-reverse">
-                        <li key={"variant-item-" + props.details.id}>
-                            <i className="fas fa-dolly"></i> 
-                            {" "} {props.details.stock.quantity} {" "}
+                <ul className="d-flex flex-row-reverse">
+                    <li key={"variant-item-" + props.details.id}>
+                        <i className="fas fa-dolly"></i> 
+                        {" "} {props.details.stock.quantity} {" "}
 
-                            {props.details.stock.quantity > 5 ? "" : 
+                        {/* {
+                            props.details.stock.quantity > 5 ? "" : 
                                 (<span className="badge badge-cart">
                                     { "Plus que " + props.details.stock.quantity + " en stock !"}
                                 </span>)
-                            }
+                        } */}
 
-
-                            {props.details.stock.quantity <= 0 ? <span>En rupture de stock !</span> : 
-                                (<button className="btn btn-primary btn-sm" onClick={() => this.handleClick(product, props.details)} id={props.details.id}>
-                                    <i className="fas fa-shopping-cart"></i>
-                                    {props.details.name}  à {props.details.price}€
-                                </button>)
-                            }
-                        </li>
-                    </ul>
-                </span>
+                        {props.details.stock.quantity <= 0 ? <span>En rupture de stock !</span> : 
+                            (<button className="btn btn-primary btn-sm" onClick={() => this.handleClick(product, props.details)} id={props.details.id}>
+                                <i className="fas fa-shopping-cart"></i>
+                                {props.details.name}  à {props.details.price}€
+                            </button>)
+                        }
+                    </li>
+                </ul>
             );
         }
         if (product.variants) {
@@ -90,38 +87,38 @@ class ProductDetails extends React.Component
         let Nutritionals = (props) => {
             return (
                 <span>
-                    <h4>valeurs nutritionnelles moyennes pour 100g</h4>
+                    <h4>Valeurs nutritionnelles (pour 100g)</h4>
                     <div className="widget">
                         <h5 className="widget-title">Energie (KJ) :
-                            { props.details.kJ }</h5>
+                            {" "}{ Math.round(props.details.kJ * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Energie (KCal) :
-                            { props.details.KCal }</h5>
+                            {" "}{ Math.round(props.details.kJ * 0.2388 * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Proteines :
-                            { props.details.protein }</h5>
+                            {" "}{ Math.round(props.details.protein * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Carbohydrates :
-                            { props.details.carbohydrates }</h5>
+                            {" "}{ Math.round(props.details.carbohydrates * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Sucre :
-                            { props.details.sugar }</h5>
+                            {" "}{ Math.round(props.details.sugar * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Matière grasse :
-                            { props.details.fat }</h5>
+                            {" "}{ Math.round(props.details.fat * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">dont acides gras saturés :
-                            { props.details.transAG }</h5>
+                            {" "}{ Math.round(props.details.transAG * 100) / 100 }</h5>
                     </div>
                     <div className="widget">
                         <h5 className="widget-title">Sel :
-                            { props.details.salt }</h5>
+                            {" "}{ Math.round(props.details.salt * 100) / 100 }</h5>
                     </div>
                 </span>
             );

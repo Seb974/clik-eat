@@ -7,11 +7,12 @@ import userExtractor from '../../../helpers/userExtractor';
 
 class CategoryForm extends React.Component 
 {
+    id = this.props.match.params.id;
+
     state = {
         isNew: true,
         name: '',
         selection: {}, 
-        title: 'Créer une nouvelle catégorie',
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token)
     };
 
@@ -22,16 +23,14 @@ class CategoryForm extends React.Component
     };
     
     componentDidMount() {
-        const id = this.props.match.params.id;
-        if (typeof id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             for (let i = 0; i < this.props.categories.length; i++) {
-                if (parseInt(this.props.categories[i].id) === parseInt(id)) {
+                if (parseInt(this.props.categories[i].id) === parseInt(this.id)) {
                     const selectedCategory = this.props.categories[i];
                     this.setState({
                         isNew: false,
                         name: selectedCategory.name,
                         selection: selectedCategory,
-                        title: 'Modifier la catégorie ' + selectedCategory.name,
                     });
                     break;
                 }
@@ -47,7 +46,7 @@ class CategoryForm extends React.Component
         e.preventDefault();
         const category = this.state.selection;
         category.name = this.state.name;
-        if (typeof this.props.match.params.id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             this.props.updateCategory(category);
         } else {
             this.props.addCategory(category);
@@ -57,7 +56,7 @@ class CategoryForm extends React.Component
 
     handleDelete = e => {
         e.preventDefault();
-        this.props.deleteCategory(this.props.match.params.id);
+        this.props.deleteCategory(this.id);
         this.props.history.push(`/categories`);
     }
 

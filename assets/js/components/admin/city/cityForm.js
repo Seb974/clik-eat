@@ -8,6 +8,8 @@ import userExtractor from '../../../helpers/userExtractor';
 
 class CityForm extends React.Component 
 {
+    id = this.props.match.params.id;
+
     state = {
         isNew: true,
         name: '',
@@ -24,10 +26,9 @@ class CityForm extends React.Component
     };
     
     componentDidMount() {
-        const id = this.props.match.params.id;
-        if (typeof id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             for (let i = 0; i < this.props.cities.length; i++) {
-                if (parseInt(this.props.cities[i].id) === parseInt(id)) {
+                if (parseInt(this.props.cities[i].id) === parseInt(this.id)) {
                     const selectedCity = this.props.cities[i];
                     this.setState({
                         isNew: false,
@@ -56,7 +57,7 @@ class CityForm extends React.Component
         city.name = this.state.name;
         city.zipCode = parseInt(this.state.zipCode);
         city.isDeliverable = this.state.isDeliverable;
-        if (typeof this.props.match.params.id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             this.props.updateCity(city);
         } else {
             this.props.addCity(city);
@@ -66,7 +67,7 @@ class CityForm extends React.Component
 
     handleDelete = e => {
         e.preventDefault();
-        this.props.deleteCity(this.props.match.params.id);
+        this.props.deleteCity(this.id);
         this.props.history.push(`/cities`);
     }
 

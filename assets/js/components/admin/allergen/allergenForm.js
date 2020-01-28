@@ -8,6 +8,8 @@ import userExtractor from '../../../helpers/userExtractor';
 
 class AllergenForm extends React.Component 
 {
+    id = this.props.match.params.id;
+
     state = {
         isNew: true,
         name: '',
@@ -21,10 +23,9 @@ class AllergenForm extends React.Component
     };
     
     componentDidMount() {
-        const id = this.props.match.params.id;
-        if (typeof id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             for (let i = 0; i < this.props.allergens.length; i++) {
-                if (parseInt(this.props.allergens[i].id) === parseInt(id)) {
+                if (parseInt(this.props.allergens[i].id) === parseInt(this.id)) {
                     const selectedAllergen = this.props.allergens[i];
                     this.setState({
                         isNew: false,
@@ -45,7 +46,7 @@ class AllergenForm extends React.Component
         e.preventDefault();
         const allergen = this.state.selection;
         allergen.name = this.state.name;
-        if (typeof this.props.match.params.id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             this.props.updateAllergen(allergen);
         } else {
             this.props.addAllergen(allergen);
@@ -55,7 +56,7 @@ class AllergenForm extends React.Component
 
     handleDelete = e => {
         e.preventDefault();
-        this.props.deleteAllergen(this.props.match.params.id);
+        this.props.deleteAllergen(this.id);
         this.props.history.push(`/allergens`);
     }
 

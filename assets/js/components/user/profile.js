@@ -210,14 +210,11 @@ class Profile extends React.Component
     render() {
         return (
             <div className="container mt-3">
-                {/* <div className="row"> */}
                     {/* Addresses panel */}
                     <div className="col-md-10 order-md-1" id="adresses-panel">
+                        <h1>Mon profil</h1>
                         <form className="needs-validation" onSubmit={ this.onSubmit }>
-                            {/* <div className="row"> */}
-
                                 <div className="row with-padding-top">
-                                    {/* <div className="col-md-4 mb-3"></div> */}
                                     {/* User info */}
                                     <div className="col-md-4 mb-4 user-infos">
                                         <label htmlFor="firstName">Nom</label>
@@ -241,7 +238,6 @@ class Profile extends React.Component
                                         </div>
                                     </div>
                                 </div>
-                            {/* </div> */}
                             {/* Delivery address panel */}
                             <hr className="mb-4"/>
                             <div className="row">
@@ -266,7 +262,6 @@ class Profile extends React.Component
                                     </div>
                             </div>
                             <div className="row with-padding-top">
-                                    {/* <div className="col-md-4 mb-3"></div> */}
                                     <div className="col-md-4 mb-4 user-infos with-phone-padding-top">
                                         <label htmlFor="complément">Complement d'adresse</label>
                                         <input type="textarea" className="form-control" id="complément" name="d_address2" value={ this.state.d_address2 } onChange={ this.onChange } placeholder="Appt, Immeuble, Digicode, etc" />
@@ -280,18 +275,11 @@ class Profile extends React.Component
                                     </div>
                                     <div className="col-md-4 mb-4 user-infos cityname-container">
                                         <span id="d_city">{ this.state.b_city.name }</span>
-                                        {/* { this.state. d_city.name } */}
                                     </div>
                             </div>
                             <div className="row">
-                                    {/* <div className="col-md-2 mt-3">
-                                        <small> */}
-                                            {/* <label htmlFor="gps">GPS</label> */}
-                                            <input type="hidden" name="d_gps" className="form-control" id="gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
-                                        {/* </small>
-                                    </div> */}
+                                <input type="hidden" name="d_gps" className="form-control" id="gps" value={ this.state.d_gps } placeholder="" onChange={ this.onChange } />
                             </div>
-                            {/* </div> */}
 
                             {/* Billing address */}
                             <hr className="mb-4"/>
@@ -332,17 +320,14 @@ class Profile extends React.Component
                                         </div>
                                         <div className="col-md-4 mb-4 user-infos cityname-container">
                                             <span id="b_city">{ this.state.b_city.name }</span>
-                                            {/* { this.state. d_city.name } */}
                                         </div>
                                     </div>
                                 </span>) }
-                            {/* </div> */}
                             <div className="row">
                                 <button className="btn btn-primary btn-lg btn-block" type="submit">Mettre à jour</button>
                             </div>
                         </form>
                     </div>
-                {/* </div> */}
             </div>
         );
     }

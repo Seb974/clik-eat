@@ -8,6 +8,8 @@ import userExtractor from '../../../helpers/userExtractor';
 
 class TaxForm extends React.Component 
 {
+    id = this.props.match.params.id;
+
     state = {
         isNew: true,
         name: '',
@@ -23,10 +25,9 @@ class TaxForm extends React.Component
     };
     
     componentDidMount() {
-        const id = this.props.match.params.id;
-        if (typeof id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             for (let i = 0; i < this.props.taxes.length; i++) {
-                if (parseInt(this.props.taxes[i].id) === parseInt(id)) {
+                if (parseInt(this.props.taxes[i].id) === parseInt(this.id)) {
                     const selectedTax = this.props.taxes[i];
                     this.setState({
                         isNew: false,
@@ -49,7 +50,7 @@ class TaxForm extends React.Component
         const tax = this.state.selection;
         tax.name = this.state.name;
         tax.taux = typeof this.state.taux === "string" ? parseFloat(this.state.taux.replace(',','.')) : this.state.taux;
-        if (typeof this.props.match.params.id !== 'undefined') {
+        if (typeof this.id !== 'undefined') {
             this.props.updateTax(tax);
         } else {
             this.props.addTax(tax);
@@ -59,7 +60,7 @@ class TaxForm extends React.Component
 
     handleDelete = e => {
         e.preventDefault();
-        this.props.deleteTax(this.props.match.params.id);
+        this.props.deleteTax(this.id);
         this.props.history.push(`/taxes`);
     }
 
