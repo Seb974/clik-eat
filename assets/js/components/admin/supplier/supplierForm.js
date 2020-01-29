@@ -1,5 +1,4 @@
 import 'flatpickr/dist/themes/material_green.css'
-
 import React from 'react';
 import { connect } from 'react-redux';
 import { addSupplier, updateSupplier, deleteSupplier } from '../../../actions/supplierActions';
@@ -8,7 +7,6 @@ import { Link } from 'react-router-dom';
 import {Redirect} from "react-router-dom";
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
-import TimePicker from 'react-time-picker';
 import Flatpickr from 'react-flatpickr'
 
 class SupplierForm extends React.Component 
@@ -27,7 +25,6 @@ class SupplierForm extends React.Component
         user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
         origin: new Date(2020, 0, 1, 0, 0, 0),
         time: new Date(2020, 0, 1, 0, 0, 0),
-
     };
 
     static propTypes = {

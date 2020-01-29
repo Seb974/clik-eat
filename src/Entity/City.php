@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity(repositoryClass="App\Repository\CityRepository")
  * @ApiResource(
  *      attributes={
+ *          "pagination_enabled"=false,
  *          "normalization_context"={"groups"={"city"}}
  *      },
   *     collectionOperations={
@@ -52,6 +53,12 @@ class City
      */
     private $isDeliverable;
 
+    /**
+     * @ORM\Column(type="time", nullable=true)
+     * @Groups({"city"})
+     */
+    private $deliveryPeriod;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +96,18 @@ class City
     public function setIsDeliverable(bool $isDeliverable): self
     {
         $this->isDeliverable = $isDeliverable;
+
+        return $this;
+    }
+
+    public function getDeliveryPeriod(): ?\DateTimeInterface
+    {
+        return $this->deliveryPeriod;
+    }
+
+    public function setDeliveryPeriod(?\DateTimeInterface $deliveryPeriod): self
+    {
+        $this->deliveryPeriod = $deliveryPeriod;
 
         return $this;
     }

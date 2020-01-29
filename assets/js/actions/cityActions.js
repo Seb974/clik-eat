@@ -36,7 +36,8 @@ export const addCity = city => dispatch =>{
     const body = JSON.stringify({ 
         name: city.name, 
         zipCode: city.zipCode,
-        isDeliverable: city.isDeliverable
+        isDeliverable: city.isDeliverable,
+        deliveryPeriod: city.deliveryPeriod,
     })
     axios.post('/api/cities', body, tokenConfig())
         .then((res) => {
@@ -71,7 +72,8 @@ export const updateCity = city => dispatch => {
     const body = JSON.stringify({ 
         name: city.name, 
         zipCode: city.zipCode,
-        isDeliverable: city.isDeliverable
+        isDeliverable: city.isDeliverable,
+        deliveryPeriod: city.deliveryPeriod,
     })
     axios.put('/api/cities/' + city.id, body, tokenConfig())
         .then((res) => {

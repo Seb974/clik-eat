@@ -174,7 +174,7 @@ class PaiementController extends AbstractController
 		$uniq_id = uniqid($request->request->get('email'));
 
 		$payment = \Payplug\Payment::create(array(
-			'amount'   => $dataItems['totalToPayTTC'] * 100,
+			'amount'   => round(floatval($dataItems['totalToPayTTC']), 2) * 100,
 			'currency' => 'EUR',
 			'billing'        => array(
 				'title'      => 'mr'               ,
@@ -270,11 +270,14 @@ class PaiementController extends AbstractController
 	}
 
 	private function createOrder(User $user, $paymentId, $dataUser, $dataItems) {
-		$now = new \DateTime();
+		$datetimeDelivery = new \DateTime($dataUser['deliveryTime']);
+		// $offset = $this->getTimezoneOffset('Indian/Reunion');
+		$timestamp = $datetimeDelivery->getTimestamp();		// - $offset;
+		$dateTime = (new \DateTime)->setTimestamp($timestamp);	//date("d/m/Y H:i", $timestamp);
 		$order = new OrderEntity();
 		$order->setUser($user);
 		$order->setPaymentId($paymentId);
-		$order->setPaymentDateTime($now);
+		$order->setPaymentDateTime($dateTime);
 		$order->setTotalTTC($dataItems['totalToPayTTC']);
 		$order->setTotalHT($dataItems['totalTax']);
 		$order->setTotalTax($dataItems['totalToPayHT']);
@@ -308,5 +311,19 @@ class PaiementController extends AbstractController
 		$response = json_encode($arrayEntity);
 		return new Update($route, $response, $target);
 		// return new Update($route, $response);
+	}
+
+	private function getTimezoneOffset($remote_tz, $origin_tz = null) {
+		if($origin_tz === null) {
+			if(!is_string($origin_tz = date_default_timezone_get())) {
+				return false; // A UTC timestamp was returned -- bail out!
+			}
+		}
+		$origin_dtz = new \DateTimeZone($origin_tz);
+		$remote_dtz = new \DateTimeZone($remote_tz);
+		$origin_dt = new \DateTime("now", $origin_dtz);
+		$remote_dt = new \DateTime("now", $remote_dtz);
+		$offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+		return $offset;
 	}
 }

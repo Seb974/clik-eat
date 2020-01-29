@@ -1,3 +1,4 @@
+import 'flatpickr/dist/themes/material_green.css'
 import React from 'react';
 import { connect } from 'react-redux';
 import { addCity, updateCity, deleteCity } from '../../../actions/cityActions';
@@ -5,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Redirect } from "react-router-dom";
 import PropTypes from 'prop-types';
 import userExtractor from '../../../helpers/userExtractor';
+import Flatpickr from 'react-flatpickr'
 
 class CityForm extends React.Component 
 {
@@ -15,8 +17,11 @@ class CityForm extends React.Component
         name: '',
         zipCode: '',
         isDeliverable: false,
+        deliveryPeriod: new Date(2020, 0, 1, 0, 0, 0),
         selection: {}, 
-        user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token)
+        user: (typeof this.props.token === 'undefined') ? {} : userExtractor(this.props.token),
+        origin: new Date(2020, 0, 1, 0, 0, 0),
+        time: new Date(2020, 0, 1, 0, 0, 0),
     };
 
     static propTypes = {
@@ -30,12 +35,15 @@ class CityForm extends React.Component
             for (let i = 0; i < this.props.cities.length; i++) {
                 if (parseInt(this.props.cities[i].id) === parseInt(this.id)) {
                     const selectedCity = this.props.cities[i];
+                    const deliveryTime = (selectedCity.deliveryPeriod !== null && typeof selectedCity.deliveryPeriod !== 'undefined') ? new Date(selectedCity.deliveryPeriod) : this.state.origin;
                     this.setState({
                         isNew: false,
                         name: selectedCity.name,
                         zipCode: selectedCity.zipCode,
+                        deliveryPeriod: (selectedCity.deliveryPeriod !== null && typeof selectedCity.deliveryPeriod !== 'undefined') ? selectedCity.deliveryPeriod : this.dateDiff(this.state.origin),
                         isDeliverable: selectedCity.isDeliverable,
                         selection: selectedCity,
+                        time: new Date(2020, 0, 1, 0, deliveryTime.getMinutes(), 0),
                     });
                     break;
                 }
@@ -51,12 +59,40 @@ class CityForm extends React.Component
         this.setState({ isDeliverable: !this.state.isDeliverable });
     };
 
+    onTimeChange = time => {
+        const period = new Date(2020, 0, 1, time[0].getHours(), time[0].getMinutes());
+        this.setState({ 
+            time: period,
+            deliveryPeriod: this.dateDiff(period)
+        });
+    }
+
+    dateDiff = (selectedPeriod) => {
+        let diff = {};
+        let tmp = selectedPeriod - this.state.origin;
+
+            tmp = Math.floor(tmp/1000);
+            diff.sec = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.sec)/60);
+            diff.min = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.min)/60);
+            diff.hour = tmp % 24;
+             
+            tmp = Math.floor((tmp-diff.hour)/24); 
+            diff.day = tmp;
+
+        return new Date(1970, 0, 1, diff.hour, diff.min, 0);
+    };
+
     handleSubmit = e => {
         e.preventDefault();
         const city = this.state.selection;
         city.name = this.state.name;
         city.zipCode = parseInt(this.state.zipCode);
         city.isDeliverable = this.state.isDeliverable;
+        city.deliveryPeriod = this.state.deliveryPeriod;
         if (typeof this.id !== 'undefined') {
             this.props.updateCity(city);
         } else {
@@ -100,7 +136,30 @@ class CityForm extends React.Component
                                     </label>
                                 </div>
                             </div>
-                                    
+                            { 
+                                this.state.isDeliverable === false ? 
+                                    <p></p> 
+                                : 
+                                    <div className="row with-padding-top">
+                                        <div className="col-md-12">
+                                            <label htmlFor="time">Temps de livraison</label>
+                                            <Flatpickr data-enable-time
+                                                value={this.state.time}
+                                                onChange={this.onTimeChange}
+                                                className="form-control"
+                                                options={  {enableTime: true,
+                                                            noCalendar: true,
+                                                            dateFormat: "H:i",
+                                                            time_24hr: true, 
+                                                            minTime: "00:05",
+                                                            maxTime: "00:59",
+                                                            minuteIncrement: 1
+                                                            }
+                                                        }
+                                            />
+                                        </div>
+                                    </div>
+                            }
                             <button type="submit" class="btn btn-primary m-t-10 btn-block">ENREGISTRER</button>
                         </form>
                         <Link role="button" className="btn btn-light btn-sm product-button with-padding-top" to={ "/cities" }>Retourner à la liste</Link>

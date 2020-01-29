@@ -1,3 +1,4 @@
+import 'flatpickr/dist/themes/material_green.css'
 import React, { Component } from 'react';
 import axios from 'axios';
 import Cart from '../cart/cart';
@@ -6,8 +7,11 @@ import { connect } from 'react-redux';
 import { logout } from '../../actions/authActions';
 import PropTypes from 'prop-types';
 import { tokenConfig } from '../../helpers/security';
+import Flatpickr from 'react-flatpickr'
 
 class Checkout extends Component {
+
+    now = new Date();
 
     constructor(props) {
         super(props);
@@ -42,6 +46,16 @@ class Checkout extends Component {
         initialTotalCost: 0,
         paymentLink: '#',
         isWaiting: false,
+        preparationTime: Math.max(...this.props.item.items.map( item => {
+                        let period = new Date(item.parent.supplier.preparationPeriod);
+                        return period.getMinutes();
+                    }), 0),
+        deliveryTime: 0,
+        origin: new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate(), 0, 0, 0),
+        time: new Date(this.now.getFullYear(), this.now.getMonth(), this.now.getDate(), 0, 0, 0),
+        showHours: true,
+        earlier: true,
+        tomorrow: false,
     }
 
     static propTypes = {
@@ -64,6 +78,7 @@ class Checkout extends Component {
                 this.setState({ cities : res.data['hydra:member'] });
                 if (this.props.user !== null) {
                     if (this.props.user.metadata.length > 0) {
+                        let now = new Date();
                         let user_d_city = this.props.user.metadata.find(meta => meta.type === 'delivery_city');
                         let user_b_city = this.props.user.metadata.find(meta => meta.type === 'billing_city');
                         let d_city = (typeof user_d_city !== 'undefined') ? res.data['hydra:member'].find(city => city.zipCode === parseInt(user_d_city.field)) : '';
@@ -71,6 +86,11 @@ class Checkout extends Component {
                         this.setState({
                             d_city: d_city,
                             b_city: b_city,
+                            deliveryTime: (d_city === '' || typeof d_city.deliveryPeriod === 'undefined' || d_city.deliveryPeriod === null) ? 
+                                          0 : (new Date(d_city.deliveryPeriod)).getMinutes(),
+                            showHours: (d_city === '' || typeof d_city.deliveryPeriod === 'undefined' || d_city.deliveryPeriod === null) ? false : true,
+                            time: (d_city === '' || typeof d_city.deliveryPeriod === 'undefined' || d_city.deliveryPeriod === null) ? 
+                                  this.state.time : this.defineTime(this.state.preparationTime, (new Date(d_city.deliveryPeriod)).getMinutes()),
                         });
                     }
                 }
@@ -181,8 +201,18 @@ class Checkout extends Component {
 
     componentDidUpdate = () => {
         if (this.props.item.totalToPayTTC !== this.state.totalCost) {
-            this.setState({ totalCost: this.props.item.totalToPayTTC });
-            // this.onInformationsReady();
+            this.setState({ 
+                totalCost: this.props.item.totalToPayTTC,
+            });
+            let newPreparationTime = Math.max(...this.props.item.items.map( item => {
+                let period = new Date(item.parent.supplier.preparationPeriod);
+                return period.getMinutes();
+            }), 0);
+            this.setState({ 
+                preparationTime: newPreparationTime,
+                tomorrow: false,
+                time: this.defineTime(newPreparationTime, this.state.deliveryTime),
+            });
         }
     }
 
@@ -200,22 +230,81 @@ class Checkout extends Component {
     }
 
     onZipCodeChange = e => {
-        this.setState({ [e.target.name]: e.target.value });
+        this.setState({ 
+            [e.target.name]: e.target.value,
+            tomorrow: false,
+        });
         const errorMsg = "Code postal invalide.";
         const notDeliverableMsg = "Nous ne livrons malheureusement pas encore votre ville...";
         let cityId = e.target.id === 'b_zip' ? 'b_city' : 'd_city';
         let cityInput = document.getElementById(cityId);
         if ( (e.target.value.length > 0 && e.target.value.length < 5) || e.target.value.length <= 0 || e.target.value.length > 5 ) {
             cityInput.textContent = e.target.value.length !== 0 ? errorMsg : '';
+            this.setState({showHours:false});
             return ;
         }
         const selectedCity = this.state.cities.find(city => city.zipCode === parseInt(e.target.value));
         cityInput.textContent = (typeof selectedCity === 'undefined') ? errorMsg : ((cityId === 'd_city' && selectedCity.isDeliverable === false) ? notDeliverableMsg : selectedCity.name);
+        this.setState({
+            showHours: true,
+            deliveryTime: (typeof selectedCity === 'undefined' || typeof selectedCity.deliveryPeriod === 'undefined' || selectedCity.deliveryPeriod === null) ? 
+                           this.state.deliveryTime : (new Date(selectedCity.deliveryPeriod)).getMinutes(),
+            time: (typeof selectedCity === 'undefined' || typeof selectedCity.deliveryPeriod === 'undefined' || selectedCity.deliveryPeriod === null) ? 
+                  this.state.time : this.defineTime(this.state.preparationTime, (new Date(selectedCity.deliveryPeriod)).getMinutes()),
+        });
     };
+
+    onTimeChange = time => {
+        const period = new Date(this.state.origin.getFullYear(), this.state.origin.getMonth(), this.state.origin.getDate(), time[0].getHours(), time[0].getMinutes());
+        this.setState({ 
+            time: period,
+            deliveryPeriod: this.dateDiff(period)
+        });
+    }
+
+    dateDiff = (selectedPeriod) => {
+        let diff = {};
+        let tmp = selectedPeriod - this.state.origin;
+
+            tmp = Math.floor(tmp/1000);
+            diff.sec = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.sec)/60);
+            diff.min = tmp % 60;
+         
+            tmp = Math.floor((tmp-diff.min)/60);
+            diff.hour = tmp % 24;
+             
+            tmp = Math.floor((tmp-diff.hour)/24); 
+            diff.day = tmp;
+
+        return new Date(1970, 0, 1, diff.hour, diff.min, 0);
+    };
+
+    defineTime = (preparationTime, deliveryTime) => {
+        const totalPeriod = preparationTime + deliveryTime;
+        let delivery_time = new Date();
+        delivery_time.setMinutes(delivery_time.getMinutes() + totalPeriod);
+        if ( delivery_time.getHours() < 18) {
+            delivery_time.setHours(18);
+            delivery_time.setMinutes(totalPeriod);
+        }
+        if (delivery_time.getDate() !== this.state.origin.getDate()) {
+            this.setState({tomorrow: true});
+        }
+        return delivery_time;
+    }
 
     handleBillingAddress = e => {
         this.setState({
             identicalBillingAddress: !this.state.identicalBillingAddress,
+          });
+    };
+
+    handleDeliveryTime = e => {
+        this.setState({
+            earlier: !this.state.earlier,
+            time: this.defineTime(this.state.preparationTime, this.state.deliveryTime),
           });
     };
 
@@ -231,8 +320,11 @@ class Checkout extends Component {
         };
     }
 
-    onInformationsReady = async () => {
-        const body = JSON.stringify( { dataUser: this.state, dataItems: this.props.item } );
+    // onInformationsReady = async () => {
+        onInformationsReady = () => {
+        const user = this.getUserInformations();
+        const itemEntity = this.getItemsInformations();
+        const body = JSON.stringify( { dataUser: user, dataItems: itemEntity } );
         axios.post('/pay', body, tokenConfig())
              .then((res) => {
                 const url = JSON.parse(res.data);
@@ -244,9 +336,10 @@ class Checkout extends Component {
         e.preventDefault();
         if (this.state.totalCost !== this.state.initialTotalCost) {
             const user = this.getUserInformations();
+            const itemEntity = this.getItemsInformations();
             if (typeof user.d_city !== 'undefined' && user.d_city.isDeliverable === true) {
                 this.setState({isWaiting: true});
-                const body = JSON.stringify( { dataUser: user, dataItems: this.props.item } );
+                const body = JSON.stringify( { dataUser: user, dataItems: itemEntity } );
                 axios.post('/pay', body, tokenConfig())
                  .then((res) => {
                     const url = JSON.parse(res.data);
@@ -270,6 +363,7 @@ class Checkout extends Component {
             username: this.state.username,
             email: this.state.email,
             phone: this.state.phone,
+            deliveryTime: this.state.time,
             d_address: this.state.d_address,
             d_address2: this.state.d_address2,
             d_zipCode: this.state.d_zipCode,
@@ -281,6 +375,16 @@ class Checkout extends Component {
             b_city: this.state.identicalBillingAddress === true || this.state.b_zipCode === '' ? this.state.d_city : this.state.cities.find(city => parseInt(city.zipCode) === parseInt(this.state.b_zipCode)),
         }
         return user;
+    }
+
+    getItemsInformations = () => {
+        const itemEntity = {
+            ...this.props.item,
+            totalTax: Math.round(this.props.item.totalTax * 100) / 100,
+            totalToPayHT: Math.round(this.props.item.totalToPayHT * 100) / 100,
+            totalToPayTTC: Math.round(this.props.item.totalToPayTTC * 100) / 100,
+        }
+        return itemEntity;
     }
 
     displayItems = () => {
@@ -334,7 +438,7 @@ class Checkout extends Component {
 
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>Total (HT)</span>
-                                <strong>{  Math.round(item.totalTax * 100) / 100 }€</strong>
+                                <strong>{ Math.round(item.totalTax * 100) / 100 }€</strong>
                             </li>
                             <li className="list-group-item d-flex justify-content-between">
                                 <span>TVA</span>
@@ -355,6 +459,11 @@ class Checkout extends Component {
                     <div className="col-md-8 order-md-1" id="adresses-panel">
                         <form className="needs-validation" onSubmit={ this.onMetadataSubmit }>
                             {/* User info */}
+                            <div className="row">
+                                <div className="col-md-4 mb-3">
+                                    <h4 className="mb-3">Contact</h4>
+                                </div>
+                            </div>
                             <div className="row">
                                 <div className="col-md-4 mb-3 user-infos">
                                     <label htmlFor="firstName">Nom</label>
@@ -378,6 +487,77 @@ class Checkout extends Component {
                                     </div>
                                 </div>
                             </div>
+                            {/* Delivery time panel */}
+                            <hr className="mb-4"/>
+                            <div className="row">
+                                <div className="col-md-4 mb-4">
+                                    <h4 className="mb-3">Heure de livraison</h4>
+                                </div>
+                                { this.state.showHours === false ? <span></span> : 
+                                    <div className="col-md-4 mb-4">
+                                        <label className="custom-control custom-checkbox custom-checkbox-primary">
+                                            <input id="deliverytime-checkbox" type="checkbox" className="custom-control-input" checked={this.state.earlier} onChange={ this.handleDeliveryTime } />
+                                            <span className="custom-control-indicator"></span>
+                                            <span className="custom-control-description">
+                                                { this.state.earlier === true ? 
+                                                    (this.state.time !== this.state.origin && this.state.time.getHours() !== 0 ? 
+                                                        "Livraison au plus tôt ("+ 
+                                                        ( this.state.tomorrow === true ? 
+                                                            'Demain ' + this.state.time.getDate() +'/'+ ( this.state.time.getMonth() + 1 < 10 ? ("0" + (this.state.time.getMonth() + 1)) : 
+                                                            (this.state.time.getMonth() + 1)) +'/'+ this.state.time.getFullYear() + ' à '
+                                                        :
+                                                            ''
+                                                        ) 
+                                                        + this.state.time.getHours() + ":" + (this.state.time.getMinutes() < 10 ? ("0" + this.state.time.getMinutes()) : this.state.time.getMinutes())
+                                                        +")" : "Livraison au plus tôt") : 
+                                                        "Livraison à partir de ..."
+                                                }
+                                            </span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    { this.state.showHours === false ? 
+                                        "Veuillez renseigner votre adresse pour le calcul du temps de livraison."
+                                        :
+                                        this.state.earlier === true ? "" :
+                                            <span>
+                                                <label htmlFor="time">Heure de livraison souhaitée</label>
+                                                <Flatpickr data-enable-time
+                                                    value={ this.state.time }
+                                                    onChange={ this.onTimeChange }
+                                                    className="form-control"
+                                                    options={  {enableTime: true,
+                                                                noCalendar: true,
+                                                                dateFormat: "H:i",
+                                                                time_24hr: true, 
+                                                                minDate: "today",
+                                                                minTime: this.state.time,
+                                                                maxTime: "23:59",
+                                                                minuteIncrement: 1,
+                                                                hourIncrement:1
+                                                                }
+                                                            }
+                                                />
+                                            </span>
+                                    }
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-12">
+                                    {this.state.tomorrow === true ? 
+                                        <span>
+                                            L'heure de livraison prévue ne nous permet pas d'honorer votre commande aujourd'hui. 
+                                            Celle-ci a été programmée pour demain, { this.state.time.getDate() +'/'+ ( this.state.time.getMonth() + 1 < 10 ? ("0" + (this.state.time.getMonth() + 1)) : (this.state.time.getMonth() + 1)) +'/'+ this.state.time.getFullYear() }
+                                        </span>
+                                        :
+                                        <span></span>
+                                    }
+                                </div>
+                            </div>
+                                
                             {/* Delivery address panel */}
                             <hr className="mb-4"/>
                             <div className="row">
@@ -414,7 +594,7 @@ class Checkout extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-4 mb-3 user-infos cityname-container">
-                                    <span id="d_city">{ this.state. d_city.name }</span>
+                                    <span id="d_city">{ this.state.d_city.name }</span>
                                 </div>
                             </div>
                             <div className="row">
