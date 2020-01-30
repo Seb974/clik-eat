@@ -213,6 +213,9 @@ div.with-padding-top {
 	.category-section {
 		top: 62px!important;
 	}
+	.button-title {
+		padding-top: 15px;
+	}
   }
 
   @media (min-width: 1024px) {

@@ -113,6 +113,16 @@ class ProductList extends React.Component
             <div className="product-wrapper">
                 <section className="p-t-30" id="react-product-list">
                     <div className="container">
+                        { this.props.authEventMessage.includes("SUCCES") === false ? '' : 
+                            <div class="alert alert-success" role="alert">
+                                { this.props.authEventMessage }
+                            </div>
+                        }
+                        { this.props.authEventMessage.includes("ECHEC") === false ? '' : 
+                            <div class="alert alert-danger" role="alert">
+                                { this.props.authEventMessage }
+                            </div>
+                        }
                         <div className="row">
                             { 
                                 Object.entries(this.props.selectedCategory).length === 0 && this.props.selectedCategory.constructor === Object ? 
@@ -135,6 +145,7 @@ const mapStateToProps = state => ({
     isAuthenticated: state.auth.isAuthenticated,
     selectedCategory: state.category.selected,
     categories: state.category.categories,
+    authEventMessage: state.auth.eventMessage,
   });
   
   export default connect(

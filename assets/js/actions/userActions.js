@@ -87,7 +87,6 @@ export const updateUser = (fromState) => dispatch => {
         username: fromState.username, 
         email: fromState.email,
         roles: fromState.roles,
-        // password: fromState.password,
         isBanned: fromState.isBanned,
     });
     axios.patch('/api/users/' + user.id, body, config)

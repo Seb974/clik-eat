@@ -500,7 +500,7 @@ class Checkout extends Component {
                                             <span className="custom-control-indicator"></span>
                                             <span className="custom-control-description">
                                                 { this.state.earlier === true ? 
-                                                    (this.state.time !== this.state.origin && this.state.time.getHours() !== 0 ? 
+                                                    (this.state.time !== this.state.origin && this.state.time.getHours() !== 0 && this.props.item.items.length > 0 ? 
                                                         "Livraison au plus tôt ("+ 
                                                         ( this.state.tomorrow === true ? 
                                                             'Demain ' + this.state.time.getDate() +'/'+ ( this.state.time.getMonth() + 1 < 10 ? ("0" + (this.state.time.getMonth() + 1)) : 

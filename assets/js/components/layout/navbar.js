@@ -102,6 +102,8 @@ class Navbar extends Component {
                             </span>
                             )
                         }
+                            <Link className="dropdown-item" to="/settings"><i class="fas fa-user-cog"></i>Paramètres du compte</Link>
+                            <div className="dropdown-divider"></div>
                             <a className="dropdown-item" href="#" onClick={ this.handleLogout }>
                             <i className="fas fa-sign-out-alt"></i>Se déconnecter</a>
                     </div>

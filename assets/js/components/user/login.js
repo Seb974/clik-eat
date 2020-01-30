@@ -51,9 +51,16 @@ class Login extends React.Component
                                     </h4>
                                 </div>
                                 <div className="card-block">
-                                    {this.state.msg ? (
-                                        <Alert color='danger'>{this.state.msg}</Alert>
-                                    ) : null}
+                                    { this.props.eventMessage.includes("SUCCES") === false ? '' : 
+                                        <div class="alert alert-success" role="alert">
+                                            { this.props.eventMessage }
+                                        </div>
+                                    }
+                                    { this.props.eventMessage.includes("ECHEC") === false ? '' : 
+                                        <div class="alert alert-danger" role="alert">
+                                            { this.props.eventMessage }
+                                        </div>
+                                    }
                                     <form onSubmit={this.handleLogin}>
                                         {(!this.props.isAuthenticated) ? "" : 
                                             <div className="mb-3">
@@ -105,6 +112,7 @@ const mapStateToProps = state => ({
     user: state.auth.user,
     error: state.error,
     isWaiting: state.auth.isLoading,
+    eventMessage: state.auth.eventMessage,
   });
   
   export default connect( mapStateToProps, { login, clearErrors })(Login);

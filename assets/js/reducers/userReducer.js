@@ -1,4 +1,4 @@
-import { GET_USERS, GET_USER, ADD_USER, DELETE_USER, UPDATE_USER, USERS_LOADING } from '../actions/types';
+import { GET_USERS, GET_USER, ADD_USER, DELETE_USER, UPDATE_USER, USERS_LOADING} from '../actions/types';
 
 const initialState = {
     users: [],
@@ -53,7 +53,6 @@ export default function(state = initialState, action) {
                 users: [action.payload, ...previousUsers].sort((a, b) => (a.id > b.id) ? 1 : -1),
                 isLoading: false
             }
-
         default:
             return state;
     }

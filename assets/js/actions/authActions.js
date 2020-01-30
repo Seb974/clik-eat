@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { returnErrors } from './errorActions';
 import { tokenConfig } from '../helpers/security';
+import { Redirect } from "react-router-dom"; 
 
 import {
   USER_LOADED,
@@ -12,6 +13,10 @@ import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
   USER_UPDATED,
+  UPDATE_PASSWORD_USER,
+  USER_STOP_LOADING,
+  AUTH_CLEAN_EVENTMESSAGE,
+  DELETE_ACCOUNT,
 } from './types';
 
 // Check token & load user
@@ -57,7 +62,6 @@ export const register = ({ username, email, password }) => dispatch => {
 };
 
 export const login = ({ email, password }) => dispatch => {
-  // const config = { headers: { 'Content-Type': 'application/json' } };
   const body = JSON.stringify({ username: email, password: password });
   dispatch({
     type: USER_LOADING,
@@ -71,16 +75,103 @@ export const login = ({ email, password }) => dispatch => {
           });
        })
        .catch(err => {
-          alert("Paramètres de connexion incorrects");
-          dispatch(
-            returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL')
-          
-          );
+          let message = {eventMessage: 'ECHEC... Votre mot de passe initial est incorrect.'};
           dispatch({
-            type: LOGIN_FAIL
+              type: USER_STOP_LOADING,
+              payload: message,
           });
+          setTimeout( () => {
+              dispatch({
+                  type: AUTH_CLEAN_EVENTMESSAGE,
+                  payload: '',
+              });
+          }, 3000);
        });
 };
+
+export const changePassword = (id, passwords) => dispatch => {
+  dispatch({
+    type: USER_LOADING,
+    payload: ''
+  });
+  const body = JSON.stringify({
+    id: id,
+    current: passwords.current,
+    new: passwords.new,
+  });
+  axios.post('/user/password/update', body, tokenConfig())
+       .then((res) => {
+          if (res.data.token !== null) {
+            res.data.eventMessage = 'SUCCES ! Votre mot de passe a bien été modifié.'
+            dispatch({
+              type: UPDATE_PASSWORD_USER,
+              payload: res.data,
+            });
+          } else {
+            res.data.eventMessage = 'ECHEC... Votre mot de passe initial est incorrect.';
+            dispatch({
+              type: USER_STOP_LOADING,
+              payload: res.data,
+            });
+          }
+          setTimeout( () => {
+              dispatch({
+                  type: AUTH_CLEAN_EVENTMESSAGE,
+                  payload: '',
+              });
+          }, 3000);
+      });
+}
+
+export const deleteAccount = (id, password) => dispatch => {
+  dispatch({
+    type: USER_LOADING,
+    payload: ''
+  });
+  axios.post('/user/account/delete', JSON.stringify({id: id, password: password}), tokenConfig())
+       .then((res) => {
+            if (res.data.delete === 'done') {
+                res.data.eventMessage = 'SUCCES ! Votre compte a bien été supprimé.'
+                dispatch({
+                    type: DELETE_ACCOUNT,
+                    payload: res.data,
+                });
+                setTimeout( () => {
+                    dispatch({
+                        type: AUTH_CLEAN_EVENTMESSAGE,
+                        payload: '',
+                    });
+                }, 3000);
+                return <Redirect to='/'/>
+            } else {
+                res.data.eventMessage = 'ECHEC... Le mot de passe saisi est incorrect.'
+                dispatch({
+                    type: USER_STOP_LOADING,
+                    payload: res.data,
+                });
+                setTimeout( () => {
+                    dispatch({
+                        type: AUTH_CLEAN_EVENTMESSAGE,
+                        payload: '',
+                    });
+                }, 3000);
+            }
+      });
+}
+
+export const displayError = (errorMessage) => dispatch => {
+    let message = {eventMessage: errorMessage};
+    dispatch({
+        type: USER_STOP_LOADING,
+        payload: message,
+    });
+    setTimeout( () => {
+        dispatch({
+            type: AUTH_CLEAN_EVENTMESSAGE,
+            payload: '',
+        });
+    }, 3000);
+}
 
 export const logout = () => {
   return {

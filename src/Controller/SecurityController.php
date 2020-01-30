@@ -14,11 +14,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Metadata;
 use App\Entity\Pics;
-
 use App\Form\EditSelfType;
 use App\Controller\UserController;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
+use App\Repository\MetadataRepository;
 use App\Security\AppAuthenticator;
 use App\Service\Cart\CartService;
 use App\Service\Metadata\MetadataService;
@@ -34,7 +34,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 // use "Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent"
 
@@ -93,6 +92,60 @@ class SecurityController extends AbstractController
         return JsonResponse::fromJsonString($serializer->serialize(['token' => $token], 'json'));
     }
 
+    /**
+     * @Route("/user/password/update", name="update_password", methods={"POST"})
+     */
+    public function updatePassword(Request $request, SerializerInterface $serializer, JWTTokenManagerInterface $jwtManager, UserRepository $userRepository, UserPasswordEncoderInterface $encoder)
+    {
+        if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+            $data = json_decode($request->getContent(), true);
+            $request->request->replace(is_array($data) ? $data : array());
+        }
+        $user = $userRepository->find($request->request->get("id"));
+        if ( $encoder->isPasswordValid($user, $request->request->get("current")) ) {
+            $newPassword = $encoder->encodePassword($user, $request->request->get("new"));
+            $user->setPassword($newPassword);
+            $this->getDoctrine()->getManager()->flush();
+            $token = $jwtManager->create($user);
+            return JsonResponse::fromJsonString($serializer->serialize(['token' => $token], 'json'));
+        }
+        return JsonResponse::fromJsonString($serializer->serialize(['token' => null], 'json'));
+    }
+
+    /**
+     * @Route("/user/account/delete", name="delete_account", methods={"POST"})
+     */
+    public function deleteAccount(Request $request, SerializerInterface $serializer, UserRepository $userRepository, MetadataRepository $metadataRepository, UserPasswordEncoderInterface $encoder)
+    {
+        if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+            $data = json_decode($request->getContent(), true);
+            $request->request->replace(is_array($data) ? $data : array());
+        }
+        $user = $userRepository->find($request->request->get("id"));
+        $em = $this->getDoctrine()->getManager();
+        if ( $encoder->isPasswordValid($user, $request->request->get("password")) ) {
+            $metadatas = $metadataRepository->findBy(['user' => $user]);
+            foreach ($metadatas as $metadata) {
+                $em->remove($metadata);
+            }
+            $user = $this->anonymizeUser($user, $encoder);
+            $em->flush();
+            return JsonResponse::fromJsonString($serializer->serialize(['delete' => 'done'], 'json'));
+        }
+        return JsonResponse::fromJsonString($serializer->serialize(['delete' => 'fail'], 'json'));
+    }
+
+    private function anonymizeUser(User $user, UserPasswordEncoderInterface $encoder) {
+        $timestamp = time();
+        $password = "pwd-". substr(strval($timestamp), rand(3, 8));
+        $user->setUsername("Account". $timestamp);
+        $user->setEmail("account". $timestamp . "@clikeat.re");
+        $user->setPassword($encoder->encodePassword($user, $password));
+        $user->setRoles(["ROLE_ANON."]);
+        $user->setIsBanned(true);
+        return $user;
+    }
+
     /*
      * login
      * @Route("/login", name="login")
@@ -147,7 +200,7 @@ class SecurityController extends AbstractController
             }
 
             $user->setRoles(['ROLE_USER']);
-            $entityManager = $this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
             // do anything else you need here, like send an email

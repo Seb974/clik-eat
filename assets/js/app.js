@@ -13,6 +13,7 @@ import Checkout from './components/payment/checkout';
 import Login from './components/user/login';
 import Register from './components/user/register';
 import Profile from './components/user/profile';
+import Settings from './components/user/settings';
 import AllergenList from './components/admin/allergen/allergenList';
 import AllergenDetails from './components/admin/allergen/allergenDetails';
 import AllergenForm from './components/admin/allergen/allergenForm';
@@ -122,6 +123,7 @@ class App extends React.Component
                                     <Route path='/cart' component={CartList} />
                                     <Route path='/checkout' component={Checkout} />
                                     <Route path='/account' component={Profile} />
+                                    <Route path='/settings' component={Settings} />
                                     <Route path='/allergens' component={AllergenList} />
                                     <Route path='/allergens-show/:id' component={AllergenDetails} />
                                     <Route path='/allergens-add-or-edit/:id?' component={AllergenForm} />
