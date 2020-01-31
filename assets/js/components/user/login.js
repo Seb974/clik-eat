@@ -30,12 +30,10 @@ class Login extends React.Component
     
     handleLogin = e => {
         e.preventDefault();
-        // this.setState({isWaiting: true});
         const { email, password } = this.state;
         const user = { email, password};
         this.setState({email: '', password: ''});
         this.props.login(user);
-        // this.setState({isWaiting: false});
     };
 
     render() {
@@ -84,7 +82,6 @@ class Login extends React.Component
     
     
                                         <button type="submit" className="btn btn-primary btn-block m-t-10">
-                                            {/* SE CONNECTER<i className="fa fa-sign-in"></i> */}
                                             <span className="spinner-border spinner-border-sm" role="status" hidden={ !this.props.isWaiting }></span> 
                                             <span hidden={ this.props.isWaiting }>SE CONNECTER <i className="fa fa-sign-in"></i></span>
                                         </button>

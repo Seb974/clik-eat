@@ -120,7 +120,7 @@ class Settings extends React.Component
                         <hr className="mb-4"/>
                         <div className="row">
                             <div className="col-md-6 mb-6 button-title">
-                                <a href="#" onClick={ this.handleDeleteInputVisibility }><h4 className="mb-3">Supprimer mon compte</h4></a>
+                                <a href="#" role="button" className="btn btn-primary" onClick={ this.handleDeleteInputVisibility }>Supprimer mon compte</a> {/* <h4 className="mb-3">Supprimer mon compte</h4> */}
                             </div>
                         </div>
                         <form className="needs-validation" onSubmit={ this.onDelete } hidden={this.state.deleteHidden}>
@@ -130,14 +130,14 @@ class Settings extends React.Component
                                     <input type="password" className="form-control" id="deletePwd" name="deletePwd" value={ this.state.deletePwd } onChange={ this.onChange } required/>
                                 </div>
                                 <div className="col-md-6 mb-6 cityname-container">
-                                    <button className="btn btn-primary btn-lg btn-block" type="submit" onDoubleClick={ this.onDelete }>
+                                    <button className="btn btn-dark btn-lg btn-block" type="submit" onDoubleClick={ this.onDelete }>
                                         <span className="spinner-border spinner-border-sm" role="status" hidden={ !this.props.isWaiting }></span> 
                                         <span hidden={ this.props.isWaiting }>Valider</span>
                                     </button>
                                 </div>
                             </div>
                         </form>
-                        <hr className="mb-4"/>
+                        <hr className="mb-4" hidden={this.state.deleteHidden}/>
                     </div>
                 </div>
             );

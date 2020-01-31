@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+//{"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"}
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OrderRepository")
  * @ApiResource(
@@ -15,11 +17,11 @@ use Doctrine\ORM\Mapping as ORM;
  *          "normalization_context"={"groups"={"order"}}
  *      },
   *     collectionOperations={
-  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
+  *         "get"={"security"="is_granted('ROLE_USER')"},
   *         "post"
   *     },
   *     itemOperations={
-  *         "get"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
+  *         "get"={"security"="is_granted('ROLE_USER')"},
   *         "put"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "patch"={"security"="is_granted('ROLE_SUPPLIER') or is_granted('ROLE_DELIVERER')"},
   *         "delete"={"security"="is_granted('ROLE_ADMIN')"},

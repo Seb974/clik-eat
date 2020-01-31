@@ -71,6 +71,7 @@ class StockList extends React.Component
         let currentSupplier = JSON.parse(this.props.user.supplier);
         let Product = (props) => {
             return (
+                <div className={"col-12 col-sm-6 col-lg-6 react-product category-" + props.details.name }>
                 <div className="card">
                     <h4 className="card-header">{ props.details.name }</h4>
                     <div className="card-body">
@@ -79,10 +80,17 @@ class StockList extends React.Component
                         </p>
                     </div>
                 </div>
+                </div>
             );
         }
         let productList = this.props.user.roles.find(role => role === "ROLE_ADMIN") !== undefined ? 
-                          this.props.products : 
+                        //   this.props.products 
+                          Object.entries(this.props.selectedCategory).length === 0 && this.props.selectedCategory.constructor === Object ? 
+                                this.props.products : 
+                                this.props.products.filter( product => {
+                                    return product.category.name === this.props.selectedCategory.name;
+                                })
+                          : 
                           this.props.products.filter(product => parseInt(product.supplier.id) === parseInt(currentSupplier.id));
         return productList.map( product => <Product details={product} /> );
     }
@@ -92,7 +100,9 @@ class StockList extends React.Component
             return (
                 <div className="container" id="content-wrap">
                     <h1>Etat des stocks</h1>
-                    { typeof this.props.products !== 'undefined' && this.props.products.length > 0 ? this.displayProducts() : <p>Aucun produit référencé</p> }
+                    <div className="row">
+                    { typeof this.props.products === 'undefined' || this.props.products.length <= 0 ? <p>Aucun produit référencé</p> : this.displayProducts() }
+                    </div>
                 </div>
             );
         }
@@ -109,6 +119,7 @@ const mapStateToProps = state => ({
     user: state.auth.user,
     suppliers: state.supplier.suppliers,
     category: state.category.getCategories,
+    selectedCategory: state.category.selected,
     allergen: state.allergen.allergens,
     tax: state.tax.taxes
   });

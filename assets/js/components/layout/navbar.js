@@ -55,8 +55,13 @@ class Navbar extends Component {
                         </span>
                     </Link>
                     <div className="dropdown-menu dropdown-menu-right">
-                        <Link className="dropdown-item" to="/account">  <i className="fas fa-user"></i>Mon profil</Link>
+                        <Link className="dropdown-item" to="/account">
+                            <i className="fas fa-user"></i>Mon profil</Link>
                         <div className="dropdown-divider"></div>
+                        <Link className="dropdown-item" to="/user-orders">
+                            <i class="fas fa-boxes"></i>Mes commandes</Link>
+                        <div className="dropdown-divider"></div>
+                        {/* <i class="fas fa-boxes"></i> */}
                         { typeof props.user === 'undefined' ? "" : (props.user.roles.indexOf('ROLE_SUPPLIER') === -1 && props.user.roles.indexOf('ROLE_ADMIN') === -1) ? "" : (
                             <span>
                                 <Link className="dropdown-item" to="/stocks">
@@ -114,14 +119,14 @@ class Navbar extends Component {
     }
 
     displayCategories = (categories) => {
-        const selectedStyle = {
-            color: "#74be6b",
-            backgroundColor: "#e1f7de", 
-        }
-        const notSelectedStyle = {
-            color: "black",
-            backgroundColor: "white", 
-        }
+        // const selectedStyle = {
+        //     color: "#74be6b",
+        //     backgroundColor: "#e1f7de", 
+        // }
+        // const notSelectedStyle = {
+        //     color: "black",
+        //     backgroundColor: "white", 
+        // }
         let Categories = (props) => {
             return (
                 <li className="dropdown">
