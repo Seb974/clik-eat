@@ -13,9 +13,9 @@ class OrderList extends React.Component
     };
     
     componentDidMount() {
-        if (this.props.orders.length === 0) {
+        // if (this.props.orders.length === 0) {
             this.props.getOrders();
-        }
+        // }
     }
 
     transferToDelivery = (e) => {

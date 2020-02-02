@@ -82,7 +82,7 @@ class App extends React.Component
                 });
             } else {
                 let user = store.getState().auth.user;
-                if (user !== null && typeof user !== 'undefined' && (user.roles.includes("ROLE_ADMIN") || user.roles.includes("ROLE_SUPPLIER") || user.roles.includes("ROLE_DELIVERER"))) {
+                if (user !== null && typeof user !== 'undefined' && (user.roles.includes("ROLE_ADMIN") || user.roles.includes("ROLE_SUPPLIER") || user.roles.includes("ROLE_DELIVERER") || data.user.id === user.id)) {
                     if (data.dataType === 'order-add') {
                         store.dispatch({
                             type: ADD_ORDER,

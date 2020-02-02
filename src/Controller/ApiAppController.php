@@ -91,7 +91,7 @@ class ApiAppController extends AbstractController
         $this->getDoctrine()->getManager()->flush();
         
         $target = $targetService->defineTarget();
-		$jsonEntity = $serializerService->serializeEntity($order, 'order');
+        $jsonEntity = $serializerService->serializeEntity($order, 'order');
         $arrayEntity = json_decode($jsonEntity, true);
         $arrayEntity['dataType'] = $request->request->get('dataType');
 		$response = json_encode($arrayEntity);
