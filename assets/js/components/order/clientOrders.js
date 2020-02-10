@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
-import { getOrders,  } from '../../actions/orderActions';
+import { getOrders } from '../../actions/orderActions';
 
 class ClientOrders extends React.Component 
 {
@@ -14,10 +14,6 @@ class ClientOrders extends React.Component
         if (this.props.orders.length === 0) {
             this.props.getOrders();
         }
-    }
-
-    transferToDelivery = (e) => {
-        e.preventDefault();
     }
 
     displayCurrentOrderItems = (items) => {
@@ -80,8 +76,8 @@ class ClientOrders extends React.Component
                 </div>
             );
         }
-        let archivedOrders = this.props.orders.filter(order => order.user.id === this.props.user.id && order.status !== "DELIVERED");
-        return archivedOrders.map( order => <CurrentOrder details={order} /> );
+        let currentOrders = this.props.orders.filter(order => order.user.id === this.props.user.id && order.status !== "DELIVERED");
+        return currentOrders.length > 0 ? currentOrders.map( order => <CurrentOrder details={order} /> ) : <p>Vous n'avez aucune commande en cours.</p>;
     }
 
     displayArchivedOrders = () => {
@@ -118,7 +114,7 @@ class ClientOrders extends React.Component
             );
         }
         let archivedOrders = this.props.orders.filter(order => order.user.id === this.props.user.id && order.status === "DELIVERED");
-        return archivedOrders.map( order => <ArchivedOrder details={order} /> );
+        return archivedOrders.length > 0 ? archivedOrders.map( order => <ArchivedOrder details={order} /> ) : <p>Vous n'avez effectué aucune commande</p> ;
     }
 
     render() {
@@ -139,15 +135,12 @@ class ClientOrders extends React.Component
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
                             <div class="card-body">
                                 {/* Liste des commandes en cours */}
-                                { this.props.isWaiting === false ?
-                                    ( typeof this.props.orders !== 'undefined' && this.props.orders.length > 0 ?
-                                        this.displayCurrentOrders() :
-                                        <p>Vous n'avez aucune commande en cours.</p> ) :
-                                        <div className="spinner-container">
-                                            <div class="spinner-border text-danger text-center" role="status"> 
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
+                                { this.props.isWaiting === false ? this.displayCurrentOrders() :
+                                    <div className="spinner-container">
+                                        <div class="spinner-border text-danger text-center" role="status"> 
+                                            <span class="sr-only">Loading...</span>
                                         </div>
+                                    </div>
                                 }
                             </div>
                             </div>
@@ -163,15 +156,12 @@ class ClientOrders extends React.Component
                             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
                             <div class="card-body">
                                 {/* Liste des anciennes commandes */}
-                                { this.props.isWaiting === false ?
-                                    ( typeof this.props.orders !== 'undefined' && this.props.orders.length > 0 ?
-                                        this.displayArchivedOrders() :
-                                        <p>Vous n'avez effectué aucune commande</p> ) :
-                                        <div className="spinner-container">
-                                            <div class="spinner-border text-danger text-center" role="status"> 
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
+                                { this.props.isWaiting === false ? this.displayArchivedOrders() :
+                                    <div className="spinner-container">
+                                        <div class="spinner-border text-danger text-center" role="status"> 
+                                            <span class="sr-only">Loading...</span>
                                         </div>
+                                    </div>
                                 }
                             </div>
                             </div>

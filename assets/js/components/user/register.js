@@ -40,7 +40,6 @@ class Register extends React.Component
         const { username, email, password, confirmPassword } = this.state;
         if ( password === confirmPassword ) {
             const user = { username, email, password };
-            console.log(user);
             this.setState({
                 username: '', 
                 email: '', 
